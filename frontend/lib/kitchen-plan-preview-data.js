@@ -493,8 +493,7 @@ export const AB_110401_FRG_ORDER_HOTSPOTS = [
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const PLAN_HOTSPOTS_BY_SLUG = {
   "ab-101246": [
-    { componentKey: "wall-cabinet-1", left: 8.4323, top: 21.6807, width: 13.7767, height: 25.3782 },
-    { componentKey: "wall-cabinet-2", left: 22.2090, top: 21.6807, width: 12.3516, height: 25.3782 },
+    { componentKey: "wall-cabinet-1", left: 8.4323, top: 21.6807, width: 26.1283, height: 25.3782 },
     { componentKey: "wall-cabinet-3", left: 34.5606, top: 21.6807, width: 14.8456, height: 25.3782 },
     { componentKey: "wall-cabinet-4", left: 49.4062, top: 21.6807, width: 14.8456, height: 25.3782 },
     { componentKey: "extractor-hood", left: 49.4062, top: 47.0589, width: 14.8456, height: 1.6806 },

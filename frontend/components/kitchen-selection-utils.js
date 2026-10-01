@@ -239,8 +239,7 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "OVEN-AB101246-DEFAULT": "5",
   "CAB-BASE-AB101246-U40-DEFAULT": "6",
   "REF-AB101246-KGCN388140E": "7",
-  "CAB-WALL-AB101246-H5002-1-DEFAULT": "8",
-  "CAB-WALL-AB101246-H5002-2-DEFAULT": "9",
+  "CAB-WALL-AB101246-H10072-DEFAULT": "8-9",
   "CAB-WALL-AB101246-H6002-DEFAULT": "10",
   "CAB-HOOD-AB101246-DEFAULT": "11",
   "HOOD-AB101246-FH664621E": "11",
@@ -1832,6 +1831,7 @@ const KGCN388140E_GALLERY = Array.from(
 );
 
 const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
+  "DISH-AB101246-600": ["/product-images/gallery/ab-101246/dishwasher/a-egspv597210.webp"],
   "DISH-BURGER103898-600": ["/product-images/gallery/burger-103898/dishwasher/a-egspv597210-01.jpg"],
   "DISH-AB105743-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),

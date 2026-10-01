@@ -140,6 +140,22 @@ const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
   "ab-105756": { "base-module-2": 2 },
 };
 const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
+  // AB 101246 draws a narrow left filler beside both the H10072 and US50.
+  // They are claimable parts even though the supplied DEFAULT rows have no Blende metadata.
+  "ab-101246": [
+    {
+      sourceComponentKey: "wall-cabinet-1",
+      code: "HP2072K",
+      name: "Filler Panel for Upper Cabinet",
+      nameDe: "Passblende Hängeschrank",
+    },
+    {
+      sourceComponentKey: "base-module-1",
+      code: "UP20K",
+      name: "Filler Panel for Lower Cabinet",
+      nameDe: "Passblende Unterschrank",
+    },
+  ],
   // The live AB 105745 kitchen row can predate its UPEF65 metadata. The panel
   // is visibly drawn beside the sink cabinet and must exist independently in claims.
   "ab-105745": [
@@ -317,7 +333,7 @@ function isFlatScreenHoodCabinet(item = {}) {
     .map((part) => part.trim().toUpperCase());
   return articleCodes.includes("FH664621E")
     && articleCodes.includes(SERVICE_CLAIM_FILTER_ARTICLE_CODE)
-    && articleCodes.includes("HD6002");
+    && (articleCodes.includes("HD6002") || articleCodes.includes("HFLH6072"));
 }
 
 function getClaimBlendeQuantity(item = {}, resolvedCode = "") {
@@ -602,7 +618,7 @@ function resolveServiceClaimArticleCode(meta = {}) {
       && (!attachedBlendeCode || normalizeClaimArticlePartCode(part) !== attachedBlendeCode)
     ));
     if (String(meta.code || "").trim().toUpperCase().startsWith("CAB-HOOD-")) {
-      const cabinetArticle = articleParts.find((part) => /^HD\d+/i.test(part));
+      const cabinetArticle = articleParts.find((part) => /^(?:HD\d+|HFLH\d+)$/i.test(part));
       if (cabinetArticle) return cabinetArticle;
     }
     const withoutFilter = articleParts.filter(

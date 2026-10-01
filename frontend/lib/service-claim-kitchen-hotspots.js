@@ -548,6 +548,11 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  // AB 101246 has the same 71.52-81.96 PDF-unit left strip beside both cabinets.
+  "ab-101246": {
+    "wall-cabinet-1": { side: "left", outer: 8.4323, inner: 9.73397 },
+    "base-module-1": { side: "left", outer: 8.4323, inner: 9.73397 },
+  },
   // AB 105775 draws most supplied Blenden as independent perspective faces.
   // Assign those complete faces to the filler products and leave the adjacent
   // cabinet fronts/sides selectable as their own articles. The two remaining

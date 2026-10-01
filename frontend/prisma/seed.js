@@ -5,6 +5,7 @@ const { loadEnvConfig } = require("@next/env");
 loadEnvConfig(process.cwd());
 
 const { PrismaClient, KitchenStatus, ItemType } = require("@prisma/client");
+const { assertBurgerCindyArticleCode } = require("../lib/burger-cindy-article-codes.cjs");
 const CLAIMS_CHATBOT_KNOWLEDGE = require("../lib/claims-chatbot-knowledge.json");
 const SERVICE_CLAIM_TROUBLESHOOTING_DATA = require("../lib/service-claim-troubleshooting-data.json");
 
@@ -1911,16 +1912,17 @@ const AB_101246_ITEMS = [
   defaultOvenHob({ code: "OVEN-AB101246-DEFAULT", sortOrder: 50, widthMm: 600, catalogArticleNumber: "A-EH923640E + 9EC744100C", articleNumber: "A-EH923640E + 9EC744100C", infoText: "Included oven, ceramic cooktop and lower drawer" }),
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB101246-U40-DEFAULT", name: "Lower Cabinet", nameDe: "Unterschrank", price: "0.00", widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Included right lower cabinet", articleNumber: "U40", catalogArticleNumber: "U40" },
   { itemType: ItemType.COMPONENT, code: "REF-AB101246-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), heightMm: 1810, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 70, infoText: "Freestanding fridge-freezer", articleNumber: "OL-KGCN388140E", catalogArticleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB101246-H5002-1-DEFAULT", name: "Wall Cabinet", nameDe: "Oberschrank", price: "0.00", widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, isLocked: true, infoText: "Included left wall cabinet and narrow end filler", articleNumber: "H5002", catalogArticleNumber: "H5002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB101246-H5002-2-DEFAULT", name: "Wall Cabinet", nameDe: "Oberschrank", price: "0.00", widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 90, isLocked: true, infoText: "Included 50 cm wall cabinet", articleNumber: "H5002", catalogArticleNumber: "H5002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB101246-H6002-DEFAULT", name: "Wall Cabinet", nameDe: "Oberschrank", price: "0.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, isLocked: true, infoText: "Included 60 cm wall cabinet", articleNumber: "H6002", catalogArticleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB101246-DEFAULT", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "0.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 110, isLocked: true, infoText: "Included hood cabinet and extractor", articleNumber: "FH664621E + FWK124 + HD6002", catalogArticleNumber: "FH664621E + FWK124 + HD6002" },
-  { itemType: ItemType.COMPONENT, code: "HOOD-AB101246-FH664621E", name: "Extractor Hood", price: "0.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 112, isLocked: true, isActive: false, infoText: "Extractor included with wall cabinet 11", articleNumber: "FH664621E + FWK124 + HD6002", catalogArticleNumber: "FH664621E + FWK124 + HD6002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB101246-H4002-DEFAULT", name: "Wall Cabinet", nameDe: "Oberschrank", price: "0.00", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, isLocked: true, infoText: "Included right wall cabinet", articleNumber: "H4002", catalogArticleNumber: "H4002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB101246-H10072-DEFAULT", name: "Wall Cabinet", nameDe: "Oberschrank", price: "0.00", widthMm: 1000, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, isLocked: true, infoText: "Included Burger 100 cm wall cabinet with two doors", articleNumber: "H10072", catalogArticleNumber: "H10072" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB101246-H6002-DEFAULT", name: "Wall Cabinet", nameDe: "Oberschrank", price: "0.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, isLocked: true, infoText: "Included Burger 60 cm wall cabinet", articleNumber: "H6072", catalogArticleNumber: "H6072" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB101246-DEFAULT", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "0.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 110, isLocked: true, infoText: "Included Burger hood cabinet and extractor", articleNumber: "FH664621E+FWK124+HFLH6072", displayArticleNumber: "FH664621E + FWK124 + HFLH6072", catalogArticleNumber: "FH664621E+FWK124+HFLH6072" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB101246-FH664621E", name: "Extractor Hood", price: "0.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 112, isLocked: true, isActive: false, infoText: "Extractor included with wall cabinet 11", articleNumber: "FH664621E+FWK124+HFLH6072", catalogArticleNumber: "FH664621E+FWK124+HFLH6072" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB101246-H4002-DEFAULT", name: "Wall Cabinet", nameDe: "Oberschrank", price: "0.00", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, isLocked: true, infoText: "Included Burger right wall cabinet", articleNumber: "H4072", catalogArticleNumber: "H4072" },
   defaultSinkWorktop({ code: "FAUCET-AB101246", sortOrder: 130, name: "Sink and faucet set", nameDe: "Spüle und Armatur", articleNumber: "526335 + 517720", catalogArticleNumber: "526335 + 517720", infoText: "Included sink and faucet" }),
   ...defaultAccessories().map((item) => item.code === "ACC-CUTLERY-ZB60SG"
-    ? { ...item, price: "20.00", articleNumber: "ZB60SG", catalogArticleNumber: "ZB60SG" }
-    : item),
+    ? { ...item, price: "20.00", articleNumber: "ZBE60", catalogArticleNumber: "ZBE60" }
+    : item.code === "ACC-WASTE-001"
+      ? { ...item, articleNumber: "Blanco Botton 517467", catalogArticleNumber: "Blanco Botton 517467" }
+      : item),
   ...defaultServices(),
 ];
 
@@ -2303,8 +2305,8 @@ const BURGER_103898_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H6072", name: "Wall Cabinet", price: "146.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6072, 2 adjustable shelves", articleNumber: "H6072", displayArticleNumber: "H6072", catalogArticleNumber: "H6072" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H3072", name: "Wall Cabinet", price: "124.00", widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "H3072, 2 adjustable shelves", articleNumber: "H3072", displayArticleNumber: "H3072", catalogArticleNumber: "H3072" },
   defaultSinkWorktop({ sortOrder: 130 }),
-  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "517467" },
-  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "20.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467", catalogArticleNumber: "Blanco Botton 517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "20.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZBE60", catalogArticleNumber: "ZBE60" },
   { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 220, articleNumber: "KALB KA220043_S3" },
   { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Delivery, Carry-in, Assembly and Installation", nameDe: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
   { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Pickup at logistics location", nameDe: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
@@ -3750,6 +3752,78 @@ async function seedCatalogMasterData() {
   );
 }
 
+async function ensureBurgerCindyCatalogArticles() {
+  // These identities and prices come from the Burger CINDY supplier list.
+  // Keep their internal kitchen item codes stable for existing orders.
+  const articles = [
+    { articleNumber: "H10072", name: "Upper Cabinet 100 cm", nameDe: "Oberschrank 100 cm", widthMm: 1000, price: "211.00" },
+    { articleNumber: "H6072", name: "Upper Cabinet 60 cm", nameDe: "Oberschrank 60 cm", widthMm: 600, price: "146.00" },
+    { articleNumber: "H4072", name: "Upper Cabinet 40 cm", nameDe: "Oberschrank 40 cm", widthMm: 400, price: "128.00" },
+    { articleNumber: "H5072", name: "Upper Cabinet 50 cm", nameDe: "Oberschrank 50 cm", widthMm: 500, price: "135.00" },
+    { articleNumber: "H3072", name: "Upper Cabinet 30 cm", nameDe: "Oberschrank 30 cm", widthMm: 300, price: "124.00" },
+    { articleNumber: "FH664621E+FWK124+HFLH6072", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, widthMm: 600, price: "346.00", isFixedPricePackage: true },
+    { articleNumber: "ZBE60", name: "Cutlery insert 60 cm", nameDe: "Besteckeinsatz 60 cm", widthMm: 600, price: "20.00" },
+    { articleNumber: "Blanco Botton 517467", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", widthMm: null, price: "89.00" },
+  ];
+  for (const spec of articles) {
+    const article = await prisma.catalogArticle.upsert({
+      where: { articleNumber: spec.articleNumber },
+      update: {},
+      create: {
+        ...spec,
+        heightMm: ["ZBE60", "Blanco Botton 517467"].includes(spec.articleNumber) ? null : 720,
+        depthMm: ["ZBE60", "Blanco Botton 517467"].includes(spec.articleNumber) ? null : 340,
+        itemType: ["ZBE60", "Blanco Botton 517467"].includes(spec.articleNumber) ? ItemType.ACCESSORY : ItemType.COMPONENT,
+        isFixedPricePackage: Boolean(spec.isFixedPricePackage),
+        isActive: true,
+      },
+    });
+    await prisma.catalogArticleProgramPrice.upsert({
+      where: {
+        programmId_catalogArticleId: {
+          programmId: "BURGER CINDY",
+          catalogArticleId: article.id,
+        },
+      },
+      update: {},
+      create: {
+        programmId: "BURGER CINDY",
+        catalogArticleId: article.id,
+        articleNumber: spec.articleNumber,
+        price: spec.price,
+        isActive: true,
+      },
+    });
+  }
+  const cornerBlende = await prisma.catalogBlende.upsert({
+    where: { code: "UPE65" },
+    update: {},
+    create: {
+      code: "UPE65",
+      name: "Corner filler panel 65 cm",
+      nameDe: "Eckblende 65 cm",
+      price: "79.00",
+      isActive: true,
+    },
+  });
+  await prisma.catalogBlendeProgramPrice.upsert({
+    where: {
+      programmId_catalogBlendeId: {
+        programmId: "BURGER CINDY",
+        catalogBlendeId: cornerBlende.id,
+      },
+    },
+    update: {},
+    create: {
+      programmId: "BURGER CINDY",
+      catalogBlendeId: cornerBlende.id,
+      code: "UPE65",
+      price: "79.00",
+      isActive: true,
+    },
+  });
+}
+
 // A kitchen item stores its own W/H/D snapshot. To keep those in sync with the catalog that
 // actually lives in the target database, we prefer the catalog article's dimension whenever it
 // specifies a positive value, and fall back to the item's seeded value otherwise (e.g. appliance
@@ -3804,6 +3878,10 @@ async function main() {
   }
 
   await seedCatalogMasterData();
+
+  if (kitchensToSeed.some((kitchen) => kitchen.programmId === "BURGER CINDY")) {
+    await ensureBurgerCindyCatalogArticles();
+  }
 
   const catalogArticleByNumber = new Map(
     (await prisma.catalogArticle.findMany()).map((article) => [article.articleNumber, article]),
@@ -3872,6 +3950,9 @@ async function main() {
           && String(item.articleNumber || "").trim() === "FH 664 621 E"
             ? "FH664621E + FWK124 + HD6002"
             : String(item.articleNumber || "").trim());
+      if (item.isActive !== false && catalogArticleNumber) {
+        assertBurgerCindyArticleCode(catalogArticleNumber, kitchen.programmId);
+      }
       const catalogArticle = catalogArticleNumber
         ? catalogArticleByNumber.get(catalogArticleNumber)
         : null;

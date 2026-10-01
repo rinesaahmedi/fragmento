@@ -1302,7 +1302,17 @@ export function serializeKitchenForLegacy(kitchen) {
     const articlePrice = catalogArticle?.programPrices?.[0]?.price ?? catalogArticle?.price;
     const blendePrice = catalogBlende?.programPrices?.[0]?.price ?? catalogBlende?.price;
     const servicePrice = catalogService?.programPrices?.[0]?.price ?? catalogService?.price;
+    const missingBurgerProgramPrice = kitchen.programmId === "BURGER CINDY" && (
+      (catalogArticle && !catalogArticle.programPrices?.length)
+      || (catalogBlende && !catalogBlende.programPrices?.length)
+      || (catalogService && !catalogService.programPrices?.length)
+    );
     const catalogPrice = (() => {
+      // The shared catalog's base price belongs to Impuls. A Burger kitchen
+      // without a Burger program price keeps its kitchen-specific snapshot.
+      if (missingBurgerProgramPrice) {
+        return Number(item.price);
+      }
       if (servicePrice != null) {
         return Number(servicePrice);
       }
@@ -1368,6 +1378,8 @@ export function serializeKitchenForLegacy(kitchen) {
       blendeNameDe: standaloneCatalogBlende ? "" : catalogBlende?.nameDe || "",
       blendePrice: standaloneCatalogBlende
         ? null
+        : kitchen.programmId === "BURGER CINDY" && catalogBlende && !catalogBlende.programPrices?.length
+          ? item.blendePrice != null ? Number(item.blendePrice) : null
         : blendePrice != null
           ? Number(blendePrice)
           : item.blendePrice != null
