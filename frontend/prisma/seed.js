@@ -4564,9 +4564,10 @@ async function main() {
       || TWO_PART_CLAIM_KITCHEN_SLUGS.has(normalizedKitchenSlug)
     );
     if (worktop && hasSeparatedWorktops) {
+      const worktopArticleCode = normalizedKitchenSlug === "ab-104296" ? "AP60" : null;
       for (const part of [
-        { partKey: "worktop-left", articleCode: "PLR60-1", name: "Left Worktop", nameDe: "Arbeitsplatte links", sortOrder: 60 },
-        { partKey: "worktop-right", articleCode: "PLR60-2", name: "Right Worktop", nameDe: "Arbeitsplatte rechts", sortOrder: 70 },
+        { partKey: "worktop-left", articleCode: worktopArticleCode || "PLR60-1", name: "Left Worktop", nameDe: "Arbeitsplatte links", sortOrder: 60 },
+        { partKey: "worktop-right", articleCode: worktopArticleCode || "PLR60-2", name: "Right Worktop", nameDe: "Arbeitsplatte rechts", sortOrder: 70 },
       ]) {
         await prisma.kitchenClaimPart.upsert({
           where: {

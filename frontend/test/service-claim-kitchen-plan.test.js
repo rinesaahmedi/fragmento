@@ -140,6 +140,39 @@ test("AB 101246 claims split both left Burger Blenden from their cabinets", () =
   }
 });
 
+test("AB 101246 worktop uses AP60 in ASC while its kitchen article remains PLR60", () => {
+  const worktop = component("TOP-AB101246", "worktop", "Worktop", {
+    articleNumber: "PLR60", isLocked: true,
+  });
+  const result = buildServiceClaimSelectableComponents({
+    kitchen: { items: [worktop] },
+    kitchenConfig: { components: [worktop] },
+    kitchenSlug: "ab-101246",
+  });
+  assert.equal(result.selectableComponents.find((entry) => entry.componentId === "component-worktop")?.articleCode, "AP60");
+  assert.equal(worktop.articleNumber, "PLR60");
+});
+
+test("AB 104296 keeps two worktop selections with the same AP60 replacement code", () => {
+  const worktop = component("TOP-AB104296", "worktop", "Worktop", {
+    articleNumber: "PLR60", isLocked: true,
+  });
+  const result = buildServiceClaimSelectableComponents({
+    kitchen: { items: [worktop] },
+    kitchenConfig: { components: [worktop] },
+    kitchenSlug: "ab-104296",
+    claimParts: ["worktop-left", "worktop-right"].map((partKey) => ({
+      partKey, articleCode: "AP60", sourceKitchenItemCode: worktop.code,
+      sourceComponentKey: "worktop", name: partKey,
+    })),
+  });
+  assert.deepEqual(
+    result.selectableComponents.filter((entry) => entry.componentId.startsWith("component-claim-worktop-"))
+      .map((entry) => entry.articleCode),
+    ["AP60", "AP60"],
+  );
+});
+
 test("AB 101246 exposes ten replacement article codes only in ASC", () => {
   const items = [
     component("CAB-BASE-AB101246-US50-DEFAULT", "base-module-1", "Lower Cabinet 50 cm", { articleNumber: "US50", isLocked: true }),
