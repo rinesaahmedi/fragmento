@@ -1926,6 +1926,21 @@ const AB_101246_ITEMS = [
   ...defaultServices(),
 ];
 
+// ASC replacement parts use their own article identities. Keep the Burger
+// kitchen items above unchanged: they define the configurator and orders.
+const AB_101246_CLAIM_PARTS = [
+  { partKey: "sink-cabinet", articleCode: "SPDT50", name: "Sink Lower Cabinet 50 cm", nameDe: "Spülen-Unterschrank 50 cm", sourceKitchenItemCode: "SINK-BASE-AB101246-SP50", sourceComponentKey: "sink-base", sortOrder: 20 },
+  { partKey: "faucet", articleCode: "519723", name: "Kitchen Faucet", nameDe: "Küchenarmatur", sourceKitchenItemCode: "FAUCET-AB101246", sourceComponentKey: "sink-faucet", sortOrder: 30 },
+  { partKey: "filter", articleCode: "KF17146", name: "Extractor Hood Filter", nameDe: "Filter für Dunstabzugshaube", sourceKitchenItemCode: "CAB-HOOD-AB101246-DEFAULT", sourceComponentKey: "wall-cabinet-4", sortOrder: 35 },
+  { partKey: "oven", articleCode: "EH9236SM-A", name: "Built-in Oven", nameDe: "Einbauherd", sourceKitchenItemCode: "OVEN-AB101246-DEFAULT", sourceComponentKey: "oven-module", sortOrder: 40 },
+  { partKey: "oven-drawer", articleCode: "UH60", name: "Lower Cabinet for Built-in Oven", nameDe: "Unterschrank für Einbauherde", sourceKitchenItemCode: "OVEN-AB101246-DEFAULT", sourceComponentKey: "oven-module", sortOrder: 45 },
+  { partKey: "cooktop", articleCode: "9EC744100E", name: "Ceramic Cooktop 60 cm", nameDe: "Glaskeramikkochfeld 60 cm", sourceKitchenItemCode: "OVEN-AB101246-DEFAULT", sourceComponentKey: "oven-module", sortOrder: 50 },
+  { partKey: "cabinet-base-module-2", articleCode: "UDT40", name: "Lower Cabinet 40 cm", nameDe: "Unterschrank 40 cm", sourceKitchenItemCode: "CAB-BASE-AB101246-U40-DEFAULT", sourceComponentKey: "base-module-2", sortOrder: 60 },
+  { partKey: "cabinet-extractor-hood", articleCode: "9FH17161E", name: "Extractor Hood", nameDe: "Flachschirmhaube", sourceKitchenItemCode: "CAB-HOOD-AB101246-DEFAULT", sourceComponentKey: "extractor-hood", sortOrder: 112 },
+  { partKey: "blende-wall-cabinet-1", articleCode: "HP1072K", name: "Filler Panel for Upper Cabinet", nameDe: "Passblende Hängeschrank", sourceKitchenItemCode: "CAB-WALL-AB101246-H10072-DEFAULT", sourceComponentKey: "wall-cabinet-1", sortOrder: 80 },
+  { partKey: "blende-base-module-1", articleCode: "UP10K", name: "Filler Panel for Lower Cabinet", nameDe: "Passblende Unterschrank", sourceKitchenItemCode: "CAB-BASE-AB101246-US50-DEFAULT", sourceComponentKey: "base-module-1", sortOrder: 21 },
+];
+
 // AB 110402: straight 30/60/60/40/40/40 cm kitchen traced from the supplied
 // vector PDF. Supplier rows 1, 2, 3, 4, 6 and 7 are DEFAULT and remain locked.
 const AB_110402_ITEMS = [
@@ -4473,6 +4488,26 @@ async function main() {
         sortOrder: 80,
       },
     });
+
+    if (normalizedKitchenSlug === "ab-101246") {
+      for (const part of AB_101246_CLAIM_PARTS) {
+        const staleProductInfo = ["oven", "cooktop"].includes(part.partKey)
+          ? {
+              productImagePath: null,
+              productInfoPdfPath: null,
+              productInfoSummary: null,
+              productInfoKeyFacts: null,
+              productInfoExtractedText: null,
+              productInfoUpdatedAt: null,
+            }
+          : {};
+        await prisma.kitchenClaimPart.upsert({
+          where: { kitchenId_partKey: { kitchenId: kitchenRecord.id, partKey: part.partKey } },
+          update: { ...part, ...staleProductInfo, isActive: true },
+          create: { kitchenId: kitchenRecord.id, ...part, ...staleProductInfo, isActive: true },
+        });
+      }
+    }
   }
 
   if (onlyKitchenSlug) {
