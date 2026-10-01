@@ -1189,4 +1189,9 @@
 <g clip-path="url(#clip_19)">
 <use data-text="5" xlink:href="#font_7_24" transform="matrix(10.999825,0,0,-11.000001,358.2321,370.05824)" fill="#ffffff"/>
 </g>
+<!-- Built-in extractor lights, following the perspective of its lower fascia. -->
+<g id="extractor-hood-light-rays" fill="none" stroke="#737373" stroke-width=".48" stroke-linecap="round" stroke-linejoin="round">
+<path d="M438.8 259.6L434.8 272.2M442.4 260.12L442.4 273.3M446 260.64L450 274.46"/>
+<path d="M477.8 265.24L473.8 277.84M481.4 265.76L481.4 278.94M485 266.28L489 280.1"/>
+</g>
 </svg>
