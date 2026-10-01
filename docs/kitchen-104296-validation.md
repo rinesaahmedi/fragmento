@@ -20,11 +20,11 @@ Implemented from `frontend/public/pdfs/670 104296.pdf` and the two supplied scre
 | 5 | US2A30 | Narrow drawer cabinet |
 | 6 | US2A50; UPE65 | Left drawer cabinet and the supplied corner filler |
 | 7 | GI88214-01; SP20214K; DBK50 | Housing cabinet with its distinct side filler and top closure; customer's refrigerator excluded |
-| 8 | H6002 + HPK2002 | Upper cabinet and outside filler |
-| 9 | H3002 | Upper cabinet |
-| 10 | FH664621E + FWK124 + HD6002 | Linked hood package |
-| 11 | H6002 | Upper cabinet |
-| 12 | H6002 | Upper cabinet |
+| 8 | H6072 + HPK2002 | Burger upper cabinet and outside filler |
+| 9 | H3072 | Burger upper cabinet |
+| 10 | FH664621E+FWK124+HFLH6072 | Burger linked hood package |
+| 11 | H6072 | Burger upper cabinet |
+| 12 | H6072 | Burger upper cabinet |
 
 The SVG is rendered directly from the original PDF. `frontend/lib/ab-104296-plan.js` contains the measured PDF vertices shared by FRG and ASC, including exposed sides, top faces, corner strips, faucet curves and the oven/cabinet seam.
 
@@ -32,7 +32,8 @@ ASC has one `oven-set` claim identity across the oven face and ceramic surface. 
 
 ## Catalog corrections
 
-- All linked article, filler and service records are registered in `BURGER CINDY`. Existing Burger prices are preserved; missing program prices retain their current catalog values. Supplier codes from the supplied schedule remain unchanged apart from removing L/R.
+- Merge with the 101246 Burger corrections: 104296 uses the supplier replacements `H6072`, `H3072`, `FH664621E+FWK124+HFLH6072`, `Blanco Botton 517467` and `ZBE60`, satisfying the new seed/admin Burger article guard. Existing kitchen-item codes and measured highlight polygons remain stable. Upper cabinet dimensions use the Burger catalog's 720 mm height. Fallback prices use the same Burger supplier values as the incoming seed; configured program prices remain authoritative.
+- All linked article, filler and service records are registered in `BURGER CINDY`. Existing Burger prices are preserved; missing program prices retain their current catalog values. The original upper-cabinet, hood and accessory aliases are mapped to the Burger identities above; supplied GI88214-01, SP20214K and DBK50 codes remain unchanged apart from removing L/R.
 - Catalog articles `GI88214-01 L` and `SPDT60 R` are renamed to `GI88214-01` and `SPDT60`, preserving their IDs. The duplicate `526335 R + 517720` is merged into the existing `526335 + 517720` package. Internal kitchen-item codes remain stable so selection and existing references continue to resolve.
 - Seven new kitchen-specific master articles remain: `GI88214-01`, `TV60`, `SPDT60`, `EHCX9330S-A`, `UHS60`, `SP20214K`, `DBK50`. The last two were added following the user's explicit supplier-code clarification. The sink/faucet package and all remaining kitchen articles already existed.
 - The first seed also restored an existing seed declaration missing from this database: `U40` (40 cm lower cabinet), unrelated to 104296 and currently unused. Initially six kitchen-specific master articles were created; the redundant oriented sink/faucet package has now been merged into the earlier catalog record.
@@ -40,6 +41,7 @@ ASC has one `oven-set` claim identity across the oven face and ceramic surface. 
 
 ## Verification
 
+- Merge verification: 32 focused tests passed for 104296, its confirmation email, Burger and 101246's independent claim strips; the production build and actual targeted seed passed. Live audit confirms all 23 catalog links, supplier code validation, one GI88214-01 claim and separate panel claims. The accepted test order remains 22 snapshots/EUR 1,484.00. The wider claims suite has 149/152 passes; the same three older failures remain (a legacy picker-source assertion and two AB 105834 geometry assertions), unrelated to these kitchen calibrations. Its hood-catalog assertion now accepts the incoming Burger HFLH6072 package.
 - All-items email check: created contract `222104296` and order `222104296-1` through the normal submission validator, with 22 saved item snapshots and a EUR 1,484.00 total. This includes every active component, the waste system, lighting, both compatible Burger cutlery widths (`ZBE30`, `ZBE50`) and assembly; pickup is the mutually exclusive alternative. The inactive hood helper is represented by its commercial package. The order remains `NEW`/`UNPAID`, clearly marked as a test; no checkout or fulfillment webhook was triggered.
 - Audited all 23 kitchen rows: linked master records and active `BURGER CINDY` program prices, all `MATCHED`. Confirmation notifications now preserve Burger cutlery article snapshots and German labels. Furniture components cannot infer customer-owned refrigerator/dishwasher PDFs. An explicit sender-copy suppression sends this requested test only to `334primex.eu@gmail.com`.
 - The two generated PDFs were rendered and visually checked. 53 focused order/email/kitchen tests and the production build passed. Gmail accepted the test email (SMTP `250 2.0.0 OK`, no rejected recipients); the delivery receipt is saved in `output/pdf/order-222104296-1/email-delivery.json` with the confirmation and purchased-kitchen PDFs.

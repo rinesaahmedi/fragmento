@@ -27,6 +27,7 @@ import { AdminComponentSlotPicker } from "../../../../components/admin-component
 import AdminBlendePriceFields from "../../../../components/admin-blende-price-fields";
 import { AdminIconKeySelect } from "../../../../components/admin-icon-key-select";
 import { AdminProductInfoPdfManager } from "../../../../components/admin-product-info-pdf-manager";
+import burgerCindyArticleCodes from "../../../../lib/burger-cindy-article-codes.cjs";
 import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -481,6 +482,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
       where: {
         isActive: true,
         programPrices: { some: { programmId: kitchen.programmId, isActive: true } },
+        ...(kitchen.programmId === "BURGER CINDY"
+          ? { articleNumber: { notIn: Object.keys(burgerCindyArticleCodes.BURGER_CINDY_ARTICLE_CODES) } }
+          : {}),
       },
       include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
       orderBy: [{ itemType: "asc" }, { articleNumber: "asc" }],

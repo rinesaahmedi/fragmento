@@ -100,6 +100,66 @@ test("service claim kitchen plan keeps only defaults and confirmed components se
   assert.equal(result.source, "kitchen");
 });
 
+test("AB 101246 claims split both left Burger Blenden from their cabinets", () => {
+  const items = [
+    component("CAB-WALL-AB101246-H10072-DEFAULT", "wall-cabinet-1", "Upper Cabinet 100 cm", {
+      articleNumber: "H10072", widthMm: 1000, isLocked: true,
+    }),
+    component("CAB-BASE-AB101246-US50-DEFAULT", "base-module-1", "Lower Cabinet 50 cm", {
+      articleNumber: "US50", widthMm: 500, isLocked: true,
+    }),
+  ];
+  const selectable = buildServiceClaimSelectableComponents({
+    kitchen: { items },
+    kitchenConfig: { components: items },
+    kitchenSlug: "ab-101246",
+  });
+  const byId = new Map(selectable.selectableComponents.map((entry) => [entry.componentId, entry]));
+  assert.equal(byId.get("component-wall-cabinet-1")?.articleCode, "H10072");
+  assert.equal(byId.get("component-claim-blende-wall-cabinet-1")?.articleCode, "HP2072K");
+  assert.equal(byId.get("component-base-module-1")?.articleCode, "US50");
+  assert.equal(byId.get("component-claim-blende-base-module-1")?.articleCode, "UP20K");
+
+  const hotspots = buildServiceClaimBlendeHotspots(
+    PLAN_HOTSPOTS_BY_SLUG["ab-101246"],
+    selectable.selectableComponents,
+    items,
+    "ab-101246",
+  );
+  for (const [cabinetKey, blendeKey] of [
+    ["wall-cabinet-1", "claim-blende-wall-cabinet-1"],
+    ["base-module-1", "claim-blende-base-module-1"],
+  ]) {
+    const cabinet = hotspots.filter((hotspot) => hotspot.componentKey === cabinetKey);
+    const blende = hotspots.filter((hotspot) => hotspot.componentKey === blendeKey);
+    assert.equal(cabinet.length, 1);
+    assert.equal(blende.length, 1);
+    assert.equal(blende[0].left + blende[0].width, cabinet[0].left);
+    assert.equal(blende[0].top, cabinet[0].top);
+    assert.equal(blende[0].height, cabinet[0].height);
+  }
+});
+
+test("AB 101246 ASC uses Burger upper-cabinet and hood article codes", () => {
+  const items = [
+    component("CAB-WALL-AB101246-H10072-DEFAULT", "wall-cabinet-1", "Upper Cabinet 100 cm", { articleNumber: "H10072", isLocked: true }),
+    component("CAB-WALL-AB101246-H6002-DEFAULT", "wall-cabinet-3", "Upper Cabinet 60 cm", { articleNumber: "H6072", isLocked: true }),
+    component("CAB-HOOD-AB101246-DEFAULT", "wall-cabinet-4", "Hood cabinet 60 cm", { articleNumber: "FH664621E+FWK124+HFLH6072", isLocked: true }),
+    component("CAB-WALL-AB101246-H4002-DEFAULT", "wall-cabinet-5", "Upper Cabinet 40 cm", { articleNumber: "H4072", isLocked: true }),
+  ];
+  const { selectableComponents } = buildServiceClaimSelectableComponents({
+    kitchen: { items },
+    kitchenConfig: { components: items },
+    kitchenSlug: "ab-101246",
+  });
+  const byId = new Map(selectableComponents.map((entry) => [entry.componentId, entry]));
+  assert.equal(byId.get("component-wall-cabinet-1")?.articleCode, "H10072");
+  assert.equal(byId.get("component-wall-cabinet-3")?.articleCode, "H6072");
+  assert.equal(byId.get("component-wall-cabinet-4")?.articleCode, "HFLH6072");
+  assert.equal(byId.get("component-wall-cabinet-5")?.articleCode, "H4072");
+  assert.equal(byId.get("component-extractor-hood")?.articleCode, "FH664621E");
+});
+
 test("service claim components show a code when no catalog article number exists", () => {
   const kitchen = {
     items: [
@@ -2021,7 +2081,7 @@ test("all seeded FH664621E hoods use a supported catalog article number", () => 
 
   assert.ok(flatHoodRows.length > 0);
   flatHoodRows.forEach((line) => {
-    assert.match(line, /articleNumber:\s*"(?:FH 664 621 E|FH664621E \+ FWK124 \+ HD6002)"/);
+    assert.match(line, /articleNumber:\s*"(?:FH 664 621 E|FH664621E \+ FWK124 \+ HD6002|FH664621E\+FWK124\+HFLH6072)"/);
   });
 });
 

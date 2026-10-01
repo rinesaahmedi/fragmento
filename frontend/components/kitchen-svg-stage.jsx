@@ -2486,7 +2486,10 @@ export default function useKitchenSvgStage({
           componentById.get(componentId) ||
           getLinkedComponentIds(normalizedKitchenSlug, componentId)
             .map((linkedComponentId) => componentById.get(linkedComponentId))
-            .find(Boolean);
+            .find(Boolean) ||
+          (normalizedKitchenSlug === "ab-101246" && definition.componentKey === "under-cabinet-light"
+            ? kitchenConfig.accessories.find((accessory) => accessory.code === "ACC-LIGHT-003")
+            : null);
         if (!item) {
           return null;
         }
@@ -2497,7 +2500,7 @@ export default function useKitchenSvgStage({
         };
       })
       .filter(Boolean);
-  }, [kitchenConfig.components, normalizedKitchenSlug, translate, language]);
+  }, [kitchenConfig.components, kitchenConfig.accessories, normalizedKitchenSlug, translate, language]);
   const hasImageHotspots = imageHotspots.length > 0;
   const legendFixedText = translate("configurator.stageLegendFixed", "Fixed parts always remain active");
   const legendPrimaryText =
@@ -2967,6 +2970,9 @@ export default function useKitchenSvgStage({
                           className={[
                             styles.planHotspot,
                             isPolygonHotspot ? styles.planHotspotPolygon : "",
+                            normalizedKitchenSlug === "ab-101246" && hotspot.componentKey === "under-cabinet-light"
+                              ? styles.planHotspotLight
+                              : "",
                             isGroupHovered ? styles.planHotspotHover : "",
                             isSelected ? styles.planHotspotSelected : "",
                             isDefaultLocked ? styles.planHotspotLocked : "",

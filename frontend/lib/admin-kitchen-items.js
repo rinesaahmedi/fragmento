@@ -1,4 +1,5 @@
 import { ItemType } from "@prisma/client";
+import burgerCindyArticleCodes from "./burger-cindy-article-codes.cjs";
 import { validateKitchenItemInput } from "./admin-forms";
 import { getCatalogProgramPrice } from "./catalog-pricing";
 import { findKitchenStructureSlot, getKitchenStructureSlots } from "./kitchen-structure";
@@ -112,6 +113,10 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
 
   if (catalogArticle && catalogArticle.programPrices.length === 0) {
     throw new Error(`Selected catalog article is not available for kitchen program ${kitchen.programmId}.`);
+  }
+
+  if (catalogArticle) {
+    burgerCindyArticleCodes.assertBurgerCindyArticleCode(catalogArticle.articleNumber, kitchen.programmId);
   }
 
   if (catalogBlende && catalogBlende.programPrices.length === 0) {

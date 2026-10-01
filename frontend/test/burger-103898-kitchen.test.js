@@ -22,6 +22,7 @@ import {
 } from "../lib/service-claim-kitchen-hotspots.js";
 import { getServiceClaimLinkedComponentIds } from "../lib/service-claim-kitchen-plan-selection.js";
 import { serializeKitchenForLegacy } from "../lib/catalog.js";
+import burgerCindyArticleCodes from "../lib/burger-cindy-article-codes.cjs";
 import { resolveCutleryCatalogArticles } from "../lib/cutlery-accessories.js";
 import { buildOrderSummaryHtml } from "../lib/email/order-notifications.js";
 
@@ -303,6 +304,43 @@ test("public kitchen serialization uses Burger program prices and supplier-facin
   assert.deepEqual(hood.productImagePaths, [
     "/product-images/gallery/burger-103898/extractor-hood/fh664621e-01.jpg",
   ]);
+});
+
+test("Burger code guard rejects Impuls identities even when they have a Burger price row", () => {
+  assert.throws(
+    () => burgerCindyArticleCodes.assertBurgerCindyArticleCode("H6002", "BURGER CINDY"),
+    /Use Burger CINDY article H6072/,
+  );
+  assert.throws(
+    () => burgerCindyArticleCodes.assertBurgerCindyArticleCode("ZB60SG", "BURGER CINDY"),
+    /Use Burger CINDY article ZBE60/,
+  );
+  assert.doesNotThrow(() => burgerCindyArticleCodes.assertBurgerCindyArticleCode("H6002", "IP 2200"));
+  assert.doesNotThrow(() => burgerCindyArticleCodes.assertBurgerCindyArticleCode("H6072", "BURGER CINDY"));
+});
+
+test("Burger serialization does not use a shared Impuls price when its program price is missing", () => {
+  const kitchen = serializeKitchenForLegacy({
+    slug: "burger-103898",
+    programmId: "BURGER CINDY",
+    items: [{
+      id: "wall-1",
+      code: "CAB-WALL-BURGER103898-H5072",
+      articleNumber: "H5072",
+      itemType: "COMPONENT",
+      name: "Upper cabinet",
+      price: 135,
+      catalogArticleId: "article-1",
+      catalogArticle: {
+        articleNumber: "H5072",
+        name: "Upper cabinet",
+        price: 149,
+        programPrices: [],
+      },
+    }],
+    claimParts: [],
+  });
+  assert.equal(kitchen.components[0].price, 135);
 });
 
 test("Burger 103898 uses cabinet-specific dimension labels", () => {

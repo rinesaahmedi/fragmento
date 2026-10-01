@@ -12,14 +12,17 @@ import { deriveKitchenAppliances } from '../lib/contract-appliances.js';
 import { isElectricalApplianceProblemArea } from '../lib/service-claim-serial-number.js';
 import { getSerialNumberHelpApplianceType } from '../lib/serial-number-help.js';
 import { loadKitchenSvgMarkup } from '../lib/load-kitchen-svg.js';
+import { assertBurgerCindyArticleCode } from '../lib/burger-cindy-article-codes.cjs';
 
 const slug = 'ab-104296';
 const seed = readFileSync(new URL('../prisma/seed.js', import.meta.url), 'utf8');
 // Evaluate the real supplier rows and catalog declarations without running the DB seed.
 const seedHelpers = seed.slice(seed.indexOf('const DEFAULT_KITCHEN_PROGRAMM_ID'), seed.indexOf('const PRODUCT_INFO_FILES'));
 const itemDeclaration = seed.slice(seed.indexOf('const AB_104296_HOUSING_CLAIM_PARTS'), seed.indexOf('const AB_101246_ITEMS'));
+const burgerCatalogStart = seed.indexOf('  const articles = [', seed.indexOf('async function ensureBurgerCindyCatalogArticles'));
+const burgerCatalogDeclaration = seed.slice(burgerCatalogStart, seed.indexOf('  for (const spec of articles)', burgerCatalogStart));
 const { items, articles, blenden, services, housingClaimDefinitions } = JSON.parse(runInNewContext(
-  `${seedHelpers}\n${itemDeclaration}\nJSON.stringify({ items: AB_104296_ITEMS, articles: CATALOG_ARTICLES, blenden: CATALOG_BLENDEN, services: CATALOG_SERVICES, housingClaimDefinitions: AB_104296_HOUSING_CLAIM_PARTS })`, { ItemType },
+  `${seedHelpers}\n${itemDeclaration}\n${burgerCatalogDeclaration}\nJSON.stringify({ items: AB_104296_ITEMS, articles: [...CATALOG_ARTICLES, ...articles], blenden: CATALOG_BLENDEN, services: CATALOG_SERVICES, housingClaimDefinitions: AB_104296_HOUSING_CLAIM_PARTS })`, { ItemType },
 ));
 const components = items.filter(item => item.itemType === 'COMPONENT' && item.isActive !== false);
 const faces = PLAN_HOTSPOTS_BY_SLUG[slug];
@@ -57,6 +60,7 @@ test('104296 maps all twelve Excel callouts and locks precisely the included fur
 
 test('every 104296 component, accessory, helper and service resolves to master catalog data', () => {
   for (const item of items) {
+    assert.doesNotThrow(() => assertBurgerCindyArticleCode(item.catalogArticleNumber || item.articleNumber, 'BURGER CINDY'), item.code);
     if (item.itemType === 'SERVICE') {
       const serviceCode = item.code === 'SVC-MONTAGE-001' ? 'MONTAGE' : 'PICKUP';
       assert.ok(services.some(service => service.code === serviceCode));
@@ -227,7 +231,7 @@ test('sink, faucet and each worktop retain their independent source outlines aft
   assert.deepEqual(claims.filter(face => face.claimPartKey?.startsWith('worktop-')).map(face => face.points), definitions.filter(face => face.componentKey === 'worktop').map(face => face.points));
 });
 
-test('the hood toggles as a package and its H6002 filler is measured separately in ASC', () => {
+test('the hood toggles as a package and its H6072 filler is measured separately in ASC', () => {
   assert.deepEqual(getLinkedComponentIds(slug, 'component-extractor-hood'), ['component-wall-cabinet-3','component-extractor-hood']);
   const selected = selection(components.map(item => ({ ...item, itemType: 'COMPONENT' })));
   const claims = buildServiceClaimBlendeHotspots(faces, selected.selectableComponents, components, slug);

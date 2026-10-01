@@ -33,7 +33,7 @@ const DEFAULT_KITCHEN_ITEMS = [
   {
     itemType: ItemType.ACCESSORY,
     code: "ACC-LIGHT-003",
-    articleNumber: "KA220043_S3",
+    articleNumber: "KALB KA220043_S3",
     name: "Beleuchtungsset 3 LED-Spots",
     nameDe: "Beleuchtungsset 3 LED-Spots",
     price: "69.00",
@@ -53,14 +53,43 @@ export async function POST(request) {
   try {
     const formData = await request.formData();
     const kitchen = await prisma.$transaction(async (tx) => {
+      const input = validateKitchenInput(formData);
+      const defaultItems = DEFAULT_KITCHEN_ITEMS.map((item) => {
+        if (input.programmId !== "BURGER CINDY") return item;
+        if (item.code === "ACC-CUTLERY-ZB60SG") return { ...item, articleNumber: "ZBE60", price: "20.00" };
+        if (item.code === "ACC-WASTE-001") return { ...item, articleNumber: "Blanco Botton 517467" };
+        return item;
+      });
+      const articleNumbers = defaultItems.map((item) => item.articleNumber);
+      const articles = await tx.catalogArticle.findMany({
+        where: {
+          articleNumber: { in: articleNumbers },
+          isActive: true,
+          programPrices: { some: { programmId: input.programmId, isActive: true } },
+        },
+        include: {
+          programPrices: {
+            where: { programmId: input.programmId, isActive: true },
+            take: 1,
+          },
+        },
+      });
+      const byArticleNumber = new Map(articles.map((article) => [article.articleNumber, article]));
+      const missing = articleNumbers.filter((articleNumber) => !byArticleNumber.has(articleNumber));
+      if (missing.length) {
+        throw new Error(`Default items are missing from price list ${input.programmId}: ${missing.join(", ")}.`);
+      }
       const createdKitchen = await tx.kitchen.create({
-        data: validateKitchenInput(formData),
+        data: input,
       });
 
       await tx.kitchenItem.createMany({
-        data: DEFAULT_KITCHEN_ITEMS.map((item) => ({
+        data: defaultItems.map((item) => ({
           kitchenId: createdKitchen.id,
           ...item,
+          catalogArticleId: byArticleNumber.get(item.articleNumber).id,
+          catalogLinkStatus: "MATCHED",
+          price: byArticleNumber.get(item.articleNumber).programPrices[0].price,
         })),
       });
 
