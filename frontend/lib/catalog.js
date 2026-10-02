@@ -1357,9 +1357,9 @@ export function serializeKitchenForLegacy(kitchen) {
         || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
         || "",
       price: catalogPrice,
-      widthMm: catalogArticle?.widthMm ?? item.widthMm ?? null,
-      heightMm: catalogArticle?.heightMm ?? item.heightMm ?? null,
-      depthMm: catalogArticle?.depthMm ?? item.depthMm ?? null,
+      widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
+      heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
+      depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: productInformation.productImagePath,
       productImagePaths: productInformation.productImagePaths || [],

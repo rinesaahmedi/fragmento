@@ -31,7 +31,7 @@ Added from `frontend/public/pdfs/670 104332.pdf` and the supplied Excel screensh
 - Optional H6072: EUR 146; hood package: EUR 346, from the existing Burger catalog.
 - HP2072K: provisional EUR 35, matching the existing equivalent upper filler. Cabinet 12 fallback total is EUR 181. Existing configured program prices remain authoritative.
 - The faucet is the guide's standard 517720, bundled with the supplied 526335 sink at no extra price.
-- Cabinet widths and known depths come from catalog/article identities. Upper cabinets are 600 x 720 x 340 mm. Unspecified heights, exact worktop lengths and filler dimensions remain omitted.
+- Linked item dimensions come exclusively from the catalog, including omitted fields. H6072 is 600 x 723 mm with no depth; the hood package specifies only its 600 mm width. Unspecified dimensions remain omitted.
 - AP60, UVADT20-01, UPEV, UP10K and HP2072K have explicit master identities, retaining the supplied codes.
 
 ## Verification

@@ -89,9 +89,36 @@ test('DEFAULT prices stay zero when a shared Burger article is priced for option
   assert.ok(result.components.every(item => item.price === 0));
   const drawer = result.components.find(item => item.componentKey === 'base-module-1');
   assert.equal(drawer.widthMm, 600);
-  assert.equal(drawer.depthMm, 600, 'blank master dimensions retain kitchen measurements');
+  assert.equal(drawer.depthMm, null, 'blank catalog dimensions remain omitted');
   const optional = serializeKitchenForLegacy({ slug, programmId: 'BURGER CINDY', items: [{ ...seeded.find(item => item.componentKey === 'base-module-1'), isLocked: false, catalogPriceSyncMode: 'AUTO' }] });
   assert.equal(optional.components[0].price, 461);
+});
+
+test('linked upper cabinets in 104296 and 104332 use catalog dimensions, including nulls', () => {
+  const masters = [
+    { articleNumber: 'H6072', widthMm: 600, heightMm: 723, depthMm: null },
+    { articleNumber: 'H3072', widthMm: 300, heightMm: 723, depthMm: null },
+    { articleNumber: 'FH664621E+FWK124+HFLH6072', widthMm: 600, heightMm: null, depthMm: null },
+  ];
+  for (const kitchenSlug of ['ab-104296', 'ab-104332']) {
+    const kitchenItems = masters.map((master, index) => ({
+      itemType: 'COMPONENT', code: `upper-${index}`, componentKey: `wall-cabinet-${index + 1}`,
+      widthMm: 600, heightMm: 720, depthMm: 340, price: 146,
+      catalogArticleId: `catalog-${index}`, catalogArticle: master,
+    }));
+    const result = serializeKitchenForLegacy({ slug: kitchenSlug, programmId: 'BURGER CINDY', items: kitchenItems });
+    for (let index = 0; index < masters.length; index++) {
+      for (const dimension of ['widthMm', 'heightMm', 'depthMm']) {
+        assert.equal(result.components[index][dimension], masters[index][dimension], `${kitchenSlug}: ${dimension}`);
+      }
+    }
+    const unlinked = serializeKitchenForLegacy({ slug: kitchenSlug, items: [{ ...kitchenItems[0], catalogArticleId: null, catalogArticle: null }] });
+    assert.equal(unlinked.components[0].depthMm, 340, 'unlinked rows retain their own dimensions');
+  }
+  const seededUpperCabinets = components.filter(item => item.componentKey.startsWith('wall-cabinet-'));
+  assert.ok(seededUpperCabinets.every(item => item.depthMm === null));
+  assert.equal(seededUpperCabinets.find(item => item.iconKey === 'hood_wall_cabinet').heightMm, null);
+  assert.ok(seededUpperCabinets.filter(item => item.articleNumber === 'H6072').every(item => item.heightMm === 723));
 });
 
 test('the source SVG and perspective polygons share the original PDF coordinates', async () => {

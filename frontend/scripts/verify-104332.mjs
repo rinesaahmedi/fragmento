@@ -18,7 +18,8 @@ const { getKitchenBySlug, serializeKitchenForLegacy } = await import('../lib/cat
 try {
   const config = serializeKitchenForLegacy(await getKitchenBySlug('ab-104332'));
   assert.ok(config.components.filter(item => item.isLocked).every(item => item.price === 0), 'serialized DEFAULT prices');
-  assert.equal(config.components.find(item => item.componentKey === 'base-module-1').depthMm, 600);
+  assert.equal(config.components.find(item => item.componentKey === 'base-module-1').depthMm, null);
+  assert.ok(config.components.filter(item => item.componentKey.startsWith('wall-cabinet-')).every(item => item.depthMm == null));
   assert.equal(config.components.filter(item => !item.isLocked).length, 4);
   const plan = await getServiceClaimKitchenPlan('670104332');
   assert.equal(plan?.kitchenSlug, 'ab-104332');
