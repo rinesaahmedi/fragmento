@@ -57,6 +57,7 @@ const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
 export const IMAGE_VIEW_BY_SLUG = {
+  "ab-104332": "/plans/670%20104332.svg",
   "ab-104296": "/plans/670%20104296.svg",
   "burger-103898": "/plans/670%20103898.svg",
   "ab-105806": "/plans/AB%20105806.svg",
@@ -1458,6 +1459,7 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-109874"] = AB_109874_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-109955"] = AB_109955_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-111539"] = AB_111539_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-101246"] = PLAN_HOTSPOTS_BY_SLUG["ab-101246"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-104332"] = PLAN_HOTSPOTS_BY_SLUG["ab-104332"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-104296"] = PLAN_HOTSPOTS_BY_SLUG["ab-104296"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-110402"] = AB_110402_FRG_ORDER_HOTSPOTS;

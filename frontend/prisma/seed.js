@@ -35,6 +35,7 @@ const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kit
 const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "105861"];
 const AB_105762_LAYOUT_ALIAS_CODES = ["105766", "105770", "105774"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-104332",
   "ab-104296",
   "burger-103898",
   "ab-105762",
@@ -167,6 +168,8 @@ const BUNDLE_PRICES = {
 };
 
 const CATALOG_ARTICLES = [
+  { articleNumber: "AP60", name: "Worktop", nameDe: "Arbeitsplatte", depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "UVADT20-01", name: "Lower pull-out cabinet", nameDe: "Unterschrank mit Auszug", widthMm: 200, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   // 670 104296: supplier-included furniture and the supplied ceramic cooker set.
   // The fridge and dishwasher appliances belong to the customer.
   { articleNumber: "GI88214-01", name: "Refrigerator housing cabinet", nameDe: "Geräteschrank für Kühlgerät", widthMm: 600, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -282,6 +285,9 @@ for (const article of CATALOG_ARTICLES) {
 }
 
 const CATALOG_BLENDEN = [
+  { code: "UP10K", name: "Lower cabinet end filler", nameDe: "Passblende Unterschrank", price: "0.00", isActive: true },
+  { code: "UPEV", name: "Corner filler panel", nameDe: "Eckpassblende Unterschrank", price: "0.00", isActive: true },
+  { code: "HP2072K", name: "Upper cabinet end filler", nameDe: "Passblende Oberschrank", price: "35.00", isActive: true },
   { code: "UPE65", name: "Corner filler panel for Lower Cabinet", nameDe: "Eckpassblende Unterschrank", price: "79.00", isActive: true },
   { code: "HPEF4302", name: "Corner filler panel for Upper Cabinet", nameDe: "Eckpassblende Hängeschrank", price: "150.00", isActive: true },
   { code: "HPK2002", name: "Filler Panel up to 20 cm", nameDe: "Passblende bis 20 cm", price: "35.00", isActive: true },
@@ -442,6 +448,7 @@ function defaultSinkWorktop(overrides = {}) {
 
 function normalizeBlendeCode(value) {
   const code = String(value || "").trim().toUpperCase();
+  if (["UP10K", "UPEV", "HP2072K"].includes(code)) return code;
   if (code.startsWith("HPEF4302")) return "HPEF4302";
   if (code.startsWith("UPK20")) return "UPK20";
   if (code.startsWith("UPEF65")) return "UPEF65";
@@ -1946,6 +1953,39 @@ const AB_104296_ITEMS = [
   ...defaultServices(),
 ];
 
+// 670 104332: supplier rows 1..8 are included; 9..12 are optional upper cabinets.
+const AB_104332_ITEMS = [
+  defaultWorktop({ code: "TOP-AB104332", sortOrder: 10, articleNumber: "AP60", catalogArticleNumber: "AP60", depthMm: 600 }),
+  defaultSinkBase({ code: "SINK-BASE-AB104332-SPDT60-R", sortOrder: 60, widthMm: 600, depthMm: 600, articleNumber: "SPDT60", catalogArticleNumber: "SPDT60", infoText: "Included sink cabinet, left hinge (SPDT60 L)" }),
+  defaultSinkWorktop({ code: "FAUCET-AB104332", name: "Sink and faucet set", nameDe: "Spüle und Armatur", sortOrder: 62, articleNumber: "526335 + 517720", catalogArticleNumber: "526335 + 517720", infoText: "Included BLANCO TIPO 45 S sink and faucet" }),
+  { itemType: ItemType.COMPONENT, code: "FRONT-AB104332-TV60", name: "Furniture front for dishwasher", nameDe: "Möbelfront für kundeneigenen Geschirrspüler", price: "0.00", widthMm: 600, iconKey: "base_cabinet_plain", colorKey: "#001f7f", componentKey: "dishwasher-front", sortOrder: 70, isLocked: true, articleNumber: "TV60", catalogArticleNumber: "TV60", infoText: "Included furniture front only; dishwasher supplied by customer" },
+  defaultOvenHob({ code: "OVEN-AB104332-SET", name: "Built-in oven and ceramic cooktop set", nameDe: "Einbauherd und Glaskeramikkochfeld", sortOrder: 40, widthMm: 600, articleNumber: "EHCX9330S-A", catalogArticleNumber: "EHCX9330S-A", infoText: "Included oven and ceramic cooktop as one appliance set" }),
+  { itemType: ItemType.COMPONENT, code: "CAB-OVEN-AB104332-UHS60", name: "Lower cabinet for built-in oven", nameDe: "Herdunterschrank", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "springgreen", componentKey: "oven-cabinet", sortOrder: 42, isLocked: true, articleNumber: "UHS60", catalogArticleNumber: "UHS60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104332-US2A60-1", name: "Lower Cabinet with Drawers", nameDe: "Unterschrank mit Schubladen", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_three", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 30, isLocked: true, articleNumber: "US2A60", catalogArticleNumber: "US2A60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104332-US2A60-2", name: "Lower Cabinet with Drawers", nameDe: "Unterschrank mit Schubladen", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_three", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 50, isLocked: true, articleNumber: "US2A60", catalogArticleNumber: "US2A60" },
+  { itemType: ItemType.COMPONENT, code: "BLENDE-AB104332-UPEV", name: "Corner filler panel", nameDe: "Eckpassblende Unterschrank", price: "0.00", iconKey: "blende", colorKey: "springgreen", componentKey: "corner-blende", sortOrder: 52, isLocked: true, catalogBlendeCode: "UPEV", articleNumber: "UPEV", catalogPriceSyncMode: "LOCKED_INCLUDED" },
+  { itemType: ItemType.COMPONENT, code: "CAB-TALL-AB104332-GI88214-01-L", name: "Refrigerator housing cabinet", nameDe: "Geräteschrank für Kühlgerät", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "tall_cabinet", colorKey: "springgreen", componentKey: "fridge-cabinet", sortOrder: 20, isLocked: true, articleNumber: "GI88214-01", catalogArticleNumber: "GI88214-01", infoText: "Included housing with BLUM Aventos HK-S lift-up front, refrigerator furniture door, drawer, lower door and shelves; refrigerator supplied by customer" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104332-H6002-1", name: "Wall Cabinet", nameDe: "Oberschrank", price: "146.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, articleNumber: "H6072", catalogArticleNumber: "H6072" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB104332-HD6002", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "346.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, articleNumber: "FH664621E+FWK124+HFLH6072", catalogArticleNumber: "FH664621E+FWK124+HFLH6072" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB104332-FH664621E", name: "Extractor Hood", price: "346.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, isActive: false, articleNumber: "FH664621E+FWK124+HFLH6072", catalogArticleNumber: "FH664621E+FWK124+HFLH6072" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104332-H6002-2", name: "Wall Cabinet", nameDe: "Oberschrank", price: "146.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, articleNumber: "H6072", catalogArticleNumber: "H6072" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104332-H6002-3", name: "Wall Cabinet", nameDe: "Oberschrank", price: "181.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, articleNumber: "H6072", catalogArticleNumber: "H6072", blendeCode: "HP2072K", blendeLabel: "HP2072K", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104332-UVADT20-01-R", name: "Lower pull-out cabinet", nameDe: "Unterschrank mit Auszug", price: "0.00", widthMm: 200, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "springgreen", componentKey: "drawer-module", sortOrder: 80, isLocked: true, articleNumber: "UVADT20-01", catalogArticleNumber: "UVADT20-01", infoText: "Included pull-out cabinet, right hinge" },
+  { itemType: ItemType.COMPONENT, code: "BLENDE-AB104332-UP10K", name: "Lower cabinet end filler", nameDe: "Passblende Unterschrank", price: "0.00", iconKey: "blende", colorKey: "springgreen", componentKey: "end-blende", sortOrder: 82, isLocked: true, articleNumber: "UP10K", catalogBlendeCode: "UP10K", catalogPriceSyncMode: "LOCKED_INCLUDED" },
+  ...defaultAccessories().map((item) => item.code === "ACC-CUTLERY-ZB60SG"
+    ? { ...item, price: "20.00", articleNumber: "ZBE60", catalogArticleNumber: "ZBE60" }
+    : item.code === "ACC-WASTE-001"
+      ? { ...item, articleNumber: "Blanco Botton 517467", catalogArticleNumber: "Blanco Botton 517467" }
+      : item),
+  ...defaultServices(),
+];
+
+
+// Protect all eight supplied DEFAULT rows from optional catalog prices.
+for (const item of AB_104332_ITEMS) {
+  if (item.isLocked) item.catalogPriceSyncMode = "LOCKED_INCLUDED";
+}
+
 // 670 101246: the supplier schedule has ten included rows. The catalog
 // articles below identify the visible modules inferred from their plan widths;
 // the two priced schedule rows are the dishwasher (4) and refrigerator (7).
@@ -3157,6 +3197,16 @@ const DEFAULT_KITCHENS = [
     name: "111539",
     description: "L-shaped kitchen configuration based on frontend/public/plans/AB 111539.svg",
     items: AB_111539_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-104332",
+    kitchenCode: "104 332",
+    programmId: "BURGER CINDY",
+    seedCatalogProgramPrices: true,
+    name: "104332",
+    description: "L-shaped kitchen based on frontend/public/pdfs/670 104332.pdf; eight included supplier rows",
+    items: AB_104332_ITEMS,
     reconcileExisting: true,
   },
   {
@@ -4488,7 +4538,7 @@ async function main() {
     if (ovenBundle) {
       const ovenArticleCode = String(ovenBundle.articleNumber || "").split("+")[0].trim() || "EH92364E-A";
       const ovenProductInfo = PRODUCT_INFO_BY_ARTICLE_NUMBER[ovenArticleCode] || OVEN_CLAIM_PRODUCT_INFO;
-      const ovenClaimParts = kitchen.slug === "ab-104296" ? [
+      const ovenClaimParts = ["ab-104296", "ab-104332"].includes(kitchen.slug) ? [
         { partKey: "oven-set", articleCode: "EHCX9330S-A", name: "Built-in oven and ceramic cooktop set", nameDe: "Einbauherd und Glaskeramikkochfeld", sortOrder: 40 },
       ] : [
         { partKey: "oven", articleCode: ovenArticleCode, name: "Built-in Oven", nameDe: "Einbauherd", sortOrder: 40, ...ovenProductInfo },
@@ -4564,7 +4614,7 @@ async function main() {
       || TWO_PART_CLAIM_KITCHEN_SLUGS.has(normalizedKitchenSlug)
     );
     if (worktop && hasSeparatedWorktops) {
-      const worktopArticleCode = normalizedKitchenSlug === "ab-104296" ? "AP60" : null;
+      const worktopArticleCode = ["ab-104296", "ab-104332"].includes(normalizedKitchenSlug) ? "AP60" : null;
       for (const part of [
         { partKey: "worktop-left", articleCode: worktopArticleCode || "PLR60-1", name: "Left Worktop", nameDe: "Arbeitsplatte links", sortOrder: 60 },
         { partKey: "worktop-right", articleCode: worktopArticleCode || "PLR60-2", name: "Right Worktop", nameDe: "Arbeitsplatte rechts", sortOrder: 70 },

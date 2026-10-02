@@ -1308,6 +1308,11 @@ export function serializeKitchenForLegacy(kitchen) {
       || (catalogService && !catalogService.programPrices?.length)
     );
     const catalogPrice = (() => {
+      // Explicit included equipment keeps its kitchen snapshot even when the
+      // same article also has an optional-item price in the shared catalog.
+      if (item.isLocked && item.catalogPriceSyncMode === "LOCKED_INCLUDED") {
+        return Number(item.price);
+      }
       // The shared catalog's base price belongs to Impuls. A Burger kitchen
       // without a Burger program price keeps its kitchen-specific snapshot.
       if (missingBurgerProgramPrice) {
@@ -1352,9 +1357,9 @@ export function serializeKitchenForLegacy(kitchen) {
         || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
         || "",
       price: catalogPrice,
-      widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
-      heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
-      depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
+      widthMm: catalogArticle?.widthMm ?? item.widthMm ?? null,
+      heightMm: catalogArticle?.heightMm ?? item.heightMm ?? null,
+      depthMm: catalogArticle?.depthMm ?? item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: productInformation.productImagePath,
       productImagePaths: productInformation.productImagePaths || [],

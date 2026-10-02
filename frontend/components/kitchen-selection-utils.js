@@ -66,6 +66,9 @@ export function shouldHideComponentFromSelectionSummary(kitchenSlug, item) {
 
   // 104296's oven cabinet and fillers are included structural parts,
   // retained for plan selection and claims without separate default rows.
+  if (normalizedSlug === "ab-104332") {
+    return ["CAB-OVEN-AB104332-UHS60", "BLENDE-AB104332-UPEV", "BLENDE-AB104332-UP10K"].includes(code);
+  }
   if (normalizedSlug === "ab-104296") {
     return ["CAB-OVEN-AB104296-UHS60", "BLENDE-AB104296-UPE65", "PANEL-AB104296-SP20214K", "PANEL-AB104296-DBK50"].includes(code);
   }
@@ -239,6 +242,22 @@ function stripDimensionsFromName(name) {
 // different callout number.
 const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "TOP-AB101246": "1",
+  "TOP-AB104332": "1",
+  "CAB-TALL-AB104332-GI88214-01-L": "2",
+  "CAB-BASE-AB104332-US2A60-1": "3",
+  "OVEN-AB104332-SET": "4",
+  "CAB-OVEN-AB104332-UHS60": "4",
+  "CAB-BASE-AB104332-US2A60-2": "5",
+  "BLENDE-AB104332-UPEV": "5",
+  "SINK-BASE-AB104332-SPDT60-R": "6",
+  "FRONT-AB104332-TV60": "7",
+  "CAB-BASE-AB104332-UVADT20-01-R": "8",
+  "BLENDE-AB104332-UP10K": "8",
+  "CAB-WALL-AB104332-H6002-1": "9",
+  "CAB-HOOD-AB104332-HD6002": "10",
+  "HOOD-AB104332-FH664621E": "10",
+  "CAB-WALL-AB104332-H6002-2": "11",
+  "CAB-WALL-AB104332-H6002-3": "12",
   "TOP-AB104296": "1",
   "SINK-BASE-AB104296-SPDT60-R": "2",
   "FRONT-AB104296-TV60": "3",
@@ -1249,6 +1268,7 @@ export function getLocalizedItemInfoText(item, translate) {
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-101246": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "ab-104332": [["component-wall-cabinet-2", "component-extractor-hood", "component-under-cabinet-light"], ["component-drawer-module", "component-end-blende"]],
   "ab-104296": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "burger-103898": [[
     "component-wall-cabinet-2",

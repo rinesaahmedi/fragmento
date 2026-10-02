@@ -32,6 +32,7 @@ const AB_105762_LAYOUT_ALIAS_SLUGS = [
 ];
 
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-104332",
   "ab-104296",
   "burger-103898",
   "ab-105762",
@@ -205,7 +206,7 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
 // These drawings contain one source hotspot for the sink bowl followed by a
 // separate source hotspot for the faucet. Do not assign both claim identities
 // to both shapes.
-const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-104296", "ab-105825", "ab-105831"]);
+const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-104332", "ab-104296", "ab-105825", "ab-105831"]);
 
 // Thin visual silhouettes traced around the faucet body. Source hotspot boxes
 // remain intentionally generous for interaction, but painting those boxes
@@ -549,6 +550,12 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  "ab-104332": {
+    "wall-cabinet-4": { side: "right", wholeFacesOnly: true, wholeBlendeFaces: [
+      { left: 66.584323, right: 67.866983, top: 13.357983, bottom: 37.963025 },
+      { left: 66.270784, right: 67.866983, top: 13.297479, bottom: 13.559664 },
+    ] },
+  },
   "ab-104296": {
     "wall-cabinet-1": {
       side: "left",
@@ -1288,6 +1295,7 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 );
 
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-104332": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-104296": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-105762": AB_105762_WORKTOP_SPLIT,
   "ab-105775": {

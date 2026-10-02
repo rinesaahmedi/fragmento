@@ -479,6 +479,7 @@ const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
   // Burger 103898 draws the hood cabinet, extractor and its two LED symbols as
   // one supplied assembly. Keep all three claim targets in sync when any face
   // of that assembly is clicked, hovered, or removed.
+  "ab-104332": [["component-wall-cabinet-2", "component-extractor-hood", "component-under-cabinet-light"]],
   "burger-103898": [[
     "component-wall-cabinet-2",
     "component-extractor-hood",
