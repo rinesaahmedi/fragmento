@@ -5,6 +5,7 @@ import https from "https";
 import nodemailer from "nodemailer";
 import sharp from "sharp";
 import { resolveServiceClaimEmailRecipient } from "../../../lib/service-claim-email-recipient";
+import { observeClaimEmailSend } from "../../../lib/email/claim-email-tracking.js";
 import { normalizeReferencePlanMarkerAppearance } from "../../../lib/reference-plan-marker-appearance";
 import { Prisma } from "@prisma/client";
 import { after, NextResponse } from "next/server";
@@ -352,6 +353,14 @@ async function postWebhook(payload) {
 }
 
 async function sendComplaintEmail(payload, attachmentParts = [], referenceSnapshot = null) {
+  return observeClaimEmailSend({
+    claimId: payload.id,
+    recipient: () => resolveServiceClaimEmailRecipient(payload.contractNumber),
+    send: (captureReceipt) => sendComplaintEmailMessage(payload, attachmentParts, referenceSnapshot, captureReceipt),
+  });
+}
+
+async function sendComplaintEmailMessage(payload, attachmentParts = [], referenceSnapshot = null, captureReceipt = () => {}) {
   const recipient = resolveServiceClaimEmailRecipient(payload.contractNumber);
   const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpFrom = String(process.env.SMTP_FROM || "").trim();
@@ -394,7 +403,7 @@ async function sendComplaintEmail(payload, attachmentParts = [], referenceSnapsh
     })),
   };
 
-  await transporter.sendMail({
+  const receipt = await transporter.sendMail({
     from: `"Fragmento" <${smtpFrom}>`,
     to: recipient,
     subject: formatServiceClaimEmailSubject(payload.contractNumber, payload.claimSequence),
@@ -403,6 +412,7 @@ async function sendComplaintEmail(payload, attachmentParts = [], referenceSnapsh
     html: buildComplaintEmailHtml(emailPayload, kitchenPreviewAttachment),
     attachments,
   });
+  captureReceipt(receipt);
 
   return true;
 }

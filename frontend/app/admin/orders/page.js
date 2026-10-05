@@ -13,6 +13,8 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminEmailDeliveryStatus } from "../../../components/admin-order-email-delivery";
+import { attachOrderEmailDelivery } from "../../../lib/email/order-email-store";
 import { AdminPagination } from "../../../components/admin-pagination";
 import {
   AdminDateTime,
@@ -182,7 +184,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
     listKitchensForAdmin(),
   ]);
   const pagination = paginateAdminItems(allOrders, resolvedSearchParams.page);
-  const orders = pagination.items;
+  const orders = await attachOrderEmailDelivery(pagination.items);
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
   const summary = getOrderSummary(allOrders);
@@ -318,13 +320,14 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                   <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
                   <th className="orders-table-optional" style={ordersThStyle}><AdminText i18nKey="contractAddressFields.city" fallback="City" /></th>
                   <th className="orders-table-date" style={ordersThStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="orderEmailDelivery.column" fallback="Email status" /></th>
                   <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!orders.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={10}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
+                    <td style={tdStyle} colSpan={11}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
                   </tr>
                 ) : null}
                 {orders.map((order) => {
@@ -365,11 +368,14 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                         <ItemCount count={order.items.length} />
                       </span>
                     </td>
-                    <td style={ordersTdStyle}><AdminStatusBadge status={order.status} /></td>
+                    <td style={ordersTdStyle}>
+                      <AdminStatusBadge status={order.status} />
+                    </td>
                     <td style={ordersTdStyle}><PaymentStatusBadge status={order.paymentStatus} /></td>
                     <td style={ordersTdStyle}><strong style={totalStyle}>{formatCurrency(order.totalPrice)}</strong></td>
                     <td className="orders-table-optional" style={ordersTdStyle}>{order.city || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</td>
                     <td className="orders-table-date" style={ordersTdStyle}><AdminDateTime value={order.createdAt} /></td>
+                    <td style={ordersTdStyle}><AdminEmailDeliveryStatus delivery={order.confirmationEmailDelivery} /></td>
                     <td style={ordersActionTdStyle}>
                       <div style={rowActionStyle}>
                         <Link href={`/admin/orders/${order.id}`} style={viewButtonStyle}>
@@ -425,6 +431,10 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                     </div>
                   </div>
                   <div style={mobileCardGridStyle}>
+                    <div>
+                      <span style={mobileLabelStyle}><AdminText i18nKey="orderEmailDelivery.column" fallback="Email status" /></span>
+                      <AdminEmailDeliveryStatus delivery={order.confirmationEmailDelivery} />
+                    </div>
                     <div>
                       <span style={mobileLabelStyle}><AdminText i18nKey="ordersAdmin.customer" fallback="Customer" /></span>
                       <strong>{order.firstName} {order.lastName}</strong>

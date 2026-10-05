@@ -24,6 +24,8 @@ import {
   AdminText,
 } from "../../../../components/admin-i18n";
 import { OrderActionButton, OrderActionFeedback } from "../../../../components/admin-order-action-buttons";
+import { AdminOrderEmailDelivery } from "../../../../components/admin-order-email-delivery";
+import { attachOrderEmailDelivery } from "../../../../lib/email/order-email-store";
 import { OrderEmailReviewModal } from "../../../../components/order-email-review-modal";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -78,7 +80,7 @@ export default async function AdminPxOrderDetailPage({ params, searchParams }) {
   const admin = await requireAdminPage();
   const { id } = await params;
   const resolvedSearchParams = (await searchParams) || {};
-  const order = await getTestOrderById(id);
+  const [order] = await attachOrderEmailDelivery([await getTestOrderById(id)], "test");
 
   if (!order) {
     return (
@@ -221,6 +223,7 @@ export default async function AdminPxOrderDetailPage({ params, searchParams }) {
                 <AdminText i18nKey="ordersAdmin.delete" fallback="Delete" />
               </OrderActionButton>
             </div>
+            <AdminOrderEmailDelivery delivery={order.confirmationEmailDelivery} />
             <OrderActionFeedback />
           </form>
 

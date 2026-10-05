@@ -1,4 +1,27 @@
 {
+  "orderEmailDelivery": {
+    "column": "E-Mail-Status",
+    "notSent": "Nicht gesendet",
+    "unverified": "Versand nicht bestätigt",
+    "partial": "Nicht alle Empfänger bestätigt",
+    "title": "Bestätigungs-E-Mail",
+    "claimTitle": "Reklamations-E-Mail",
+    "service": "Service-Empfänger",
+    "count": "{sent}/{total} gesendet",
+    "noData": "Kein Versandnachweis",
+    "customer": "Kunde",
+    "copy": "Absenderkopie",
+    "lastAttempt": "Zuletzt protokollierter Versuch",
+    "hint": "Zuletzt protokollierter Versuch. Gesendet bedeutet vom Mailserver angenommen, nicht im Postfach nachgewiesen. Der Status wird nach der Verarbeitung gespeichert; zum Aktualisieren neu laden. Bei Störungen kann das Ergebnis fehlen oder veraltet sein.",
+    "status": {
+      "SENT": "Gesendet",
+      "SKIPPED": "Nicht gesendet (E-Mail nicht konfiguriert)",
+      "FAILED": "Fehlgeschlagen",
+      "PENDING": "Versand läuft / Ergebnis ausstehend",
+      "UNKNOWN": "Unbekannt",
+      "NOT_REQUIRED": "Keine separate Kopie"
+    }
+  },
   "adminShellLogin": {
     "fragmentoAdmin": "Fragmento Admin",
     "modernEditorialOperationsForKitchensAndOrders": "Katalog- und Bestellverwaltung für Küchen.",

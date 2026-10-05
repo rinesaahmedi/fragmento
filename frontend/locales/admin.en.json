@@ -1,4 +1,27 @@
 {
+  "orderEmailDelivery": {
+    "column": "Email status",
+    "notSent": "Not sent",
+    "unverified": "Sending not verified",
+    "partial": "Not all recipients confirmed",
+    "title": "Confirmation email",
+    "claimTitle": "Claim email",
+    "service": "Service recipient",
+    "count": "{sent}/{total} sent",
+    "noData": "No sending record",
+    "customer": "Customer",
+    "copy": "Sender copy",
+    "lastAttempt": "Last recorded attempt",
+    "hint": "Last recorded attempt. Sent means accepted by the mail server, not verified inbox delivery. Status is saved after processing; refresh to see updates. If tracking is unavailable, this result may be missing or outdated.",
+    "status": {
+      "SENT": "Sent",
+      "SKIPPED": "Not sent (email not configured)",
+      "FAILED": "Failed",
+      "PENDING": "Sending / awaiting result",
+      "UNKNOWN": "Unknown",
+      "NOT_REQUIRED": "No separate copy"
+    }
+  },
   "adminShellLogin": {
     "fragmentoAdmin": "Fragmento Admin",
     "modernEditorialOperationsForKitchensAndOrders": "Kitchen catalog and order operations.",

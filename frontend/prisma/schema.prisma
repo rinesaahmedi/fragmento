@@ -394,11 +394,25 @@ model Order {
   updatedAt               DateTime         @updatedAt
   items                   OrderItem[]
   cancellationRequests    OrderCancellationRequest[]
+  confirmationEmailDelivery Json?
 
   @@index([kitchenContractId])
   @@index([kitchenContractId, createdAt])
   @@index([status, createdAt])
   @@index([createdAt])
+}
+
+// Independent audit records: deliberately no relation/foreign key to orders.
+// Tracking must never lock or update rows in the checkout/order workflow.
+model OrderEmailAttempt {
+  id          String   @id
+  orderId     String
+  orderKind   String
+  attemptedAt DateTime
+  delivery    Json
+  createdAt   DateTime @default(now())
+
+  @@index([orderKind, orderId, attemptedAt(sort: Desc), createdAt(sort: Desc)])
 }
 
 model OrderCancellationRequest {
@@ -464,6 +478,7 @@ model TestOrder {
   createdAt               DateTime         @default(now())
   updatedAt               DateTime         @updatedAt
   items                   TestOrderItem[]
+  confirmationEmailDelivery Json?
 
   @@index([kitchenContractId])
   @@index([kitchenContractId, createdAt])
@@ -643,6 +658,17 @@ model TestOrderItem {
   createdAt             DateTime     @default(now())
 
   @@index([orderId])
+}
+
+// Independent delivery log; no foreign key or update to ServiceClaim.
+model ServiceClaimEmailAttempt {
+  id          String   @id
+  claimId     String
+  attemptedAt DateTime
+  delivery    Json
+  createdAt   DateTime @default(now())
+
+  @@index([claimId, attemptedAt(sort: Desc), createdAt(sort: Desc)])
 }
 
 model ServiceClaim {

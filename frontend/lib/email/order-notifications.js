@@ -6,6 +6,9 @@ import nodemailer from "nodemailer";
 import path from "path";
 import { PDFDocument, rgb } from "pdf-lib";
 import sharp from "sharp";
+import { observeOrderEmailSend, buildOrderEmailDelivery } from "./order-email-observer.js";
+import { scheduleOrderEmailAttempt } from "./order-email-after.js";
+import { getOrderKindForContractNumber } from "../order-kind.js";
 import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
 import { getPriceBreakdown } from "../price-utils.js";
@@ -1933,7 +1936,27 @@ export function getMissingEmailSmtpConfig(env = process.env) {
   ].filter(Boolean);
 }
 
-export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText, excludedAttachmentKeys = [], suppressSenderCopy = false }) {
+export async function sendOrderConfirmationEmail(options) {
+  return observeOrderEmailSend({
+    send: () => sendOrderConfirmationEmailMessage(options),
+    schedule: scheduleOrderEmailAttempt,
+    buildAttempt: ({ result, failed, attemptedAt }) => {
+      const { order } = options;
+      return {
+        orderId: order.id,
+        orderKind: getOrderKindForContractNumber(order.customer.contractNumber || order.orderNumber),
+        delivery: buildOrderEmailDelivery({
+          result, failed, attemptedAt,
+          recipients: buildOrderConfirmationRecipients(order.customer.email, process.env.SMTP_FROM, {
+            suppressSenderCopy: options.suppressSenderCopy === true || shouldSuppressOrderSenderCopy(order),
+          }),
+        }),
+      };
+    },
+  });
+}
+
+async function sendOrderConfirmationEmailMessage({ order, pdfBase64, pdfFilename, subject, bodyText, excludedAttachmentKeys = [], suppressSenderCopy = false }) {
   const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
   const smtpUser = String(process.env.SMTP_USER || "").trim();

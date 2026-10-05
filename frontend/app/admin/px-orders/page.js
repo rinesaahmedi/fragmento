@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { AdminEmailDeliveryStatus } from "../../../components/admin-order-email-delivery";
+import { attachOrderEmailDelivery } from "../../../lib/email/order-email-store";
 import {
   AdminSection,
   FlashMessage,
@@ -72,7 +74,7 @@ export default async function AdminPxOrdersPage({ searchParams = {} }) {
     dateFrom: normalizeParam(resolvedSearchParams.dateFrom).trim(),
     dateTo: normalizeParam(resolvedSearchParams.dateTo).trim(),
   };
-  const orders = await getTestOrdersForAdmin(filters);
+  const orders = await attachOrderEmailDelivery(await getTestOrdersForAdmin(filters), "test");
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
@@ -131,13 +133,14 @@ export default async function AdminPxOrdersPage({ searchParams = {} }) {
                   <th style={thStyle}><AdminText i18nKey="reportsAdmin.payment" fallback="Payment" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
+                  <th style={thStyle}><AdminText i18nKey="orderEmailDelivery.column" fallback="Email status" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!orders.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={8}>
+                    <td style={tdStyle} colSpan={9}>
                       <AdminText i18nKey="pxOrdersAdmin.noOrders" fallback="No PX orders found." />
                     </td>
                   </tr>
@@ -159,6 +162,7 @@ export default async function AdminPxOrdersPage({ searchParams = {} }) {
                     <td style={tdStyle}><PaymentStatusBadge status={order.paymentStatus} /></td>
                     <td style={tdStyle}><strong>{formatCurrency(order.totalPrice)}</strong></td>
                     <td style={tdStyle}><AdminDateTime value={order.createdAt} /></td>
+                    <td style={tdStyle}><AdminEmailDeliveryStatus delivery={order.confirmationEmailDelivery} /></td>
                     <td style={tdStyle}>
                       <Link href={`/admin/px-orders/${order.id}`} style={viewButtonStyle}>
                         <AdminText i18nKey="ordersAdmin.view" fallback="View" />

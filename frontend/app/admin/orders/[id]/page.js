@@ -26,6 +26,8 @@ import { OrderActionButton, OrderActionFeedback } from "../../../../components/a
 import { CancellationRequestPanel } from "../../../../components/admin-order-cancellation-panel";
 import { AdminOrderAs400Form } from "../../../../components/admin-order-as400-form";
 import { OrderEmailReviewModal } from "../../../../components/order-email-review-modal";
+import { AdminOrderEmailDelivery } from "../../../../components/admin-order-email-delivery";
+import { attachOrderEmailDelivery } from "../../../../lib/email/order-email-store";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getCancellationRequestsForOrder } from "../../../../lib/order-cancellations";
@@ -187,7 +189,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
   const admin = await requireAdminPage();
   const { id } = await params;
   const resolvedSearchParams = (await searchParams) || {};
-  const order = await getOrderById(id);
+  const [order] = await attachOrderEmailDelivery([await getOrderById(id)]);
 
   if (!order) {
     return (
@@ -326,6 +328,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 </OrderActionButton>
               ) : null}
             </div>
+            <AdminOrderEmailDelivery delivery={order.confirmationEmailDelivery} />
             <OrderActionFeedback />
           </form>
 

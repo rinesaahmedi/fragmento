@@ -11,6 +11,8 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminEmailDeliveryStatus } from "../../../components/admin-order-email-delivery";
+import { attachClaimEmailDelivery } from "../../../lib/email/claim-email-store";
 import { AdminPagination } from "../../../components/admin-pagination";
 import { AdminDateTime, AdminPluralText, AdminText, AdminTranslatedInput } from "../../../components/admin-i18n";
 import AdminSelect from "../../../components/admin-select";
@@ -62,7 +64,7 @@ export default async function AdminClaimsPage({ searchParams = {}, pxOnly = fals
     listClaimCities(),
   ]);
   const pagination = paginateAdminItems(allClaims, resolvedSearchParams.page);
-  const claims = pagination.items;
+  const claims = await attachClaimEmailDelivery(pagination.items);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -140,13 +142,14 @@ export default async function AdminClaimsPage({ searchParams = {}, pxOnly = fals
                   <th style={thStyle}><AdminText i18nKey="claimsAdmin.serialNumber" fallback="Serial number" /></th>
                   <th style={thStyle}><AdminText i18nKey="claimsAdmin.issue" fallback="Issue" /></th>
                   <th className="claims-table-date" style={thStyle}><AdminText i18nKey="claimsAdmin.createdAt" fallback="Created" /></th>
+                  <th style={thStyle}><AdminText i18nKey="orderEmailDelivery.column" fallback="Email status" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!claims.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={7}>
+                    <td style={tdStyle} colSpan={8}>
                       <AdminText i18nKey="claimsAdmin.noClaimsFound" fallback="No claims found." />
                     </td>
                   </tr>
@@ -167,6 +170,7 @@ export default async function AdminClaimsPage({ searchParams = {}, pxOnly = fals
                       <AdminClaimLocalizedText text={truncate(claim.problemDescription, 220)} style={issueClampStyle} />
                     </td>
                     <td className="claims-table-date" style={tdStyle}><AdminDateTime value={claim.createdAt} /></td>
+                    <td style={tdStyle}><AdminEmailDeliveryStatus delivery={claim.emailDelivery} /></td>
                     <td style={{ ...tdStyle, width: 220 }}>
                       <div style={actionCellStyle}>
                         <Link href={`/admin/claims/${claim.id}`} style={detailsLinkStyle}>
@@ -199,6 +203,10 @@ export default async function AdminClaimsPage({ searchParams = {}, pxOnly = fals
                     <div style={rowMetaStyle}><AdminText i18nKey="claimsAdmin.contractNumber" fallback="Contract" /> {claim.contractNumber}</div>
                   </div>
                   <AdminClaimLocalizedText text={truncate(claim.problemDescription, 160)} style={issueClampStyle} />
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <span style={rowMetaStyle}><AdminText i18nKey="orderEmailDelivery.column" fallback="Email status" /></span>
+                    <AdminEmailDeliveryStatus delivery={claim.emailDelivery} />
+                  </div>
                   <div style={actionCellStyle}>
                     <Link href={`/admin/claims/${claim.id}`} style={detailsLinkStyle}>
                       <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />

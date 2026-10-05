@@ -12,6 +12,8 @@ import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submi
 import { AdminClaimLocalizedText } from "../../../../components/admin-claim-localized-text";
 import { AdminDateTime, AdminText } from "../../../../components/admin-i18n";
 import { AdminShell } from "../../../../components/admin-shell";
+import { AdminOrderEmailDelivery } from "../../../../components/admin-order-email-delivery";
+import { attachClaimEmailDelivery } from "../../../../lib/email/claim-email-store";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminClaimsPage } from "../../../../lib/admin-claims-access";
 import { renderClaimKitchenPreviewPng } from "../../../../lib/claim-kitchen-preview";
@@ -142,7 +144,7 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
 
   const claims = await queryServiceClaimById(prisma, id);
 
-  const claim = claims[0];
+  const [claim] = await attachClaimEmailDelivery(claims);
 
   if (!claim) {
     return (
@@ -235,6 +237,7 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
             </div>
           </form>
 
+          <AdminOrderEmailDelivery delivery={claim.emailDelivery} titleKey="orderEmailDelivery.claimTitle" titleFallback="Claim email" />
           <div style={splitGridStyle}>
             <article style={itemCardStyle}>
               <strong style={sectionTitleStyle}><AdminText i18nKey="claimsAdmin.customer" fallback="Customer" /></strong>
