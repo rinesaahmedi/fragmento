@@ -522,7 +522,7 @@ export default function FragmentoEntryFlow() {
         <div style={centerWrapStyle}>
         <section style={panelStyle}>
           <Link href="/admin" prefetch={false} style={adminLinkStyle}>
-            Admin
+            admin
           </Link>
 
           <div style={logoWrapStyle}>
