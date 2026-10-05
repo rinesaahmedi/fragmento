@@ -35,8 +35,32 @@ jobs:
             git rev-parse --short HEAD
             git log -1 --oneline --no-decorate
 
-            git reset --hard HEAD
             git fetch https://github.com/rinesaahmedi/fragmento.git main
+            git reset --hard HEAD
+
+            # A migration created directly on the server can later become tracked
+            # upstream. Preserve those collisions outside the checkout before
+            # merging; unrelated local files (including .env) stay in place.
+            bash <<'BASH'
+            set -euo pipefail
+            umask 077
+            BACKUP_BASE="/var/backups/fragmento-deploy"
+            BACKUP_DIR=""
+            git ls-tree -r --name-only -z FETCH_HEAD -- frontend/prisma/migrations |
+              while IFS= read -r -d '' migration; do
+                if { [ -f "$migration" ] || [ -L "$migration" ]; } &&
+                   ! git ls-files --error-unmatch -- "$migration" >/dev/null 2>&1; then
+                  if [ -z "$BACKUP_DIR" ]; then
+                    mkdir -p "$BACKUP_BASE"
+                    BACKUP_DIR=$(mktemp -d "$BACKUP_BASE/deploy-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX")
+                  fi
+                  mkdir -p "$BACKUP_DIR/$(dirname "$migration")"
+                  mv -- "$migration" "$BACKUP_DIR/$migration"
+                  printf 'Preserved untracked migration: %s\n' "$BACKUP_DIR/$migration"
+                fi
+              done
+            BASH
+
             git merge --ff-only FETCH_HEAD
 
             echo "After deploy:"

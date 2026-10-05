@@ -479,6 +479,7 @@ const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
   // Burger 103898 draws the hood cabinet, extractor and its two LED symbols as
   // one supplied assembly. Keep all three claim targets in sync when any face
   // of that assembly is clicked, hovered, or removed.
+  "ab-104332": [["component-wall-cabinet-2", "component-extractor-hood", "component-under-cabinet-light"]],
   "burger-103898": [[
     "component-wall-cabinet-2",
     "component-extractor-hood",
@@ -609,7 +610,13 @@ function resolveServiceClaimComponentNameDe(componentId, meta = {}) {
   ) || meta.code || componentId;
 }
 
-function resolveServiceClaimArticleCode(meta = {}) {
+function resolveServiceClaimArticleCode(meta = {}, kitchenSlug = "") {
+  if (
+    String(kitchenSlug || "").trim().toLowerCase() === "ab-101246"
+    && String(meta.componentKey || "").trim().toLowerCase() === "worktop"
+  ) {
+    return "AP60";
+  }
   const articleNumber = String(meta.articleNumber || meta.articleCode || "").trim();
   if (articleNumber) {
     const attachedBlendeCode = normalizeClaimArticlePartCode(
@@ -641,7 +648,7 @@ function resolveServiceClaimArticleCode(meta = {}) {
   return String(meta.code || "").trim();
 }
 
-export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
+export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig, kitchenSlug = kitchen?.slug) {
   const componentMetaById = new Map();
 
   for (const item of kitchen?.items || []) {
@@ -654,7 +661,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
     }
     componentMetaById.set(componentId, {
       code: String(item.code || "").trim(),
-      articleCode: resolveServiceClaimArticleCode(item),
+      articleCode: resolveServiceClaimArticleCode(item, kitchenSlug),
       name: resolveServiceClaimComponentName(componentId, item),
       nameDe: resolveServiceClaimComponentNameDe(componentId, item),
       componentKey: String(item.componentKey || "").trim(),
@@ -668,7 +675,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
     }
     componentMetaById.set(componentId, {
       code: String(comp.code || "").trim(),
-      articleCode: resolveServiceClaimArticleCode(comp),
+      articleCode: resolveServiceClaimArticleCode(comp, kitchenSlug),
       name: resolveServiceClaimComponentName(componentId, comp),
       nameDe: resolveServiceClaimComponentNameDe(componentId, comp),
       componentKey: String(comp.componentKey || "").trim(),
@@ -685,7 +692,7 @@ export function buildServiceClaimSelectableComponents({
   confirmedItems = [],
   claimParts = [],
 }) {
-  const componentMetaById = buildServiceClaimComponentMetaById(kitchen, kitchenConfig);
+  const componentMetaById = buildServiceClaimComponentMetaById(kitchen, kitchenConfig, kitchenSlug);
   const selectableIds = new Set();
   const selectableMetaIds = new Set();
   const selectableMeta = [];
