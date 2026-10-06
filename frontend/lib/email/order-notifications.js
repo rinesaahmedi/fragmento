@@ -1962,7 +1962,7 @@ async function sendOrderConfirmationEmailMessage({ order, pdfBase64, pdfFilename
     throw new Error(`Email SMTP config is missing: ${missingSmtpConfig.join(", ")}`);
   }
 
-  // 111 (internal) contracts are sent from SMTP_111_* (315primex), all others from SMTP_*.
+  // 111 and 222 contract orders are sent from SMTP_111_* (315primex), all others from SMTP_*.
   const contractNumber = order.customer?.contractNumber || order.orderNumber;
   const smtpConfig = resolveSmtpConfigForContract(contractNumber);
   const smtpFrom = smtpConfig.from;

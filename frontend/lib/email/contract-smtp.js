@@ -4,12 +4,12 @@ import nodemailer from "nodemailer";
  * Some contract ranges are sent from a separate mailbox (SMTP_111_*, e.g.
  * 315primex.eu@gmail.com) instead of the customer-facing SMTP_* account
  * (nachkauf@myarchitecto.de):
- *   - order e-mails: contracts starting with 111
+ *   - order e-mails: contracts starting with 111 or 222
  *   - claim e-mails: contracts starting with 111 or 222
  * When SMTP_111_* is not configured, or that account refuses to send, the mail is
  * delivered through the default SMTP_* account so no e-mail is lost.
  */
-export const ORDER_INTERNAL_PREFIXES = Object.freeze(["111"]);
+export const ORDER_INTERNAL_PREFIXES = Object.freeze(["111", "222"]);
 export const CLAIM_INTERNAL_PREFIXES = Object.freeze(["111", "222"]);
 
 export function isInternalContractNumber(contractNumber, prefixes = ORDER_INTERNAL_PREFIXES) {

@@ -35,14 +35,15 @@ test("111 contracts use the internal mailbox, app password without spaces", () =
   assert.equal(config.pass, "abcdefghijklmnop");
 });
 
-test("claims for 222 contracts also use the internal mailbox; orders for 222 do not", () => {
+test("claims and orders for 222 contracts use the internal mailbox", () => {
   assert.equal(isInternalContractNumber("222123456", CLAIM_INTERNAL_PREFIXES), true);
   assert.equal(resolveSmtpConfigForContract("222123456", env, CLAIM_INTERNAL_PREFIXES).from, "315primex.eu@gmail.com");
   assert.equal(resolveSmtpConfigForContract("111123456", env, CLAIM_INTERNAL_PREFIXES).from, "315primex.eu@gmail.com");
   assert.equal(resolveSmtpConfigForContract("670123456", env, CLAIM_INTERNAL_PREFIXES).from, "nachkauf@myarchitecto.de");
-  // default (orders) prefixes: only 111
-  assert.equal(isInternalContractNumber("222123456"), false);
-  assert.equal(resolveSmtpConfigForContract("222123456", env).from, "nachkauf@myarchitecto.de");
+  // default (orders) prefixes: 111 and 222
+  assert.equal(isInternalContractNumber("222123456"), true);
+  assert.equal(resolveSmtpConfigForContract("222123456", env).from, "315primex.eu@gmail.com");
+  assert.equal(resolveSmtpConfigForContract("333123456", env).from, "nachkauf@myarchitecto.de");
 });
 
 test("sendMailForContract honours claim prefixes for 222", async () => {
