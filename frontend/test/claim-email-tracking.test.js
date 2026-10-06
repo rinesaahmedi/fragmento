@@ -8,6 +8,7 @@ import test from "node:test";
 import { resolveServiceClaimEmailRecipient } from "../lib/service-claim-email-recipient.js";
 import { formatServiceClaimEmailSubject } from "../lib/service-claim-email-subject.js";
 import { attachClaimEmailDelivery } from "../lib/email/claim-email-store.js";
+import { resolveSmtpConfigForContract, sendMailForContract } from "../lib/email/contract-smtp.js";
 
 globalThis.AsyncLocalStorage ||= AsyncLocalStorage;
 const require = createRequire(import.meta.url);
@@ -72,6 +73,9 @@ for (const scenario of ["success", "px", "partial", "failure", "missing-recipien
       buildUserAttachmentCid: () => "photo-cid",
       buildComplaintEmailText: () => "Original text",
       buildComplaintEmailHtml: () => "<p>Original HTML</p>",
+      resolveSmtpConfigForContract: (number) => resolveSmtpConfigForContract(number, env),
+      // the route sends through the per-contract SMTP helper; feed it the same mocked transport
+      sendMailForContract: (number, message) => sendMailForContract(number, message, { env, createTransport: () => context.nodemailer.createTransport() }),
       nodemailer: { createTransport: () => ({ sendMail: async (mail) => {
         events.push("smtp");
         mails.push(mail);

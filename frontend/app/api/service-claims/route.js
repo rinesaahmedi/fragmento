@@ -2,9 +2,9 @@ import { readFile } from "fs/promises";
 import http from "http";
 import path from "path";
 import https from "https";
-import nodemailer from "nodemailer";
 import sharp from "sharp";
 import { resolveServiceClaimEmailRecipient } from "../../../lib/service-claim-email-recipient";
+import { resolveSmtpConfigForContract, sendMailForContract } from "../../../lib/email/contract-smtp";
 import { observeClaimEmailSend } from "../../../lib/email/claim-email-tracking.js";
 import { normalizeReferencePlanMarkerAppearance } from "../../../lib/reference-plan-marker-appearance";
 import { Prisma } from "@prisma/client";
@@ -362,22 +362,11 @@ async function sendComplaintEmail(payload, attachmentParts = [], referenceSnapsh
 
 async function sendComplaintEmailMessage(payload, attachmentParts = [], referenceSnapshot = null, captureReceipt = () => {}) {
   const recipient = resolveServiceClaimEmailRecipient(payload.contractNumber);
-  const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
-  const smtpFrom = String(process.env.SMTP_FROM || "").trim();
+  const smtpConfig = resolveSmtpConfigForContract(payload.contractNumber);
 
-  if (!recipient || !smtpHost || !smtpFrom) {
+  if (!recipient || !smtpConfig.host || !smtpConfig.from) {
     return false;
   }
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: Number.parseInt(process.env.SMTP_PORT || "587", 10),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
 
   const kitchenPreviewAttachment = referenceSnapshot || await buildClaimKitchenPreviewAttachment(payload);
   const emailAttachmentParts = attachmentParts.map((part, index) => ({
@@ -403,8 +392,8 @@ async function sendComplaintEmailMessage(payload, attachmentParts = [], referenc
     })),
   };
 
-  const receipt = await transporter.sendMail({
-    from: `"Fragmento" <${smtpFrom}>`,
+  // 111 (internal) contracts are sent from SMTP_111_* (315primex), all others from SMTP_*.
+  const { receipt } = await sendMailForContract(payload.contractNumber, {
     to: recipient,
     subject: formatServiceClaimEmailSubject(payload.contractNumber, payload.claimSequence),
     replyTo: payload.email || undefined,

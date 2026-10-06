@@ -2,12 +2,12 @@ import fs from "fs/promises";
 import http from "http";
 import https from "https";
 import { jsPDF } from "jspdf";
-import nodemailer from "nodemailer";
 import path from "path";
 import { PDFDocument, rgb } from "pdf-lib";
 import sharp from "sharp";
 import { observeOrderEmailSend, buildOrderEmailDelivery } from "./order-email-observer.js";
 import { scheduleOrderEmailAttempt } from "./order-email-after.js";
+import { resolveSmtpConfigForContract, sendMailForContract } from "./contract-smtp.js";
 import { getOrderKindForContractNumber } from "../order-kind.js";
 import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
@@ -1957,26 +1957,15 @@ export async function sendOrderConfirmationEmail(options) {
 }
 
 async function sendOrderConfirmationEmailMessage({ order, pdfBase64, pdfFilename, subject, bodyText, excludedAttachmentKeys = [], suppressSenderCopy = false }) {
-  const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
-  const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
-  const smtpUser = String(process.env.SMTP_USER || "").trim();
-  const smtpFrom = String(process.env.SMTP_FROM || "").trim();
-  const smtpPass = String(process.env.SMTP_PASS || "");
-
   const missingSmtpConfig = getMissingEmailSmtpConfig();
   if (missingSmtpConfig.length) {
     throw new Error(`Email SMTP config is missing: ${missingSmtpConfig.join(", ")}`);
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  });
+  // 111 (internal) contracts are sent from SMTP_111_* (315primex), all others from SMTP_*.
+  const contractNumber = order.customer?.contractNumber || order.orderNumber;
+  const smtpConfig = resolveSmtpConfigForContract(contractNumber);
+  const smtpFrom = smtpConfig.from;
 
   const excludedAttachments = normalizeExcludedAttachmentKeys(excludedAttachmentKeys);
   const attachments = [];
@@ -2026,16 +2015,16 @@ async function sendOrderConfirmationEmailMessage({ order, pdfBase64, pdfFilename
   attachments.push(...(emailPreview.productImageAttachments || []));
 
   try {
-    return await transporter.sendMail({
-      from: `"Fragmento" <${smtpFrom}>`,
+    const { receipt } = await sendMailForContract(contractNumber, {
       to: emailPreview.to,
       cc: emailPreview.cc,
       subject: emailPreview.subject,
       html: emailPreview.html,
       attachments,
     });
+    return receipt;
   } catch (error) {
-    throw new Error(`Email sending failed via ${smtpHost || "(missing SMTP_HOST)"}:${smtpPort} as ${smtpUser || "(missing SMTP_USER)"}: ${error.message}`);
+    throw new Error(`Email sending failed via ${smtpConfig.host || "(missing SMTP_HOST)"}:${smtpConfig.port} as ${smtpConfig.user || "(missing SMTP_USER)"}: ${error.message}`);
   }
 }
 
