@@ -4,7 +4,7 @@ import path from "path";
 import https from "https";
 import sharp from "sharp";
 import { resolveServiceClaimEmailRecipient } from "../../../lib/service-claim-email-recipient";
-import { resolveSmtpConfigForContract, sendMailForContract } from "../../../lib/email/contract-smtp";
+import { CLAIM_INTERNAL_PREFIXES, resolveSmtpConfigForContract, sendMailForContract } from "../../../lib/email/contract-smtp";
 import { observeClaimEmailSend } from "../../../lib/email/claim-email-tracking.js";
 import { normalizeReferencePlanMarkerAppearance } from "../../../lib/reference-plan-marker-appearance";
 import { Prisma } from "@prisma/client";
@@ -362,7 +362,7 @@ async function sendComplaintEmail(payload, attachmentParts = [], referenceSnapsh
 
 async function sendComplaintEmailMessage(payload, attachmentParts = [], referenceSnapshot = null, captureReceipt = () => {}) {
   const recipient = resolveServiceClaimEmailRecipient(payload.contractNumber);
-  const smtpConfig = resolveSmtpConfigForContract(payload.contractNumber);
+  const smtpConfig = resolveSmtpConfigForContract(payload.contractNumber, process.env, CLAIM_INTERNAL_PREFIXES);
 
   if (!recipient || !smtpConfig.host || !smtpConfig.from) {
     return false;
@@ -392,7 +392,7 @@ async function sendComplaintEmailMessage(payload, attachmentParts = [], referenc
     })),
   };
 
-  // 111 (internal) contracts are sent from SMTP_111_* (315primex), all others from SMTP_*.
+  // 111 and 222 contract claims are sent from SMTP_111_* (315primex), all others from SMTP_*.
   const { receipt } = await sendMailForContract(payload.contractNumber, {
     to: recipient,
     subject: formatServiceClaimEmailSubject(payload.contractNumber, payload.claimSequence),
@@ -400,7 +400,7 @@ async function sendComplaintEmailMessage(payload, attachmentParts = [], referenc
     text: buildComplaintEmailText(emailPayload),
     html: buildComplaintEmailHtml(emailPayload, kitchenPreviewAttachment),
     attachments,
-  });
+  }, { prefixes: CLAIM_INTERNAL_PREFIXES });
   captureReceipt(receipt);
 
   return true;

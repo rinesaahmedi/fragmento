@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  CLAIM_INTERNAL_PREFIXES,
   isInternalContractNumber,
   resolveSmtpConfigForContract,
   sendMailForContract,
@@ -32,6 +33,23 @@ test("111 contracts use the internal mailbox, app password without spaces", () =
   assert.equal(config.user, "315primex.eu@gmail.com");
   assert.equal(config.from, "315primex.eu@gmail.com");
   assert.equal(config.pass, "abcdefghijklmnop");
+});
+
+test("claims for 222 contracts also use the internal mailbox; orders for 222 do not", () => {
+  assert.equal(isInternalContractNumber("222123456", CLAIM_INTERNAL_PREFIXES), true);
+  assert.equal(resolveSmtpConfigForContract("222123456", env, CLAIM_INTERNAL_PREFIXES).from, "315primex.eu@gmail.com");
+  assert.equal(resolveSmtpConfigForContract("111123456", env, CLAIM_INTERNAL_PREFIXES).from, "315primex.eu@gmail.com");
+  assert.equal(resolveSmtpConfigForContract("670123456", env, CLAIM_INTERNAL_PREFIXES).from, "nachkauf@myarchitecto.de");
+  // default (orders) prefixes: only 111
+  assert.equal(isInternalContractNumber("222123456"), false);
+  assert.equal(resolveSmtpConfigForContract("222123456", env).from, "nachkauf@myarchitecto.de");
+});
+
+test("sendMailForContract honours claim prefixes for 222", async () => {
+  const sent = [];
+  const createTransport = (config) => ({ sendMail: async (msg) => { sent.push(msg); return { messageId: "3" }; } });
+  await sendMailForContract("222000111", { to: "x@example.com" }, { env, createTransport, prefixes: CLAIM_INTERNAL_PREFIXES });
+  assert.equal(sent[0].from, '"Fragmento" <315primex.eu@gmail.com>');
 });
 
 test("all other contracts keep the default mailbox", () => {

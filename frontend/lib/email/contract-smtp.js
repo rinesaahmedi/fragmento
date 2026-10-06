@@ -1,14 +1,20 @@
 import nodemailer from "nodemailer";
 
 /**
- * Contracts starting with "111" are internal/test contracts. Their claim and order
- * e-mails are sent from a separate mailbox (SMTP_111_*, e.g. 315primex.eu@gmail.com)
- * instead of the customer-facing SMTP_* account (nachkauf@myarchitecto.de).
+ * Some contract ranges are sent from a separate mailbox (SMTP_111_*, e.g.
+ * 315primex.eu@gmail.com) instead of the customer-facing SMTP_* account
+ * (nachkauf@myarchitecto.de):
+ *   - order e-mails: contracts starting with 111
+ *   - claim e-mails: contracts starting with 111 or 222
  * When SMTP_111_* is not configured, or that account refuses to send, the mail is
  * delivered through the default SMTP_* account so no e-mail is lost.
  */
-export function isInternalContractNumber(contractNumber) {
-  return String(contractNumber || "").trim().replace(/\s+/g, "").startsWith("111");
+export const ORDER_INTERNAL_PREFIXES = Object.freeze(["111"]);
+export const CLAIM_INTERNAL_PREFIXES = Object.freeze(["111", "222"]);
+
+export function isInternalContractNumber(contractNumber, prefixes = ORDER_INTERNAL_PREFIXES) {
+  const normalized = String(contractNumber || "").trim().replace(/\s+/g, "");
+  return prefixes.some((prefix) => normalized.startsWith(prefix));
 }
 
 function buildSmtpConfig(prefix, env, profile) {
@@ -33,9 +39,9 @@ export function resolveInternalSmtpConfig(env = process.env) {
   return config.user && config.pass && config.from ? config : null;
 }
 
-/** SMTP account to use for a contract: the internal one for 111 contracts when configured. */
-export function resolveSmtpConfigForContract(contractNumber, env = process.env) {
-  if (isInternalContractNumber(contractNumber)) {
+/** SMTP account to use for a contract: the internal one for the given prefixes when configured. */
+export function resolveSmtpConfigForContract(contractNumber, env = process.env, prefixes = ORDER_INTERNAL_PREFIXES) {
+  if (isInternalContractNumber(contractNumber, prefixes)) {
     const internal = resolveInternalSmtpConfig(env);
     if (internal) return internal;
   }
@@ -56,8 +62,8 @@ export function createSmtpTransport(config) {
  * Falls back to the default account if the internal 111 account fails.
  * Returns { receipt, config } so callers can log/track which account was used.
  */
-export async function sendMailForContract(contractNumber, message, { fromName = "Fragmento", env = process.env, createTransport = createSmtpTransport } = {}) {
-  const primary = resolveSmtpConfigForContract(contractNumber, env);
+export async function sendMailForContract(contractNumber, message, { fromName = "Fragmento", env = process.env, createTransport = createSmtpTransport, prefixes = ORDER_INTERNAL_PREFIXES } = {}) {
+  const primary = resolveSmtpConfigForContract(contractNumber, env, prefixes);
   const send = (config) => createTransport(config).sendMail({ ...message, from: `"${fromName}" <${config.from}>` });
 
   try {
