@@ -5,6 +5,7 @@ import { normalizeReferencePlanMarkerAppearance } from "./reference-plan-marker-
 import { componentIdForItem } from "../components/kitchen-selection-utils.js";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "./catalog.js";
 import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "./kitchen-plan-preview-data.js";
+import { withBasePlinthExtension } from "./kitchen-plan-plinth.js";
 import { loadKitchenSvgMarkup } from "./load-kitchen-svg.js";
 import { parseServiceClaimProblemAreas } from "./service-claim-problem-areas.js";
 import {
@@ -610,9 +611,12 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
     return null;
   }
 
-  const displayHotspots = withClaimPreviewDerivedSinkFaucet(
-    applyClaimPreviewSourceHotspotOverrides(normalizedSlug, sourceHotspots),
-    plan.kitchenConfig?.components,
+  const displayHotspots = withBasePlinthExtension(
+    withClaimPreviewDerivedSinkFaucet(
+      applyClaimPreviewSourceHotspotOverrides(normalizedSlug, sourceHotspots),
+      plan.kitchenConfig?.components,
+    ),
+    normalizedSlug,
   );
   const preparedHotspots = buildServiceClaimBlendeHotspots(
     displayHotspots,

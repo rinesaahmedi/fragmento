@@ -17,6 +17,38 @@ import {
 } from "../lib/claim-kitchen-preview.js";
 import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
 import { buildServiceClaimPartHotspots } from "../lib/service-claim-kitchen-hotspots.js";
+import { withBasePlinthExtension } from "../lib/kitchen-plan-plinth.js";
+
+test("AB 105763 email cabinet selections include the plinth and preserve the oven seam", () => {
+  const source = PLAN_HOTSPOTS_BY_SLUG["ab-105763"];
+  const extended = withBasePlinthExtension(source, "ab-105763");
+  const crop = { left: 0, top: 0, width: 100, height: 100 };
+  const cropped = extended.map((hotspot) => cropClaimPlanHotspot(hotspot, crop));
+  const selected = resolveSelectedClaimPlanHotspots({
+    selectedAreas: [{ componentId: "component-drawer-module" }],
+    claimHotspots: cropped,
+    sourceHotspots: cropped,
+    selectableComponents: [],
+  });
+  assert.equal(selected.length, 1);
+  assert.ok(Math.abs(selected[0].top + selected[0].height - 92.37) < 0.000001);
+  for (const key of ["base-module-1", "base-module-2", "base-module-3", "sink-base", "oven-module"]) {
+    const hotspot = extended.find((item) => item.componentKey === key);
+    assert.ok(Math.abs(hotspot.top + hotspot.height - 92.37) < 0.000001, key);
+  }
+
+  const originalOven = source.find((hotspot) => hotspot.componentKey === "oven-module");
+  const oven = extended.find((hotspot) => hotspot.componentKey === "oven-module");
+  const parts = buildServiceClaimPartHotspots([oven], [
+    { partKey: "oven", sourceComponentKey: "oven-module" },
+    { partKey: "oven-drawer", sourceComponentKey: "oven-module" },
+  ], "ab-105763");
+  const drawer = parts.find((hotspot) => hotspot.claimPartKey === "oven-drawer");
+  assert.ok(Math.abs(drawer.top - (originalOven.top + originalOven.height * (2040 - 1554) / (2160 - 1554))) < 0.000001);
+  assert.ok(Math.abs(drawer.top + drawer.height - 92.37) < 0.000001);
+  assert.equal(source.find((hotspot) => hotspot.componentKey === "drawer-module").height, 24.44);
+  assert.deepEqual(withBasePlinthExtension(extended, "ab-105763"), extended);
+});
 
 const SAMPLE_SVG = '<svg viewBox="0 0 900 600"></svg>';
 const SAMPLE_KITCHEN_SVG = `
