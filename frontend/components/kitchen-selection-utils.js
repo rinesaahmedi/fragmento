@@ -66,6 +66,11 @@ export function shouldHideComponentFromSelectionSummary(kitchenSlug, item) {
   const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
   const code = String(item?.code || "").trim().toUpperCase();
 
+  // Both 105790 worktops stay selected; the default summary uses one row.
+  if (normalizedSlug === "ab-105790") {
+    return code === "TOP-AB105790-SECONDARY";
+  }
+
   // 104296's oven cabinet and fillers are included structural parts,
   // retained for plan selection and claims without separate default rows.
   if (normalizedSlug === "ab-104332") {
@@ -393,6 +398,19 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "TOP-AB105776": "2",
   "TOP-AB105778": "2",
   "TOP-AB105789": "2",
+  "TOP-AB105790": "2",
+  "SINK-BASE-AB105790-SP60-L": "3",
+  "TOP-AB105790-SECONDARY": "4",
+  "REF-AB105790-KGCN388140E": "5",
+  "CAB-BASE-AB105790-US60-UPK20": "6",
+  "BLENDE-AB105790-SINK-END": "7",
+  "DISH-AB105790-600": "8",
+  "CAB-BASE-AB105790-US50-UPK20": "9",
+  "CAB-WALL-AB105790-H6002-HPK2002": "10",
+  "CAB-WALL-AB105790-H6002": "11",
+  "CAB-HOOD-AB105790-600": "12",
+  "HOOD-AB105790-FH664621E": "12",
+  "CAB-WALL-AB105790-H5002": "13",
   "SINK-BASE-AB105789-SP60-R": "3",
   "REF-AB105789-KGCN388140E": "4",
   "BLENDE-AB105789-OVEN-END": "5",
@@ -1314,6 +1332,7 @@ export function getLocalizedItemInfoText(item, translate) {
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105779": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105790": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105789": [
     ["component-wall-cabinet-1", "component-extractor-hood"],
   ],

@@ -981,7 +981,11 @@ export function buildServiceClaimSelectableComponents({
     "ab-110401": ["component-base-module-2"],
     "ab-110402": ["component-base-module-2"],
   }[normalizedKitchenSlug] || []);
-  const worktopEndPanelChoicePartKey = hasSplitWorktopClaimParts
+  // The end panel belongs to the right block in 105790, regardless of
+  // whether both separate worktop claim parts are present in the input.
+  const worktopEndPanelChoicePartKey = normalizedKitchenSlug === "ab-105790"
+    ? "worktop-right"
+    : hasSplitWorktopClaimParts
     ? LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS.has(normalizedKitchenSlug)
       ? "worktop-left"
       : "worktop-right"

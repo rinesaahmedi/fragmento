@@ -1,4 +1,5 @@
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
+import { AB_105790_BLENDE_CALIBRATION, AB_105790_COOKTOP_POINTS, AB_105790_OVEN_PART_POINTS, AB_105790_SINK_POINTS } from "./ab-105790-plan.js";
 import { AB_105789_BLENDE_CALIBRATION, AB_105789_COOKTOP_POINTS, AB_105789_OVEN_PART_POINTS, AB_105789_SINK_POINTS } from "./ab-105789-plan.js";
 import { AB_105777_LAYOUT_ALIAS_SLUGS } from "./ab-105777-layout.js";
 import { AB_105779_LAYOUT_ALIAS_SLUGS } from "./ab-105779-layout.js";
@@ -41,6 +42,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   ...AB_105779_LAYOUT_ALIAS_SLUGS,
   "ab-105779",
   "ab-105789",
+  "ab-105790",
   "ab-104332",
   "ab-104296",
   "burger-103898",
@@ -134,6 +136,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
   "ab-105779": AB_105779_SINK_POINTS,
   "ab-105789": AB_105789_SINK_POINTS,
+  "ab-105790": AB_105790_SINK_POINTS,
   "burger-103898": [[57.662708, 59.30084], [64.033254, 58.211765], [77.073634, 60.329412], [70.945368, 61.398319]],
   "ab-105762": [[58.118765,56.578151],[64.147268,55.710924],[70.07601,56.820168],[75.76247,57.889076],[70.047506,58.776471],[63.463183,57.788235]],
   // Complete outside sink rim, including the left bowl and right drainer.
@@ -221,6 +224,7 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
 // to both shapes.
 const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-104332", "ab-104296", "ab-105825", "ab-105831"]);
 DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105789");
+DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105790");
 
 // Thin visual silhouettes traced around the faucet body. Source hotspot boxes
 // remain intentionally generous for interaction, but painting those boxes
@@ -467,6 +471,7 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
   "ab-105789": AB_105789_COOKTOP_POINTS,
+  "ab-105790": AB_105790_COOKTOP_POINTS,
   // Exact outside cooktop strokes from the AB 105775 vector plan. The
   // dedicated source polygon keeps the ASC mask on the glass perimeter
   // instead of re-projecting it from the taller oven cabinet.
@@ -568,6 +573,7 @@ const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   "ab-105779": { "wall-cabinet-3": { wholeFacesOnly: true, wholeBlendeFaces: AB_105779_BLENDE_FACES } },
   "ab-105789": AB_105789_BLENDE_CALIBRATION,
+  "ab-105790": AB_105790_BLENDE_CALIBRATION,
   "ab-105777": {
   "dishwasher-base": { side: "right", inner: 98.707838, outer: 99.035629 },
   "base-module-3": {
@@ -1235,6 +1241,7 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
   "ab-105779": AB_105779_OVEN_PART_POINTS,
   "ab-105789": AB_105789_OVEN_PART_POINTS,
+  "ab-105790": AB_105790_OVEN_PART_POINTS,
   "ab-105762": {
     oven: [[36,61.07563],[46.831354,59.502521],[46.831354,78.722689],[36,80.295798]],
     "oven-drawer": [[36,80.295798],[46.831354,78.722689],[46.831354,88.584874],[36,90.137815]],
@@ -2416,6 +2423,10 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     if (sourceComponentKey === "worktop" && sourceHotspot.claimExcludeFromWorktop) return [];
     if (!sourceParts.length) {
       return [hotspot];
+    }
+    if (normalizedSlug === "ab-105790" && hotspot.claimFurniturePartKey) {
+      const part = sourceParts.find((entry) => entry.partKey === hotspot.claimFurniturePartKey);
+      return part ? [existingClaimPartHotspot(hotspot, part)] : [];
     }
     if (
       sourceComponentKey === "worktop"

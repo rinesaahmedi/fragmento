@@ -16,6 +16,7 @@ const SVG_BY_SLUG = {
     slug, path.join(process.cwd(), "public", "plans", "AB 105779.svg"),
   ])),
   "ab-105789": path.join(process.cwd(), "public", "plans", "670 105789.svg"),
+  "ab-105790": path.join(process.cwd(), "public", "plans", "AB 105790.svg"),
   ...Object.fromEntries(AB_105777_LAYOUT_ALIAS_SLUGS.map((slug) => [
     slug, path.join(process.cwd(), "public", "plans", "AB 105777.svg"),
   ])),

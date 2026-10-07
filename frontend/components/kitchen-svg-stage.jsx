@@ -65,6 +65,7 @@ const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
 export const IMAGE_VIEW_BY_SLUG = {
   "ab-105779": "/plans/AB%20105779.svg",
   "ab-105789": "/plans/670%20105789.svg",
+  "ab-105790": "/plans/AB%20105790.svg",
   "ab-105777": "/plans/AB%20105777.svg",
   "ab-104332": "/plans/670%20104332.svg",
   "ab-104296": "/plans/670%20104296.svg",
@@ -204,6 +205,7 @@ AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const IMAGE_HOTSPOTS_BY_SLUG = {
   "ab-105789": PLAN_HOTSPOTS_BY_SLUG["ab-105789"],
+  "ab-105790": PLAN_HOTSPOTS_BY_SLUG["ab-105790"],
   "burger-103898": [
     // Exact visible faces traced from the 842 x 595 Burger vector plan.
     { componentKey: "refrigerator", points: [[9.562945, 36.813445], [17.75772, 35.139496], [28.304038, 36.652101], [20.109264, 38.346218]], preserveManualSize: true },
