@@ -1,0 +1,7 @@
+export const AB_105779_LAYOUT_ALIAS_SLUGS = [
+  "ab-105782",
+  "ab-105785",
+  "ab-105788",
+];
+
+export const AB_105779_LAYOUT_SLUGS = ["ab-105779", ...AB_105779_LAYOUT_ALIAS_SLUGS];

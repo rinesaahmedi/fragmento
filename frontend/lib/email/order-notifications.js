@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 import path from "path";
 import { PDFDocument, rgb } from "pdf-lib";
 import sharp from "sharp";
+import { AB_105779_LAYOUT_SLUGS } from "../ab-105779-layout.js";
 import { observeOrderEmailSend, buildOrderEmailDelivery } from "./order-email-observer.js";
 import { scheduleOrderEmailAttempt } from "./order-email-after.js";
 import { resolveSmtpConfigForContract, sendMailForContract } from "./contract-smtp.js";
@@ -672,7 +673,7 @@ export function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, 
     const fill = isLocked ? "rgba(37,99,235,0.26)" : "rgba(62,188,116,0.34)";
     // AB 105779 partitions the worktop around its appliance cutouts. Only
     // the source drawing should show edges; outlining these pieces adds seams.
-    const stroke = slug === "ab-105779" && componentKey === "worktop"
+    const stroke = AB_105779_LAYOUT_SLUGS.includes(slug) && componentKey === "worktop"
       ? "none"
       : (isLocked ? "rgba(37,99,235,0.9)" : "rgba(42,145,85,1)");
     const points = Array.isArray(hotspot.points) ? hotspot.points : [];

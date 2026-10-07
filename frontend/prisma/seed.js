@@ -34,7 +34,9 @@ const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kitchen configuration";
 const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "105861"];
 const AB_105762_LAYOUT_ALIAS_CODES = ["105766", "105770", "105774"];
+const AB_105779_LAYOUT_ALIAS_CODES = ["105782", "105785", "105788"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
   "ab-105779",
   "ab-104332",
   "ab-104296",
@@ -82,6 +84,7 @@ const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105862",
 ]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
+  ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
   "ab-105779",
   "ab-105743",
   "ab-105748",
@@ -2520,6 +2523,14 @@ const AB_105779_ITEMS = [
 PRODUCT_INFO_BY_CODE["DISH-AB105779-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 
 const DEFAULT_KITCHENS = [
+  ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => ({
+    slug: `ab-${code}`,
+    kitchenCode: `${code.slice(0, 3)} ${code.slice(3)}`,
+    name: code,
+    description: "L-shaped kitchen using the AB 105779 plan and catalog-linked elements",
+    items: AB_105779_ITEMS,
+    reconcileExisting: true,
+  })),
   { slug: "ab-105779", kitchenCode: "105 779", name: "105779", description: "L-shaped kitchen based on frontend/public/pdfs/670 105779.pdf", items: AB_105779_ITEMS, reconcileExisting: true },
   { slug: "ab-105777", kitchenCode: "105 777", name: "105777", description: "Two-elevation kitchen based on frontend/public/pdfs/670 105777.pdf", items: AB_105777_ITEMS, reconcileExisting: true },
   ...["105780", "105783", "105786"].map((code) => ({

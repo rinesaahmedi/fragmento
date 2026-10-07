@@ -1,5 +1,9 @@
 # Kitchen 105779
 
+Kitchens 105782, 105785 and 105788 reuse this complete configuration, including
+the excluded corner gap, fixed blue divider strips and seam-free PDF worktop.
+Each has its own kitchen record and `670<code>` / `111<code>` contracts.
+
 Source: `frontend/public/pdfs/670 105779.pdf` and the final Excel screenshot
 (Image #2, without the L suffixes). Contracts: `670105779` and test `111105779`.
 
