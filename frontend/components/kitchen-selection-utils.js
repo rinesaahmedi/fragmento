@@ -390,6 +390,16 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105777-H6002-15": "15",
   "CAB-WALL-AB105777-H6002-16": "16",
   "TOP-AB105776": "2",
+  "TOP-AB105778": "2",
+  "SINK-BASE-AB105778-SP50-R": "3",
+  "CAB-BASE-AB105778-US40": "4",
+  "DISH-AB105778-600": "5",
+  "BLENDE-AB105778-SINK-END": "6",
+  "CAB-WALL-AB105778-H4002": "7",
+  "CAB-HOOD-AB105778-600": "8",
+  "HOOD-AB105778-FH664621E": "8",
+  "CAB-WALL-AB105778-H6002": "9",
+  "CAB-WALL-AB105778-H5002-HPK2002": "10",
   "SINK-BASE-AB105776-SP60": "3",
   "REF-AB105776-KGCN388140E": "4",
   "DISH-AB105776-600": "5",
@@ -1329,6 +1339,10 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105760": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105777": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105776": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105778": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105781": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105784": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105787": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105761": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105765": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105769": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -2071,6 +2085,12 @@ export function getProductImagePaths(item) {
     item?.articleNumber || item?.catalogArticle?.articleNumber || "",
   ).trim().toUpperCase();
   if (articleNumber === "OL-KGCN388140E") return KGCN388140E_GALLERY;
+  if (articleNumber.split("+").some((article) => article.trim() === "A-EGSPV597210")) {
+    return ["/product-images/gallery/a-egspv597210-dishwasher/01.webp"];
+  }
+  if (articleNumber.split("+").some((article) => article.replace(/\s+/g, "") === "FH664621E")) {
+    return ["/product-images/gallery/fh664621s-flat-hood/01.webp"];
+  }
   return item?.productImagePath ? [item.productImagePath] : [];
 }
 

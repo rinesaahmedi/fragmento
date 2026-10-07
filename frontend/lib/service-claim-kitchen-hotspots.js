@@ -2,6 +2,8 @@ import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-sel
 import { AB_105777_LAYOUT_ALIAS_SLUGS } from "./ab-105777-layout.js";
 import { AB_105779_BLENDE_FACES, AB_105779_WORKTOP_PART_KEYS, AB_105779_SINK_POINTS, AB_105779_COOKTOP_POINTS, AB_105779_OVEN_PART_POINTS } from "./ab-105779-plan.js";
 
+const AB_105778_LAYOUT_SLUGS = new Set(["ab-105778", "ab-105781", "ab-105784", "ab-105787"]);
+
 const AB_105845_LAYOUT_ALIAS_SLUGS = [
   "105845-modul-2",
   "ab-105848",
@@ -1177,6 +1179,10 @@ for (const alias of AB_105846_LAYOUT_ALIAS_SLUGS) {
 const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   "ab-105779": (468.76 - 352.12) / (528.52 - 352.12),
   "ab-105777": 0.6613545816733069,
+  "ab-105778": (515.92 - 386.68) / (582.16 - 386.68),
+  "ab-105781": (515.92 - 386.68) / (582.16 - 386.68),
+  "ab-105784": (515.92 - 386.68) / (582.16 - 386.68),
+  "ab-105787": (515.92 - 386.68) / (582.16 - 386.68),
   // PDF-measured seam between the oven and the drawer below it. The oven ends
   // on this line and the independently selectable drawer starts on the same line.
   "ab-105743": 0.661358,
@@ -1607,19 +1613,27 @@ function splitSinkFixtureHotspot(hotspot, part) {
   return separated;
 }
 
-function elevationSinkHotspot(hotspots, part, sinkCabinetSourceKey = "sink-base") {
+function elevationSinkHotspot(hotspots, part, sinkCabinetSourceKey = "sink-base", kitchenSlug = "") {
   const sinkBase = hotspots.find(
     (hotspot) => hotspot?.componentKey === sinkCabinetSourceKey,
   );
   if (!sinkBase) return null;
 
-  const stripHeight = 1.2;
+  // This elevation has a measured worktop band: follow both drawn edges while
+  // keeping the sink selection confined to the sink cabinet's width.
+  const measuredWorktop = AB_105778_LAYOUT_SLUGS.has(kitchenSlug)
+    ? hotspots.find((hotspot) => (
+      hotspot?.componentKey === "worktop"
+      && !isFloorHeightWorktopEndPanel(hotspot)
+    ))
+    : null;
+  const stripHeight = measuredWorktop ? Number(measuredWorktop.height) : 1.2;
   return {
     componentId: part.componentId,
     componentKey: `claim-${part.partKey}`,
     claimPartKey: part.partKey,
     left: Number(sinkBase.left || 0),
-    top: Number(sinkBase.top || 0) - stripHeight,
+    top: measuredWorktop ? Number(measuredWorktop.top) : Number(sinkBase.top || 0) - stripHeight,
     width: Number(sinkBase.width || 0),
     height: stripHeight,
     preserveManualSize: true,
@@ -2455,7 +2469,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
       }
       if (!hasVisibleSink && part.partKey === "sink") {
         return hotspotIndex === primarySinkFixtureIndex
-          ? elevationSinkHotspot(hotspots, part, elevationSinkCabinetSourceKey) || []
+          ? elevationSinkHotspot(hotspots, part, elevationSinkCabinetSourceKey, normalizedSlug) || []
           : [];
       }
       if (part.partKey === "faucet") {
