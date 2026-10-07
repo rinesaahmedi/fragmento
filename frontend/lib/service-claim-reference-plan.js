@@ -1,6 +1,10 @@
 const PDF_PATH_PREFIX = "/pdfs/";
 const PREVIEW_PATH_PREFIXES = ["/jpg/", "/img/"];
 
+// These newly configured kitchens supersede their earlier reference uploads.
+// Keep the uploaded assets stored, while claims use the measured interactive plan.
+const CONFIGURED_CLAIM_PLAN_SLUGS = new Set(["ab-105777"]);
+
 export const PDF_ONLY_KITCHEN_SLUG = "pdf-only-kitchen";
 export const PDF_ONLY_KITCHEN_NAME = "Archived kitchen plan";
 
@@ -54,11 +58,12 @@ export function normalizeServiceClaimPlanPreviewPath(value) {
 }
 
 export function buildServiceClaimReferencePlan(contract) {
+  const kitchenSlug = String(contract?.kitchen?.slug || "").trim().toLowerCase();
+  if (CONFIGURED_CLAIM_PLAN_SLUGS.has(kitchenSlug)) return null;
   const pdfPath = normalizeServiceClaimPlanPdfPath(contract?.claimPlanPdfPath);
   const previewImagePath = normalizeServiceClaimPlanPreviewPath(contract?.claimPlanPreviewPath);
   if (!pdfPath && !previewImagePath) return null;
 
-  const kitchenSlug = String(contract?.kitchen?.slug || "").trim();
   const storedKitchenName = String(contract?.kitchen?.name || "").trim();
 
   return {

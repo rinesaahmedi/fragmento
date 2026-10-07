@@ -550,6 +550,34 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  "ab-105777": {
+  "dishwasher-base": { side: "right", inner: 98.707838, outer: 99.035629 },
+  "base-module-3": {
+    "side": "right",
+    "inner": 52.95962,
+    "outer": 54.171021
+  },
+  "drawer-module": {
+    "side": "left",
+    "inner": 64.090261,
+    "outer": 62.365796
+  },
+  "wall-cabinet-4": {
+    "side": "right",
+    "inner": 52.95962,
+    "outer": 54.171021
+  },
+  "wall-cabinet-5": {
+    "side": "left",
+    "inner": 64.090261,
+    "outer": 62.365796
+  },
+  "wall-cabinet-7": {
+    "side": "right",
+    "inner": 98.707838,
+    "outer": 99.035629
+  }
+},
   "ab-104332": {
     "wall-cabinet-4": { side: "right", wholeFacesOnly: true, wholeBlendeFaces: [
       { left: 66.584323, right: 67.866983, top: 13.357983, bottom: 37.963025 },
@@ -1140,6 +1168,7 @@ for (const alias of AB_105846_LAYOUT_ALIAS_SLUGS) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105846"];
 }
 const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
+  "ab-105777": 0.6613545816733069,
   // PDF-measured seam between the oven and the drawer below it. The oven ends
   // on this line and the independently selectable drawer starts on the same line.
   "ab-105743": 0.661358,
@@ -1295,6 +1324,7 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 );
 
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-105777": { indexPartKeys: ["worktop-left", "worktop-right", null] },
   "ab-104332": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-104296": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-105762": AB_105762_WORKTOP_SPLIT,

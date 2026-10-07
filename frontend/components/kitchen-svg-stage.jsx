@@ -60,6 +60,7 @@ const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
 export const IMAGE_VIEW_BY_SLUG = {
+  "ab-105777": "/plans/AB%20105777.svg",
   "ab-104332": "/plans/670%20104332.svg",
   "ab-104296": "/plans/670%20104296.svg",
   "burger-103898": "/plans/670%20103898.svg",
@@ -1584,6 +1585,7 @@ AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105759"];
 });
 IMAGE_HOTSPOTS_BY_SLUG["ab-105762"] = PLAN_HOTSPOTS_BY_SLUG["ab-105762"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105777"] = PLAN_HOTSPOTS_BY_SLUG["ab-105777"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105775"] = PLAN_HOTSPOTS_BY_SLUG["ab-105775"];
 AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105762"];
@@ -1810,6 +1812,7 @@ const SPLIT_SIDE_WORKTOP_GAP_PERCENT = 8;
 const SPLIT_SIDE_OVEN_KEYS = new Set(["oven-module", "oven-base"]);
 const SPLIT_SIDE_SINK_KEYS = new Set(["sink-base"]);
 const SPLIT_SIDE_LABEL_SLUGS = new Set([
+  "ab-105777",
   "ab-105833",
   "ab-105836",
   "ab-105839",

@@ -59,6 +59,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   ...AB_105846_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
 ]);
 const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105777",
   "ab-105833",
   "ab-105836",
   "ab-105839",
@@ -761,6 +762,8 @@ PRODUCT_INFO_BY_CODE["HOOD-AB105745-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-F
 PRODUCT_INFO_BY_CODE["HOOD-AB105825-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105822-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105828-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105777-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["DISH-AB105777-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105845-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB109874-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["CAB-HOOD-AB109874-600"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
@@ -2412,7 +2415,49 @@ const BURGER_103898_ITEMS = [
   { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Pickup at logistics location", nameDe: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
 ];
 
+// AB 105777: supplier rows 1-16; two measured front elevations.
+const AB_105777_ITEMS = [
+  defaultOvenHob({
+    catalogArticleNumber: "A-EH923640E + 9EC744100C",
+    displayArticleNumber: "EH92364E-A + 9EC744100C",
+    claimArticleNumber: "EH92364E-A",
+    claimProductInfoByPartKey: {
+      oven: AB_109955_OVEN_CLAIM_PRODUCT_INFO,
+      cooktop: {
+        productImagePath: null,
+        productInfoPdfPath: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf",
+        productInfoSummary: "Glaskeramikkochfeld 9EC744100C",
+        productInfoKeyFacts: [],
+        productInfoExtractedText: null,
+      },
+    },
+    widthMm: 600,
+    sortOrder: 10,
+    infoText: "Included EH92364E-A oven, 9EC744100C cooktop and UHK lower cabinet",
+  }),
+  defaultWorktop({ code: "TOP-AB105777", catalogArticleNumber: "PLR60", displayArticleNumber: "PLR60", sortOrder: 20 }),
+  defaultSinkBase({ code: "SINK-BASE-AB105777-SP60", catalogArticleNumber: "SP60", articleNumber: "SP60", widthMm: 600, heightMm: 878, depthMm: 600, sortOrder: 30 }),
+  AB_105776_ITEMS.find((item) => item.componentKey === "refrigerator"),
+  { ...AB_105776_ITEMS.find((item) => item.componentKey === "dishwasher-base"), code: "DISH-AB105777-600", sortOrder: 90, price: articlePriceWithBlende("A-EGSPV597210 + TGV60", "UPK20", 1), blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1), infoText: "Fully integrated dishwasher incl. furniture front and right UPK20 filler panel" },
+  { ...AB_105776_ITEMS.find((item) => item.componentKey === "wall-cabinet-2"), code: "CAB-HOOD-AB105777-600", sortOrder: 110 },
+  { ...AB_105776_ITEMS.find((item) => item.componentKey === "extractor-hood"), code: "HOOD-AB105777-FH664621E", sortOrder: 112 },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105777-US60-5", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, articleNumber: "US60", price: articlePrice("US60") },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105777-US40-6", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 60, articleNumber: "US40", price: articlePrice("US40") },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105777-US30-7", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", price: articlePriceWithBlende("US30", "UPK20", 1), blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105777-US50-8", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", widthMm: 500, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 80, articleNumber: "US50", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", price: articlePriceWithBlende("US50", "UPK20", 1), blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105777-H6002-10", name: "Upper Cabinet", nameDe: "Oberschrank", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 100, articleNumber: "H6002", price: articlePrice("H6002") },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105777-H4002-12", name: "Upper Cabinet", nameDe: "Oberschrank", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 120, articleNumber: "H4002", price: articlePrice("H4002") },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105777-H3002-13", name: "Upper Cabinet", nameDe: "Oberschrank", widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 130, articleNumber: "H3002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", price: articlePriceWithBlende("H3002", "HPK2002", 1), blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105777-H5002-14", name: "Upper Cabinet", nameDe: "Oberschrank", widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 140, articleNumber: "H5002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", price: articlePriceWithBlende("H5002", "HPK2002", 1), blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105777-H6002-15", name: "Upper Cabinet", nameDe: "Oberschrank", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 150, articleNumber: "H6002", price: articlePrice("H6002") },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105777-H6002-16", name: "Upper Cabinet", nameDe: "Oberschrank", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-7", sortOrder: 160, articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", price: articlePriceWithBlende("H6002", "HPK2002", 1), blendePrice: blendePrice("HPK2002", 1) },
+  defaultSinkWorktop({ catalogArticleNumber: "526335 + 517720", displayArticleNumber: "526335 + 517720", sortOrder: 35 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 const DEFAULT_KITCHENS = [
+  { slug: "ab-105777", kitchenCode: "105 777", name: "105777", description: "Two-elevation kitchen based on frontend/public/pdfs/670 105777.pdf", items: AB_105777_ITEMS, reconcileExisting: true },
   {
     slug: "burger-103898",
     kitchenCode: "103 898",
@@ -4536,14 +4581,14 @@ async function main() {
         && String(item?.code || "").toUpperCase().startsWith("OVEN-")
       ));
     if (ovenBundle) {
-      const ovenArticleCode = String(ovenBundle.articleNumber || "").split("+")[0].trim() || "EH92364E-A";
+      const ovenArticleCode = String(ovenBundle.claimArticleNumber || ovenBundle.articleNumber || "").split("+")[0].trim() || "EH92364E-A";
       const ovenProductInfo = PRODUCT_INFO_BY_ARTICLE_NUMBER[ovenArticleCode] || OVEN_CLAIM_PRODUCT_INFO;
       const ovenClaimParts = ["ab-104296", "ab-104332"].includes(kitchen.slug) ? [
         { partKey: "oven-set", articleCode: "EHCX9330S-A", name: "Built-in oven and ceramic cooktop set", nameDe: "Einbauherd und Glaskeramikkochfeld", sortOrder: 40 },
       ] : [
-        { partKey: "oven", articleCode: ovenArticleCode, name: "Built-in Oven", nameDe: "Einbauherd", sortOrder: 40, ...ovenProductInfo },
+        { partKey: "oven", articleCode: ovenArticleCode, name: "Built-in Oven", nameDe: "Einbauherd", sortOrder: 40, ...ovenProductInfo, ...ovenBundle.claimProductInfoByPartKey?.oven },
         { partKey: "oven-drawer", articleCode: "UHK", name: "Lower Cabinet for Built-in Oven", nameDe: "Unterschrank für Einbauherde", sortOrder: 45 },
-        { partKey: "cooktop", articleCode: "9EC744100C", name: "Ceramic Cooktop 60cm", nameDe: "Glaskeramikkochfeld 60 cm", sortOrder: 50, ...COOKTOP_CLAIM_PRODUCT_INFO },
+        { partKey: "cooktop", articleCode: "9EC744100C", name: "Ceramic Cooktop 60cm", nameDe: "Glaskeramikkochfeld 60 cm", sortOrder: 50, ...COOKTOP_CLAIM_PRODUCT_INFO, ...ovenBundle.claimProductInfoByPartKey?.cooktop },
       ];
       for (const part of ovenClaimParts) {
         await prisma.kitchenClaimPart.upsert({

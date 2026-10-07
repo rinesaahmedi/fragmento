@@ -19,6 +19,7 @@ const AB_105847_MOBILE_LAYOUT_SLUGS = new Set([
 
 export function getTwoPartMobilePlanLayout(slug = "") {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
+  if (normalizedSlug === "ab-105777") return { splitX: 60, shiftX: 6 };
   if (AB_105845_MOBILE_LAYOUT_SLUGS.has(normalizedSlug)) {
     return { splitX: 57, shiftX: 12 };
   }

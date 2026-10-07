@@ -1,4 +1,5 @@
 const KITCHEN_ARTICLE_NUMBER_ALIAS_SLUGS = new Set([
+  "ab-105777",
   "burger-103898",
   "ab-105762",
   "ab-105766",

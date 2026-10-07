@@ -5,6 +5,7 @@ import { AB_104332_HOTSPOTS } from './ab-104332-plan.js';
 import { AB_104296_HOTSPOTS } from './ab-104296-plan.js';
 
 export const PLAN_IMAGE_BY_SLUG = {
+  "ab-105777": "/plans/AB%20105777.svg",
   "ab-104332": "/plans/670%20104332.svg",
   "ab-104296": "/plans/670%20104296.svg",
   "burger-103898": "/plans/670%20103898.svg",
@@ -118,6 +119,7 @@ export const PLAN_IMAGE_BY_SLUG = {
 // Most legacy drawings use the 842 x 595 CAD sheet. Keep native dimensions for
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
+  "ab-105777": { width: 842, height: 595 },
   "ab-104332": { width: 842, height: 595 },
   "ab-104296": { width: 842, height: 595 },
   "burger-103898": { width: 842, height: 595 },
@@ -150,6 +152,10 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
+  "ab-105777": [
+    {"componentKey": "dishwasher-base", "left": 87.030879, "top": 70.033613, "width": 11.223278, "height": 6.302521, "key": "dishwasher-basket", "persistWhenSelected": true},
+    {"componentKey": "dishwasher-base", "left": 91.581948, "top": 79.02521, "width": 2.266033, "height": 2.92437, "key": "dishwasher-gs-mark", "persistWhenSelected": true},
+  ],
   "ab-104332": [
     { key: "customer-dishwasher-basket", componentKey: "dishwasher-front", left: 71.483373, top: 70.047059, width: 8.641331, height: 8.921008, persistWhenSelected: true },
     { key: "customer-dishwasher-gs-mark", componentKey: "dishwasher-front", left: 74.947743, top: 82.531092, width: 1.814727, height: 3.89916, persistWhenSelected: true },
@@ -507,6 +513,30 @@ export const AB_110401_FRG_ORDER_HOTSPOTS = [
 // linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const PLAN_HOTSPOTS_BY_SLUG = {
+  "ab-105777": [
+    {"componentKey": "refrigerator", "left": 1.881235, "top": 34.998319, "width": 11.315914, "height": 51.448739, "preserveManualSize": true},
+    {"componentKey": "wall-cabinet-1", "left": 14.251781, "top": 24.45042, "width": 12.228029, "height": 20.833613, "preserveManualSize": true},
+    {"componentKey": "wall-cabinet-2", "left": 26.47981, "top": 24.45042, "width": 12.213777, "height": 20.833613, "preserveManualSize": true},
+    {"componentKey": "wall-cabinet-3", "left": 38.693587, "top": 24.45042, "width": 8.152019, "height": 20.833613, "preserveManualSize": true},
+    {"componentKey": "wall-cabinet-4", "left": 46.845606, "top": 24.45042, "width": 7.325416, "height": 20.833613, "preserveManualSize": true},
+    {"componentKey": "wall-cabinet-5", "left": 62.365796, "top": 24.45042, "width": 11.900238, "height": 20.833613, "preserveManualSize": true},
+    {"componentKey": "wall-cabinet-6", "left": 74.266033, "top": 24.45042, "width": 12.228029, "height": 20.833613, "preserveManualSize": true},
+    {"componentKey": "wall-cabinet-7", "left": 86.494062, "top": 24.45042, "width": 12.541568, "height": 20.833613, "preserveManualSize": true},
+    {"componentKey": "extractor-hood", "left": 26.47981, "top": 45.284034, "width": 12.213777, "height": 1.431933, "preserveManualSize": true},
+    { componentKey: "extractor-hood", left: 28.574822, top: 47.744538, width: 2.380048, height: 2.4, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 34.760095, top: 47.744538, width: 2.380048, height: 2.4, preserveManualSize: true },
+    {"componentKey": "worktop", "left": 13.92399, "top": 60.410084, "width": 40.247031, "height": 1.14958, "preserveManualSize": true},
+    {"componentKey": "worktop", "left": 62.365796, "top": 60.410084, "width": 36.669834, "height": 1.14958, "preserveManualSize": true},
+    { componentKey: "worktop", left: 13.92399, top: 61.559664, width: 0.327791, height: 25.310924, preserveManualSize: true, separateLockedSidePanel: true },
+    {"componentKey": "sink-faucet", "left": 81.691211, "top": 54.601681, "width": 1.140143, "height": 5.808403, "preserveManualSize": true},
+    {"componentKey": "base-module-1", "left": 14.251781, "top": 61.559664, "width": 12.228029, "height": 25.310924, "preserveManualSize": true},
+    {"componentKey": "oven-module", "left": 26.47981, "top": 61.559664, "width": 12.213777, "height": 25.310924, "preserveManualSize": true},
+    {"componentKey": "base-module-2", "left": 38.693587, "top": 61.559664, "width": 8.152019, "height": 25.310924, "preserveManualSize": true},
+    {"componentKey": "base-module-3", "left": 46.845606, "top": 61.559664, "width": 7.325416, "height": 25.310924, "preserveManualSize": true},
+    {"componentKey": "drawer-module", "left": 62.365796, "top": 61.559664, "width": 11.900238, "height": 25.310924, "preserveManualSize": true},
+    {"componentKey": "sink-base", "left": 74.266033, "top": 61.559664, "width": 12.228029, "height": 25.310924, "preserveManualSize": true},
+    {"componentKey": "dishwasher-base", "left": 86.494062, "top": 61.559664, "width": 12.541568, "height": 25.310924, "preserveManualSize": true},
+  ],
   "ab-104332": AB_104332_HOTSPOTS,
   "ab-104296": AB_104296_HOTSPOTS,
   "ab-101246": [
