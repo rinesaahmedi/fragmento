@@ -5,7 +5,7 @@ const PREVIEW_PATH_PREFIXES = ["/jpg/", "/img/"];
 
 // These newly configured kitchens supersede their earlier reference uploads.
 // Keep the uploaded assets stored, while claims use the measured interactive plan.
-const CONFIGURED_CLAIM_PLAN_SLUGS = new Set(AB_105777_LAYOUT_SLUGS);
+const CONFIGURED_CLAIM_PLAN_SLUGS = new Set([...AB_105777_LAYOUT_SLUGS, "ab-105779"]);
 
 export const PDF_ONLY_KITCHEN_SLUG = "pdf-only-kitchen";
 export const PDF_ONLY_KITCHEN_NAME = "Archived kitchen plan";

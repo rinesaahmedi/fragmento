@@ -1,5 +1,6 @@
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
 import { AB_105777_LAYOUT_ALIAS_SLUGS } from "./ab-105777-layout.js";
+import { AB_105779_BLENDE_FACES, AB_105779_WORKTOP_PART_KEYS, AB_105779_SINK_POINTS, AB_105779_COOKTOP_POINTS, AB_105779_OVEN_PART_POINTS } from "./ab-105779-plan.js";
 
 const AB_105845_LAYOUT_ALIAS_SLUGS = [
   "105845-modul-2",
@@ -33,6 +34,7 @@ const AB_105762_LAYOUT_ALIAS_SLUGS = [
 ];
 
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105779",
   "ab-104332",
   "ab-104296",
   "burger-103898",
@@ -81,6 +83,7 @@ export function isLShapedClaimKitchen(kitchenSlug = "") {
 // Measured from the full-resolution PDF renders. Coordinates are relative to each plan's
 // faucet hotspot so the polygons remain aligned after the plan is cropped for display.
 const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
+  "ab-105779": AB_105779_SINK_POINTS.map(([x, y]) => [(x - 55.068884) / 0.88361, (y - 46.043697) / 3.569748]),
   "burger-103898": [[-2.075268817, 0.964447543], [-0.47311828, 0.851516208], [2.806451613, 1.071104915], [1.265232975, 1.181944929]],
   "ab-105762": [[-1.570532556,0.966873712],[-0.244514078,0.877846782],[1.059561153,0.991718454],[2.310344479,1.101449353],[1.053291465,1.19254667],[-0.394984162,1.091097317]],
   "ab-105775": [[-2.094650206,0.997690531],[-0.740740741,0.877598152],[3.041152263,1.072363356],[3.069958848,1.212471132],[1.448559671,1.2147806],[-1.995884774,1.013856813]],
@@ -122,6 +125,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 // by several narrow hotspots. These coordinates remain in the uncropped source
 // plan system and are projected into the ASC display crop below.
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
+  "ab-105779": AB_105779_SINK_POINTS,
   "burger-103898": [[57.662708, 59.30084], [64.033254, 58.211765], [77.073634, 60.329412], [70.945368, 61.398319]],
   "ab-105762": [[58.118765,56.578151],[64.147268,55.710924],[70.07601,56.820168],[75.76247,57.889076],[70.047506,58.776471],[63.463183,57.788235]],
   // Complete outside sink rim, including the left bowl and right drainer.
@@ -304,6 +308,7 @@ const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
 // source plan render. Keeping the values relative to the oven hotspot
 // preserves their alignment when the claim picker applies its display crop.
 const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
+  "ab-105779": AB_105779_COOKTOP_POINTS.map(([x, y]) => [(x - 33.76247) / 11.059382, (y - 57.566387) / 31.260504]),
   "ab-105762": [[-0.693421063,-0.052666216],[0.296052645,-0.103357487],[1.022368395,-0.05200789],[0,0.002633303]],
   "ab-105775": [[0.033873343,-0.098082596],[1.615611193,-0.044247788],[1.04712813,0.007374631],[0.033873343,-0.044247788]],
   "ab-110140": [[1.118461627, -0.096485619], [2.112307687, -0.038977633], [1.023076953, 0.012140566], [0.029230786, -0.049201273]],
@@ -551,6 +556,7 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  "ab-105779": { "wall-cabinet-3": { wholeFacesOnly: true, wholeBlendeFaces: AB_105779_BLENDE_FACES } },
   "ab-105777": {
   "dishwasher-base": { side: "right", inner: 98.707838, outer: 99.035629 },
   "base-module-3": {
@@ -1169,6 +1175,7 @@ for (const alias of AB_105846_LAYOUT_ALIAS_SLUGS) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105846"];
 }
 const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
+  "ab-105779": (468.76 - 352.12) / (528.52 - 352.12),
   "ab-105777": 0.6613545816733069,
   // PDF-measured seam between the oven and the drawer below it. The oven ends
   // on this line and the independently selectable drawer starts on the same line.
@@ -1211,6 +1218,7 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-105779": AB_105779_OVEN_PART_POINTS,
   "ab-105762": {
     oven: [[36,61.07563],[46.831354,59.502521],[46.831354,78.722689],[36,80.295798]],
     "oven-drawer": [[36,80.295798],[46.831354,78.722689],[46.831354,88.584874],[36,90.137815]],
@@ -1325,6 +1333,7 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 );
 
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-105779": { indexPartKeys: AB_105779_WORKTOP_PART_KEYS },
   "ab-105777": { indexPartKeys: ["worktop-left", "worktop-right", null] },
   "ab-104332": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-104296": { indexPartKeys: ["worktop-left", "worktop-right"] },
@@ -2368,6 +2377,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
       return [existingClaimPartHotspot(hotspot, linkedSinkCabinetPart)];
     }
     const sourceParts = partsBySourceKey.get(sourceComponentKey) || [];
+    if (sourceComponentKey === "worktop" && sourceHotspot.claimExcludeFromWorktop) return [];
     if (!sourceParts.length) {
       return [hotspot];
     }

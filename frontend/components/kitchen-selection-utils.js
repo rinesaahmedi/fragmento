@@ -367,6 +367,14 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "HOOD-AB105760-FH664621E": "10",
   "CAB-WALL-AB105760-H6002-4": "11",
   "TOP-AB105777": "2",
+  "TOP-AB105779": "2",
+  "SINK-BASE-AB105779-SP60": "3",
+  "CAB-BASE-AB105779-US30": "5",
+  "DISH-AB105779-600": "7",
+  "CAB-BASE-AB105779-US60": "8",
+  "CAB-BASE-AB105779-US40": "9",
+  "CAB-WALL-AB105779-H3002": "10",
+  "CAB-WALL-AB105779-H6002-HPK2002": "12",
   "SINK-BASE-AB105777-SP60": "3",
   "DISH-AB105777-600": "9",
   "CAB-HOOD-AB105777-600": "11",
@@ -1283,6 +1291,7 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "ab-105779": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-101246": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-104332": [["component-wall-cabinet-2", "component-extractor-hood", "component-under-cabinet-light"], ["component-drawer-module", "component-end-blende"]],
   "ab-104296": [["component-wall-cabinet-3", "component-extractor-hood"]],
