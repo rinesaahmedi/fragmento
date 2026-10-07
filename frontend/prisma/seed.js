@@ -2340,6 +2340,44 @@ const AB_105776_ITEMS = [
   ...defaultServices(),
 ];
 
+// 670 105778: supplier callouts 1..10, measured from the vector elevation.
+// SP50 R uses the SP50 catalog article; the right hinge is retained in its note.
+// The independently scheduled UPK20 stays selectable; HPK2002 belongs to H5002.
+const AB_105778_ITEMS = [
+  defaultOvenHob({
+    catalogArticleNumber: "A-EH923640E + 9EC744100C",
+    widthMm: 600,
+    heightMm: 878,
+    depthMm: 600,
+    sortOrder: 10,
+    infoText: "Supplier EH92364E-A oven (catalog A-EH923640E), 9EC744100C cooktop and UHK lower cabinet",
+    catalogPriceSyncMode: "LOCKED_INCLUDED",
+  }),
+  defaultWorktop({ code: "TOP-AB105778", sortOrder: 20, catalogArticleNumber: "PLR60", catalogPriceSyncMode: "LOCKED_INCLUDED" }),
+  defaultSinkBase({
+    code: "SINK-BASE-AB105778-SP50-R",
+    articleNumber: "SP50",
+    catalogArticleNumber: "SP50",
+    widthMm: 500,
+    heightMm: 878,
+    depthMm: 600,
+    sortOrder: 30,
+    infoText: "Included SP50 R sink base cabinet, hinge right",
+    catalogPriceSyncMode: "LOCKED_INCLUDED",
+  }),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105778-US40", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePrice("US40"), widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US40 lower cabinet with drawer", articleNumber: "US40" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105778-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  sinkEndBlende("105778", { sortOrder: 60, catalogBlendeCode: "UPK20" }),
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105778-H4002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H4002"), widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H4002 upper cabinet", articleNumber: "H4002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105778-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "HD6002 cabinet, FH664621E flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105778-FH664621E", name: "FH664621E Extractor Hood", nameDe: "FH664621E Flachschirmhaube", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 82, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105778-H6002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "H6002 upper cabinet", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105778-H5002-HPK2002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H5002", "HPK2002", 1), widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 100, infoText: "H5002 upper cabinet with HPK2002 end filler panel", articleNumber: "H5002", catalogArticleNumber: "H5002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  defaultSinkWorktop({ sortOrder: 110, catalogArticleNumber: "526335 + 517720", catalogPriceSyncMode: "LOCKED_INCLUDED" }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // AB 105775-64: two-leg perspective kitchen. Supplier rows 1-3 are the
 // included oven, split worktop, and sink cabinet. Every secondary UPK/UPEF/HPK
 // article remains attached to its scheduled cabinet through a catalog Blende.
@@ -2698,6 +2736,23 @@ const DEFAULT_KITCHENS = [
     items: AB_105775_ITEMS,
     reconcileExisting: true,
   },
+  {
+    slug: "ab-105778",
+    kitchenCode: "105 778",
+    name: "105778",
+    description: "Straight kitchen configuration based on frontend/public/plans/670 105778.svg",
+    items: AB_105778_ITEMS,
+    reconcileExisting: true,
+  },
+  // Separate kitchen records with the same article schedule and measured plan.
+  ...["105781", "105784", "105787"].map((number) => ({
+    slug: `ab-${number}`,
+    kitchenCode: `${number.slice(0, 3)} ${number.slice(3)}`,
+    name: number,
+    description: "Straight kitchen configuration using the identical 105778 layout and articles",
+    items: AB_105778_ITEMS.map((item) => ({ ...item })),
+    reconcileExisting: true,
+  })),
   {
     slug: "ab-105828",
     kitchenCode: "105 828",

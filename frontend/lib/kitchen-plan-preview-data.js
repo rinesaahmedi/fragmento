@@ -96,6 +96,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105768": "/plans/AB%20105760-61.svg",
   "ab-105772": "/plans/AB%20105760-61.svg",
   "ab-105776": "/plans/AB%20105776%20-%2066.svg",
+  "ab-105778": "/plans/670%20105778.svg",
   "ab-105775": "/plans/AB%20105775%20-%2064.svg?v=4",
   "ab-105745": "/plans/AB%20105748.svg",
   "ab-105746": "/plans/AB%20105746.svg",
@@ -118,6 +119,7 @@ export const PLAN_IMAGE_BY_SLUG = {
 // Most legacy drawings use the 842 x 595 CAD sheet. Keep native dimensions for
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
+  "ab-105778": { width: 842, height: 595 },
   "ab-104332": { width: 842, height: 595 },
   "ab-104296": { width: 842, height: 595 },
   "burger-103898": { width: 842, height: 595 },
@@ -173,6 +175,10 @@ export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
   "ab-105776": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 21.288117, top: 75.967742, width: 14.676546, height: 8.185484, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 27.187232, top: 87.661290, width: 2.878313, height: 3.830645, persistWhenSelected: true },
+  ],
+  "ab-105778": [
+    { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 48.990499, top: 75.983193, width: 14.596200, height: 8.159664, persistWhenSelected: true },
+    { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 54.904988, top: 87.647059, width: 2.935867, height: 3.791597, persistWhenSelected: true },
   ],
   "ab-105775": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 77.486936, top: 76.685714, width: 8.821853, height: 7.441176, persistWhenSelected: true },
@@ -283,6 +289,12 @@ export const AB_105762_LAYOUT_ALIAS_SLUGS = [
   "ab-105770",
   "ab-105774",
 ];
+export const AB_105778_LAYOUT_ALIAS_SLUGS = ["ab-105781", "ab-105784", "ab-105787"];
+AB_105778_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  PLAN_IMAGE_BY_SLUG[slug] = PLAN_IMAGE_BY_SLUG["ab-105778"];
+  PLAN_IMAGE_SOURCE_SIZE_BY_SLUG[slug] = PLAN_IMAGE_SOURCE_SIZE_BY_SLUG["ab-105778"];
+  PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG[slug] = PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105778"];
+});
 AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   PLAN_IMAGE_BY_SLUG[slug] = PLAN_IMAGE_BY_SLUG["ab-105759"];
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG[slug] =
@@ -1848,6 +1860,26 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-base", left: 81.447706, top: 64.959677, width: 15.873468, height: 32.862904, preserveManualSize: true },
     { componentKey: "sink-end-blende", left: 97.321174, top: 64.959677, width: 1.310915, height: 32.862904, preserveManualSize: true },
   ],
+  // 670 105778: exact source-PDF coordinates / 842 x 595, including the plinth.
+  // UPK20 is schedule row 6; the wall HPK2002 joins row 10's H5002 face.
+  "ab-105778": [
+    { componentKey: "wall-cabinet-1", left: 21.847981, top: 16.786555, width: 10.574822, height: 27.045378, preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", left: 32.422803, top: 16.786555, width: 15.862233, height: 27.045378, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 32.422803, top: 43.831933, width: 15.862233, height: 1.875630, preserveManualSize: true },
+    // The two LED ray symbols belong visually to the same hood selection.
+    { componentKey: "extractor-hood", points: [[36.014252, 47.018487], [37.368171, 47.018487], [38.237530, 50.164706], [35.144893, 50.164706]], preserveManualSize: true },
+    { componentKey: "extractor-hood", points: [[44.052257, 47.018487], [45.406176, 47.018487], [46.275534, 50.164706], [43.182898, 50.164706]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", left: 48.285036, top: 16.786555, width: 15.876484, height: 27.045378, preserveManualSize: true },
+    { componentKey: "wall-cabinet-4", left: 64.161520, top: 16.786555, width: 14.650831, height: 27.045378, preserveManualSize: true },
+    { componentKey: "worktop", left: 21.420428, top: 63.475630, width: 57.391923, height: 1.512605, preserveManualSize: true },
+    { componentKey: "worktop", left: 21.420428, top: 64.988235, width: 0.427553, height: 32.853782, preserveManualSize: true, separateLockedSidePanel: true },
+    { componentKey: "sink-faucet", left: 66.926366, top: 55.932773, width: 1.482185, height: 7.542857, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 21.847981, top: 64.988235, width: 10.574822, height: 32.853782, preserveManualSize: true },
+    { componentKey: "oven-module", left: 32.422803, top: 64.988235, width: 15.862233, height: 32.853782, preserveManualSize: true },
+    { componentKey: "dishwasher-base", left: 48.285036, top: 64.988235, width: 15.876484, height: 32.853782, preserveManualSize: true },
+    { componentKey: "sink-base", left: 64.161520, top: 64.988235, width: 13.225653, height: 32.853782, preserveManualSize: true },
+    { componentKey: "sink-end-blende", left: 77.387173, top: 64.988235, width: 1.425178, height: 32.853782, preserveManualSize: true },
+  ],
   // AB 105775-64: exact visible faces converted from the 842 x 595 vector PDF.
   // Repeated component keys join all exposed perspective faces of one item.
   "ab-105775": [
@@ -2035,6 +2067,9 @@ AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
 });
 AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105762"];
+});
+AB_105778_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105778"];
 });
 AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105846"];
