@@ -1110,6 +1110,14 @@ export function formatCurrency(num) {
 }
 
 function buildBlendeDisplayItem(item) {
+  // A separately purchased filler is already a main item. Older notification
+  // payloads can also carry its catalog data as attached-filler metadata.
+  const code = String(item?.code || "").trim().toUpperCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  if (code.startsWith("BLENDE-") && (item?.iconKey === "blende" || componentKey.endsWith("-blende"))) {
+    return null;
+  }
+
   const blendeLabel = String(item?.blendeLabel || "").trim();
   if (!blendeLabel) return null;
 

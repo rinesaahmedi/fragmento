@@ -101,3 +101,32 @@ test("standalone filler keeps purchased quantity and excludes earlier confirmed 
   assert.match(html, /<td[^>]*>50/);
   assert.doesNotMatch(html, /<td[^>]*>1\.1<\/td>/);
 });
+
+test("105790 sink-end filler has its own row even with legacy attached-filler metadata", () => {
+  const order = {
+    orderNumber: "670105790-1",
+    kitchen: { slug: "ab-105790", name: "105790" },
+    customer: {},
+    total: 269,
+    components: [
+      {
+        code: "CAB-BASE-AB105790-US60-UPK20", articleNumber: "US60",
+        nameDe: "Unterschrank mit Schublade 60 cm", price: 244,
+        componentKey: "base-module-1", iconKey: "drawer_base_two",
+        blendeCode: "UPK20", blendeLabel: "Passblende bis 20 cm", blendePrice: 25,
+      },
+      {
+        code: "BLENDE-AB105790-SINK-END", articleNumber: "UPK20",
+        nameDe: "Passblende bis 20 cm", price: 25,
+        componentKey: "sink-end-blende", iconKey: "blende",
+        blendeCode: "UPK20", blendeLabel: "Passblende bis 20 cm", blendePrice: 25,
+      },
+    ],
+    accessories: [], services: [],
+  };
+  const html = buildOrderSummaryHtml(order);
+  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Typen-Nr\.: UPK20[\s\S]*?<\/td><td[^>]*>25/);
+  assert.match(html, /<tr><td[^>]*>2<\/td><td[\s\S]*?Passblende bis 20 cm[\s\S]*?Typen-Nr\.: UPK20[\s\S]*?<\/td><td[^>]*>25/);
+  assert.equal((html.match(/Typen-Nr\.: UPK20/g) || []).length, 2);
+  assert.doesNotMatch(html, /Passblende bis 20 cm x 2/);
+});
