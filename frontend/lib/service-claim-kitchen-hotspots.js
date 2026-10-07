@@ -1,4 +1,5 @@
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
+import { AB_105777_LAYOUT_ALIAS_SLUGS } from "./ab-105777-layout.js";
 
 const AB_105778_LAYOUT_SLUGS = new Set(["ab-105778", "ab-105781", "ab-105784", "ab-105787"]);
 
@@ -552,6 +553,34 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  "ab-105777": {
+  "dishwasher-base": { side: "right", inner: 98.707838, outer: 99.035629 },
+  "base-module-3": {
+    "side": "right",
+    "inner": 52.95962,
+    "outer": 54.171021
+  },
+  "drawer-module": {
+    "side": "left",
+    "inner": 64.090261,
+    "outer": 62.365796
+  },
+  "wall-cabinet-4": {
+    "side": "right",
+    "inner": 52.95962,
+    "outer": 54.171021
+  },
+  "wall-cabinet-5": {
+    "side": "left",
+    "inner": 64.090261,
+    "outer": 62.365796
+  },
+  "wall-cabinet-7": {
+    "side": "right",
+    "inner": 98.707838,
+    "outer": 99.035629
+  }
+},
   "ab-104332": {
     "wall-cabinet-4": { side: "right", wholeFacesOnly: true, wholeBlendeFaces: [
       { left: 66.584323, right: 67.866983, top: 13.357983, bottom: 37.963025 },
@@ -1142,6 +1171,7 @@ for (const alias of AB_105846_LAYOUT_ALIAS_SLUGS) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105846"];
 }
 const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
+  "ab-105777": 0.6613545816733069,
   "ab-105778": (515.92 - 386.68) / (582.16 - 386.68),
   "ab-105781": (515.92 - 386.68) / (582.16 - 386.68),
   "ab-105784": (515.92 - 386.68) / (582.16 - 386.68),
@@ -1301,6 +1331,7 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 );
 
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-105777": { indexPartKeys: ["worktop-left", "worktop-right", null] },
   "ab-104332": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-104296": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-105762": AB_105762_WORKTOP_SPLIT,
@@ -1535,6 +1566,12 @@ for (const alias of ["ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-105
 for (const alias of AB_105847_LAYOUT_ALIAS_SLUGS) {
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] =
     SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105847"];
+}
+
+for (const slug of AB_105777_LAYOUT_ALIAS_SLUGS) {
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[slug] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105777"];
+  OVEN_DRAWER_TOP_RATIO_BY_SLUG[slug] = OVEN_DRAWER_TOP_RATIO_BY_SLUG["ab-105777"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[slug] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105777"];
 }
 
 function normalizeClaimPart(part) {

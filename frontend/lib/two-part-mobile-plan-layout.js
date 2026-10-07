@@ -1,3 +1,5 @@
+import { AB_105777_LAYOUT_SLUGS } from "./ab-105777-layout.js";
+
 const AB_105845_MOBILE_LAYOUT_SLUGS = new Set([
   "ab-105845",
   "105845-modul-2",
@@ -19,6 +21,7 @@ const AB_105847_MOBILE_LAYOUT_SLUGS = new Set([
 
 export function getTwoPartMobilePlanLayout(slug = "") {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
+  if (AB_105777_LAYOUT_SLUGS.includes(normalizedSlug)) return { splitX: 60, shiftX: 6 };
   if (AB_105845_MOBILE_LAYOUT_SLUGS.has(normalizedSlug)) {
     return { splitX: 57, shiftX: 12 };
   }

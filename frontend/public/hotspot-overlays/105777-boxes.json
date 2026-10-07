@@ -1,0 +1,201 @@
+[
+  {
+    "componentKey": "refrigerator",
+    "left": 1.881235,
+    "top": 34.998319,
+    "width": 11.315914,
+    "height": 51.448739,
+    "preserveManualSize": true,
+    "name": "refrigerator"
+  },
+  {
+    "componentKey": "wall-cabinet-1",
+    "left": 14.251781,
+    "top": 24.45042,
+    "width": 12.228029,
+    "height": 20.833613,
+    "preserveManualSize": true,
+    "name": "wall-cabinet-1"
+  },
+  {
+    "componentKey": "wall-cabinet-2",
+    "left": 26.47981,
+    "top": 24.45042,
+    "width": 12.213777,
+    "height": 20.833613,
+    "preserveManualSize": true,
+    "name": "wall-cabinet-2"
+  },
+  {
+    "componentKey": "wall-cabinet-3",
+    "left": 38.693587,
+    "top": 24.45042,
+    "width": 8.152019,
+    "height": 20.833613,
+    "preserveManualSize": true,
+    "name": "wall-cabinet-3"
+  },
+  {
+    "componentKey": "wall-cabinet-4",
+    "left": 46.845606,
+    "top": 24.45042,
+    "width": 7.325416,
+    "height": 20.833613,
+    "preserveManualSize": true,
+    "name": "wall-cabinet-4"
+  },
+  {
+    "componentKey": "wall-cabinet-5",
+    "left": 62.365796,
+    "top": 24.45042,
+    "width": 11.900238,
+    "height": 20.833613,
+    "preserveManualSize": true,
+    "name": "wall-cabinet-5"
+  },
+  {
+    "componentKey": "wall-cabinet-6",
+    "left": 74.266033,
+    "top": 24.45042,
+    "width": 12.228029,
+    "height": 20.833613,
+    "preserveManualSize": true,
+    "name": "wall-cabinet-6"
+  },
+  {
+    "componentKey": "wall-cabinet-7",
+    "left": 86.494062,
+    "top": 24.45042,
+    "width": 12.541568,
+    "height": 20.833613,
+    "preserveManualSize": true,
+    "name": "wall-cabinet-7"
+  },
+  {
+    "componentKey": "extractor-hood",
+    "left": 26.47981,
+    "top": 45.284034,
+    "width": 12.213777,
+    "height": 1.431933,
+    "preserveManualSize": true,
+    "name": "extractor-hood"
+  },
+  {
+    "componentKey": "extractor-hood",
+    "left": 28.574822,
+    "top": 47.744538,
+    "width": 2.380048,
+    "height": 2.4,
+    "preserveManualSize": true,
+    "name": "extractor-hood"
+  },
+  {
+    "componentKey": "extractor-hood",
+    "left": 34.760095,
+    "top": 47.744538,
+    "width": 2.380048,
+    "height": 2.4,
+    "preserveManualSize": true,
+    "name": "extractor-hood"
+  },
+  {
+    "componentKey": "worktop",
+    "left": 13.92399,
+    "top": 60.410084,
+    "width": 40.247031,
+    "height": 1.14958,
+    "preserveManualSize": true,
+    "name": "worktop"
+  },
+  {
+    "componentKey": "worktop",
+    "left": 62.365796,
+    "top": 60.410084,
+    "width": 36.669834,
+    "height": 1.14958,
+    "preserveManualSize": true,
+    "name": "worktop"
+  },
+  {
+    "componentKey": "worktop",
+    "left": 13.92399,
+    "top": 61.559664,
+    "width": 0.327791,
+    "height": 25.310924,
+    "preserveManualSize": true,
+    "separateLockedSidePanel": true,
+    "name": "worktop"
+  },
+  {
+    "componentKey": "sink-faucet",
+    "left": 81.691211,
+    "top": 54.601681,
+    "width": 1.140143,
+    "height": 5.808403,
+    "preserveManualSize": true,
+    "name": "sink-faucet"
+  },
+  {
+    "componentKey": "base-module-1",
+    "left": 14.251781,
+    "top": 61.559664,
+    "width": 12.228029,
+    "height": 25.310924,
+    "preserveManualSize": true,
+    "name": "base-module-1"
+  },
+  {
+    "componentKey": "oven-module",
+    "left": 26.47981,
+    "top": 61.559664,
+    "width": 12.213777,
+    "height": 25.310924,
+    "preserveManualSize": true,
+    "name": "oven-module"
+  },
+  {
+    "componentKey": "base-module-2",
+    "left": 38.693587,
+    "top": 61.559664,
+    "width": 8.152019,
+    "height": 25.310924,
+    "preserveManualSize": true,
+    "name": "base-module-2"
+  },
+  {
+    "componentKey": "base-module-3",
+    "left": 46.845606,
+    "top": 61.559664,
+    "width": 7.325416,
+    "height": 25.310924,
+    "preserveManualSize": true,
+    "name": "base-module-3"
+  },
+  {
+    "componentKey": "drawer-module",
+    "left": 62.365796,
+    "top": 61.559664,
+    "width": 11.900238,
+    "height": 25.310924,
+    "preserveManualSize": true,
+    "name": "drawer-module"
+  },
+  {
+    "componentKey": "sink-base",
+    "left": 74.266033,
+    "top": 61.559664,
+    "width": 12.228029,
+    "height": 25.310924,
+    "preserveManualSize": true,
+    "name": "sink-base"
+  },
+  {
+    "componentKey": "dishwasher-base",
+    "left": 86.494062,
+    "top": 61.559664,
+    "width": 12.541568,
+    "height": 25.310924,
+    "preserveManualSize": true,
+    "name": "dishwasher-base"
+  }
+]

@@ -1,4 +1,7 @@
+import { AB_105777_LAYOUT_SLUGS } from "./ab-105777-layout.js";
+
 const KITCHEN_ARTICLE_NUMBER_ALIAS_SLUGS = new Set([
+  ...AB_105777_LAYOUT_SLUGS,
   "burger-103898",
   "ab-105762",
   "ab-105766",

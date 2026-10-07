@@ -1,4 +1,5 @@
 import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
+import { AB_105777_LAYOUT_ALIAS_SLUGS } from "../lib/ab-105777-layout.js";
 
 export function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
@@ -365,6 +366,21 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-HOOD-AB105760-600": "10",
   "HOOD-AB105760-FH664621E": "10",
   "CAB-WALL-AB105760-H6002-4": "11",
+  "TOP-AB105777": "2",
+  "SINK-BASE-AB105777-SP60": "3",
+  "DISH-AB105777-600": "9",
+  "CAB-HOOD-AB105777-600": "11",
+  "HOOD-AB105777-FH664621E": "11",
+  "CAB-BASE-AB105777-US60-5": "5",
+  "CAB-BASE-AB105777-US40-6": "6",
+  "CAB-BASE-AB105777-US30-7": "7",
+  "CAB-BASE-AB105777-US50-8": "8",
+  "CAB-WALL-AB105777-H6002-10": "10",
+  "CAB-WALL-AB105777-H4002-12": "12",
+  "CAB-WALL-AB105777-H3002-13": "13",
+  "CAB-WALL-AB105777-H5002-14": "14",
+  "CAB-WALL-AB105777-H6002-15": "15",
+  "CAB-WALL-AB105777-H6002-16": "16",
   "TOP-AB105776": "2",
   "TOP-AB105778": "2",
   "SINK-BASE-AB105778-SP50-R": "3",
@@ -843,7 +859,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   if (code === "SVC-PICKUP-001") {
     return translate("configurator.catalogItemNames.servicePickup", "Pickup at logistics location");
   }
-  if (articleNumber.replace(/\s+/g, "") === "A-EH923640E+9EC744100C") {
+  if (["A-EH923640E+9EC744100C", "EH92364E-A+9EC744100C"].includes(articleNumber.replace(/\s+/g, ""))) {
     return withDimensions(translate(
       "configurator.itemNameOvenCeramicHob",
       language === "de"
@@ -1312,6 +1328,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105818": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105815": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105760": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105777": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105776": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105778": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105781": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1436,6 +1453,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
 };
 
 const FLAT_HOOD_PRODUCT_INFO_PDF_HREF = "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf";
+for (const slug of AB_105777_LAYOUT_ALIAS_SLUGS) {
+  LINKED_COMPONENT_GROUPS_BY_SLUG[slug] = LINKED_COMPONENT_GROUPS_BY_SLUG["ab-105777"];
+}
 const FLAT_HOOD_PRODUCT_INFO_DOCUMENTS = [
   { label: "Produktinfo PDF", href: FLAT_HOOD_PRODUCT_INFO_PDF_HREF },
 ];
@@ -1635,6 +1655,9 @@ const PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER = {
 
 function getConfiguredProductInfoDocuments(item) {
   const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+  if (articleNumber === "EH92364E-A + 9EC744100C") {
+    return PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER["A-EH923640E + 9EC744100C"];
+  }
   return PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER[articleNumber]
     || PRODUCT_INFO_DOCUMENTS_BY_CODE[item?.code];
 }
