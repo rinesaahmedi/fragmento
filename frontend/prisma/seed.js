@@ -34,7 +34,10 @@ const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kitchen configuration";
 const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "105861"];
 const AB_105762_LAYOUT_ALIAS_CODES = ["105766", "105770", "105774"];
+const AB_105779_LAYOUT_ALIAS_CODES = ["105782", "105785", "105788"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
+  "ab-105779",
   "ab-105789",
   "ab-104332",
   "ab-104296",
@@ -82,6 +85,8 @@ const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105862",
 ]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
+  ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
+  "ab-105779",
   "ab-105789",
   "ab-105743",
   "ab-105748",
@@ -2519,7 +2524,36 @@ const AB_105777_ITEMS = [
   ...defaultServices(),
 ];
 
+// AB 105779: the customer excluded supplier row 6 (UPEF65) from the configuration.
+const AB_105779_ITEMS = [
+  { ...AB_105777_ITEMS.find((item) => item.componentKey === "oven-module") },
+  defaultWorktop({ code: "TOP-AB105779", catalogArticleNumber: "PLR60", displayArticleNumber: "PLR60", sortOrder: 20 }),
+  defaultSinkBase({ code: "SINK-BASE-AB105779-SP60", catalogArticleNumber: "SP60", articleNumber: "SP60", widthMm: 600, heightMm: 878, depthMm: 600, sortOrder: 30 }),
+  defaultSinkWorktop({ catalogArticleNumber: "526335 + 517720", displayArticleNumber: "526335 + 517720", sortOrder: 35 }),
+  AB_105777_ITEMS.find((item) => item.componentKey === "refrigerator"),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105779-US30", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", articleNumber: "US30", price: articlePrice("US30"), widthMm: 300, heightMm: 878, depthMm: 600, componentKey: "base-module-1", iconKey: "drawer_base_two", colorKey: "#f0a500", sortOrder: 50 },
+  { ...AB_105776_ITEMS.find((item) => item.componentKey === "dishwasher-base"), code: "DISH-AB105779-600", sortOrder: 70 },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105779-US60", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", articleNumber: "US60", price: articlePrice("US60"), widthMm: 600, heightMm: 878, depthMm: 600, componentKey: "base-module-2", iconKey: "drawer_base_two", colorKey: "#f0a500", sortOrder: 80 },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105779-US40", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", articleNumber: "US40", price: articlePrice("US40"), widthMm: 400, heightMm: 878, depthMm: 600, componentKey: "base-module-3", iconKey: "drawer_base_two", colorKey: "#f0a500", sortOrder: 90 },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105779-H3002", name: "Upper Cabinet", nameDe: "Oberschrank", articleNumber: "H3002", price: articlePrice("H3002"), widthMm: 300, heightMm: 720, depthMm: 340, componentKey: "wall-cabinet-1", iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", sortOrder: 100 },
+  AB_105777_ITEMS.find((item) => item.componentKey === "wall-cabinet-2"),
+  AB_105777_ITEMS.find((item) => item.componentKey === "extractor-hood"),
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105779-H6002-HPK2002", name: "Upper Cabinet", nameDe: "Oberschrank", articleNumber: "H6002", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, componentKey: "wall-cabinet-3", iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", sortOrder: 120, blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+PRODUCT_INFO_BY_CODE["DISH-AB105779-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+
 const DEFAULT_KITCHENS = [
+  ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => ({
+    slug: `ab-${code}`,
+    kitchenCode: `${code.slice(0, 3)} ${code.slice(3)}`,
+    name: code,
+    description: "L-shaped kitchen using the AB 105779 plan and catalog-linked elements",
+    items: AB_105779_ITEMS,
+    reconcileExisting: true,
+  })),
+  { slug: "ab-105779", kitchenCode: "105 779", name: "105779", description: "L-shaped kitchen based on frontend/public/pdfs/670 105779.pdf", items: AB_105779_ITEMS, reconcileExisting: true },
   { slug: "ab-105777", kitchenCode: "105 777", name: "105777", description: "Two-elevation kitchen based on frontend/public/pdfs/670 105777.pdf", items: AB_105777_ITEMS, reconcileExisting: true },
   ...["105780", "105783", "105786"].map((code) => ({
     slug: `ab-${code}`,

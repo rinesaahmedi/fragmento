@@ -1,11 +1,12 @@
 import { AB_105777_LAYOUT_SLUGS } from "./ab-105777-layout.js";
+import { AB_105779_LAYOUT_SLUGS } from "./ab-105779-layout.js";
 
 const PDF_PATH_PREFIX = "/pdfs/";
 const PREVIEW_PATH_PREFIXES = ["/jpg/", "/img/"];
 
 // These newly configured kitchens supersede their earlier reference uploads.
 // Keep the uploaded assets stored, while claims use the measured interactive plan.
-const CONFIGURED_CLAIM_PLAN_SLUGS = new Set(AB_105777_LAYOUT_SLUGS);
+const CONFIGURED_CLAIM_PLAN_SLUGS = new Set([...AB_105777_LAYOUT_SLUGS, ...AB_105779_LAYOUT_SLUGS]);
 
 export const PDF_ONLY_KITCHEN_SLUG = "pdf-only-kitchen";
 export const PDF_ONLY_KITCHEN_NAME = "Archived kitchen plan";

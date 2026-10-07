@@ -1,5 +1,6 @@
 "use client";
 import { AB_105777_LAYOUT_ALIAS_SLUGS } from "../lib/ab-105777-layout.js";
+import { AB_105779_LAYOUT_ALIAS_SLUGS, AB_105779_LAYOUT_SLUGS } from "../lib/ab-105779-layout.js";
 
 import { isBaseBodyHotspot, withBasePlinthExtension } from "../lib/kitchen-plan-plinth.js";
 export { withBasePlinthExtension } from "../lib/kitchen-plan-plinth.js";
@@ -62,6 +63,7 @@ const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
 export const IMAGE_VIEW_BY_SLUG = {
+  "ab-105779": "/plans/AB%20105779.svg",
   "ab-105789": "/plans/670%20105789.svg",
   "ab-105777": "/plans/AB%20105777.svg",
   "ab-104332": "/plans/670%20104332.svg",
@@ -1591,6 +1593,11 @@ AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
 });
 IMAGE_HOTSPOTS_BY_SLUG["ab-105762"] = PLAN_HOTSPOTS_BY_SLUG["ab-105762"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105777"] = PLAN_HOTSPOTS_BY_SLUG["ab-105777"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105779"] = PLAN_HOTSPOTS_BY_SLUG["ab-105779"];
+for (const slug of AB_105779_LAYOUT_ALIAS_SLUGS) {
+  IMAGE_VIEW_BY_SLUG[slug] = IMAGE_VIEW_BY_SLUG["ab-105779"];
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG[slug];
+}
 for (const slug of AB_105777_LAYOUT_ALIAS_SLUGS) {
   IMAGE_VIEW_BY_SLUG[slug] = IMAGE_VIEW_BY_SLUG["ab-105777"];
   IMAGE_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG[slug];
@@ -2879,6 +2886,14 @@ export default function useKitchenSvgStage({
                         hotspotStyle.clipPath = hotspot.clipPath;
                         hotspotStyle.WebkitClipPath = hotspot.clipPath;
                         hotspotStyle.borderRadius = 0;
+                      }
+                      // The worktop is partitioned around the sink/cooktop cutouts.
+                      // Paint its pieces continuously; their internal clipping edges
+                      // must not add blue borders or inset shadows to the PDF.
+                      if (AB_105779_LAYOUT_SLUGS.includes(normalizedKitchenSlug) && hotspot.componentKey === "worktop" && hotspot.clipPath) {
+                        hotspotStyle.border = 0;
+                        hotspotStyle.boxShadow = "none";
+                        hotspotStyle.backgroundClip = "border-box";
                       }
                       const isPolygonHotspot = Boolean(hotspot.clipPath);
                       return (
