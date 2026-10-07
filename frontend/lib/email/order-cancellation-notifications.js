@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { createGuardedSmtpTransport } from "./local-email-safety.js";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -105,7 +105,7 @@ function getTransportConfig() {
 
   return {
     from,
-    transporter: nodemailer.createTransport({
+    transporter: createGuardedSmtpTransport({
       host,
       port,
       secure: process.env.SMTP_SECURE === "true",

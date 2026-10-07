@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
+import { createGuardedSmtpTransport } from "./email/local-email-safety.js";
 import { prisma } from "./prisma";
 
 export const ADMIN_LOGIN_CODE_TTL_MS = 15 * 60 * 1000;
@@ -112,7 +112,7 @@ export async function sendAdminLoginVerificationEmail({ to, code }) {
     throw error;
   }
 
-  const transporter = nodemailer.createTransport({
+  const transporter = createGuardedSmtpTransport({
     host: smtpHost,
     port: Number.parseInt(process.env.SMTP_PORT || "587", 10),
     secure: process.env.SMTP_SECURE === "true",

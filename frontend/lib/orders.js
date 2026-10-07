@@ -46,6 +46,7 @@ import {
   matchesConfiguredArticleNumber,
 } from "./order-article-aliases";
 import { getNotificationArticleNumber } from "./notification-article-number.js";
+import { isStandaloneCatalogBlendeItem } from "./catalog-pricing.js";
 
 const PAYMENT_METHOD_ALIASES = new Map([
   ["card", "card"],
@@ -305,6 +306,7 @@ export function buildOrderForNotifications(orderRecord, { confirmedItems = [] } 
     const catalogArticle = kitchenItem?.catalogArticleId ? kitchenItem.catalogArticle : null;
     const catalogService = kitchenItem?.catalogServiceId ? kitchenItem.catalogService : null;
     const catalogBlende = kitchenItem?.catalogBlendeId ? kitchenItem.catalogBlende : null;
+    const standaloneCatalogBlende = isStandaloneCatalogBlendeItem(kitchenItem || item);
     const productInformation = resolveProductInformation({
       catalogArticleId: kitchenItem?.catalogArticleId || null,
       catalogArticle,
@@ -366,12 +368,12 @@ export function buildOrderForNotifications(orderRecord, { confirmedItems = [] } 
       productInfoSummary: productInformation.productInfoSummary,
       productInfoKeyFacts: productInformation.productInfoKeyFacts,
       productInfoExtractedText: productInformation.productInfoExtractedText,
-      blendeCode: catalogBlende?.code || kitchenItem?.blendeCode || item.blendeCode || "",
-      blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || kitchenItem?.blendeLabel || item.blendeLabel || "",
-      blendeName: catalogBlende?.name || item.blendeName || "",
-      blendeNameDe: catalogBlende?.nameDe || item.blendeNameDe || "",
+      blendeCode: standaloneCatalogBlende ? "" : catalogBlende?.code || kitchenItem?.blendeCode || item.blendeCode || "",
+      blendeLabel: standaloneCatalogBlende ? "" : catalogBlende?.nameDe || catalogBlende?.name || kitchenItem?.blendeLabel || item.blendeLabel || "",
+      blendeName: standaloneCatalogBlende ? "" : catalogBlende?.name || item.blendeName || "",
+      blendeNameDe: standaloneCatalogBlende ? "" : catalogBlende?.nameDe || item.blendeNameDe || "",
       catalogBlendeQuantity,
-      blendePrice: catalogBlende?.price != null
+      blendePrice: standaloneCatalogBlende ? null : catalogBlende?.price != null
         ? Number(catalogBlende.price) * catalogBlendeQuantity
         : kitchenItem?.blendePrice != null
           ? Number(kitchenItem.blendePrice) * (kitchenItem?.catalogBlendeId ? catalogBlendeQuantity : 1)

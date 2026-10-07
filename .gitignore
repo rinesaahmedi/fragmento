@@ -19,3 +19,6 @@ outputs/pre-burger-20260826-1213/*.xlsx
 
 # Local test-order PDFs and SMTP delivery receipts
 /output/pdf/order-*/
+
+# Local database catalog audit reports
+/output/catalog-link-audit/

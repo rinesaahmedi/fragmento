@@ -1,6 +1,6 @@
 import http from "http";
 import https from "https";
-import nodemailer from "nodemailer";
+import { createGuardedSmtpTransport } from "../../../lib/email/local-email-safety.js";
 import { NextResponse } from "next/server";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 
@@ -63,7 +63,7 @@ export async function POST(request) {
     return NextResponse.json({ error: `Email SMTP config is missing: ${missing}` }, { status: 500 });
   }
 
-  const transporter = nodemailer.createTransport({
+  const transporter = createGuardedSmtpTransport({
     host: smtpHost,
     port: smtpPort,
     secure: process.env.SMTP_SECURE === "true",

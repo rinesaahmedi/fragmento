@@ -1188,6 +1188,11 @@ function isElectricalComponentItem(item) {
   const code = String(item?.code || "").toLowerCase();
   const iconKey = String(item?.iconKey || "").toLowerCase();
   const componentKey = String(item?.componentKey || "").toLowerCase();
+  // Standalone fillers can mention their neighbouring appliance in the code
+  // (BLENDE-AB105789-OVEN-END). Only attached fillers inherit its category.
+  if (!item?.isBlendeDisplayItem && (iconKey === "blende" || componentKey.endsWith("-blende"))) {
+    return false;
+  }
   const name = String(getItemDisplayName(item)).toLowerCase();
   const parentCode = String(item?.parentCode || "").toLowerCase();
   const parentIconKey = String(item?.parentIconKey || "").toLowerCase();
