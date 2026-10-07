@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { AB_105777_LAYOUT_ALIAS_SLUGS } from "./ab-105777-layout.js";
 
 function normalizeAssetPaths(input) {
   return input
@@ -10,6 +11,9 @@ function normalizeAssetPaths(input) {
 }
 
 const SVG_BY_SLUG = {
+  ...Object.fromEntries(AB_105777_LAYOUT_ALIAS_SLUGS.map((slug) => [
+    slug, path.join(process.cwd(), "public", "plans", "AB 105777.svg"),
+  ])),
   "ab-104332": path.join(process.cwd(), "public", "plans", "670 104332.svg"),
   "ab-104296": path.join(process.cwd(), "public", "plans", "670 104296.svg"),
   "burger-103898": path.join(process.cwd(), "public", "plans", "670 103898.svg"),

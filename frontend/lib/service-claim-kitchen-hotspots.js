@@ -1,4 +1,5 @@
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
+import { AB_105777_LAYOUT_ALIAS_SLUGS } from "./ab-105777-layout.js";
 
 const AB_105845_LAYOUT_ALIAS_SLUGS = [
   "105845-modul-2",
@@ -1559,6 +1560,12 @@ for (const alias of ["ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-105
 for (const alias of AB_105847_LAYOUT_ALIAS_SLUGS) {
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] =
     SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105847"];
+}
+
+for (const slug of AB_105777_LAYOUT_ALIAS_SLUGS) {
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[slug] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105777"];
+  OVEN_DRAWER_TOP_RATIO_BY_SLUG[slug] = OVEN_DRAWER_TOP_RATIO_BY_SLUG["ab-105777"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[slug] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105777"];
 }
 
 function normalizeClaimPart(part) {

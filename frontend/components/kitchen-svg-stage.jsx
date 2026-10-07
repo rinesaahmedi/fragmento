@@ -1,4 +1,5 @@
 "use client";
+import { AB_105777_LAYOUT_ALIAS_SLUGS } from "../lib/ab-105777-layout.js";
 
 import { isBaseBodyHotspot, withBasePlinthExtension } from "../lib/kitchen-plan-plinth.js";
 export { withBasePlinthExtension } from "../lib/kitchen-plan-plinth.js";
@@ -1586,6 +1587,10 @@ AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
 });
 IMAGE_HOTSPOTS_BY_SLUG["ab-105762"] = PLAN_HOTSPOTS_BY_SLUG["ab-105762"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105777"] = PLAN_HOTSPOTS_BY_SLUG["ab-105777"];
+for (const slug of AB_105777_LAYOUT_ALIAS_SLUGS) {
+  IMAGE_VIEW_BY_SLUG[slug] = IMAGE_VIEW_BY_SLUG["ab-105777"];
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG[slug];
+}
 IMAGE_HOTSPOTS_BY_SLUG["ab-105775"] = PLAN_HOTSPOTS_BY_SLUG["ab-105775"];
 AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105762"];
@@ -1812,6 +1817,7 @@ const SPLIT_SIDE_WORKTOP_GAP_PERCENT = 8;
 const SPLIT_SIDE_OVEN_KEYS = new Set(["oven-module", "oven-base"]);
 const SPLIT_SIDE_SINK_KEYS = new Set(["sink-base"]);
 const SPLIT_SIDE_LABEL_SLUGS = new Set([
+  ...AB_105777_LAYOUT_ALIAS_SLUGS,
   "ab-105777",
   "ab-105833",
   "ab-105836",

@@ -1,4 +1,5 @@
 import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
+import { AB_105777_LAYOUT_ALIAS_SLUGS } from "../lib/ab-105777-layout.js";
 
 export function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
@@ -1438,6 +1439,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
 };
 
 const FLAT_HOOD_PRODUCT_INFO_PDF_HREF = "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf";
+for (const slug of AB_105777_LAYOUT_ALIAS_SLUGS) {
+  LINKED_COMPONENT_GROUPS_BY_SLUG[slug] = LINKED_COMPONENT_GROUPS_BY_SLUG["ab-105777"];
+}
 const FLAT_HOOD_PRODUCT_INFO_DOCUMENTS = [
   { label: "Produktinfo PDF", href: FLAT_HOOD_PRODUCT_INFO_PDF_HREF },
 ];

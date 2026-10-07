@@ -60,6 +60,9 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
 ]);
 const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105777",
+  "ab-105780",
+  "ab-105783",
+  "ab-105786",
   "ab-105833",
   "ab-105836",
   "ab-105839",
@@ -2458,6 +2461,14 @@ const AB_105777_ITEMS = [
 
 const DEFAULT_KITCHENS = [
   { slug: "ab-105777", kitchenCode: "105 777", name: "105777", description: "Two-elevation kitchen based on frontend/public/pdfs/670 105777.pdf", items: AB_105777_ITEMS, reconcileExisting: true },
+  ...["105780", "105783", "105786"].map((code) => ({
+    slug: `ab-${code}`,
+    kitchenCode: `${code.slice(0, 3)} ${code.slice(3)}`,
+    name: code,
+    description: "Two-elevation kitchen using the AB 105777 plan and catalog-linked elements",
+    items: AB_105777_ITEMS,
+    reconcileExisting: true,
+  })),
   {
     slug: "burger-103898",
     kitchenCode: "103 898",

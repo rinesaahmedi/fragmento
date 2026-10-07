@@ -1,5 +1,10 @@
 # Kitchen 105777
 
+Kitchens 105780, 105783 and 105786 reuse this complete layout and item schedule.
+Each has its own kitchen record and contracts `670<code>` and `111<code>`.
+They share the same catalog-linked items, fixed left end panel, linked hood lights,
+claim part splits, filler geometry, dishwasher light details and mobile layout.
+
 Source: `frontend/public/pdfs/670 105777.pdf` and the supplied Excel screenshot.
 The PDF contains two front elevations on an 842 × 595 page. Contract: `670105777`.
 
