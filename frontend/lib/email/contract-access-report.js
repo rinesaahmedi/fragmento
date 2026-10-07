@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { createGuardedSmtpTransport } from "./local-email-safety.js";
 import { PUBLIC_VISIT_EVENT_TYPES } from "../public-visit-tracking.js";
 import { isJunkServiceClaimVisitEvent } from "../service-claim-lookup.js";
 
@@ -212,12 +212,12 @@ async function sendAccessReport({ db, now, env, eventTypes, buildReport }) {
   });
   const report = buildReport({ events, start, end });
   const config = getMailConfig(env);
-  const transporter = nodemailer.createTransport({
+  const transporter = createGuardedSmtpTransport({
     host: config.host,
     port: config.port,
     secure: env.SMTP_SECURE === "true",
     auth: { user: config.user, pass: config.pass },
-  });
+  }, env);
   const delivery = await transporter.sendMail({
     from: config.from,
     to: config.recipients,

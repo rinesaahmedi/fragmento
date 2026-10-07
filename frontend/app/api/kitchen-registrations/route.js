@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
+import { createGuardedSmtpTransport } from "../../../lib/email/local-email-safety.js";
 import { NextResponse } from "next/server";
 import { getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
 import { isMissingKitchenRegistrationTableError, kitchenRegistrationUnavailableMessage } from "../../../lib/kitchen-registration-db";
@@ -45,7 +45,7 @@ async function sendRegistrationVerificationEmail({ to, code, contractNumber, kit
     throw error;
   }
 
-  const transporter = nodemailer.createTransport({
+  const transporter = createGuardedSmtpTransport({
     host: smtpHost,
     port: Number.parseInt(process.env.SMTP_PORT || "587", 10),
     secure: process.env.SMTP_SECURE === "true",
