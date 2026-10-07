@@ -3,9 +3,11 @@
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
 import { AB_104332_HOTSPOTS } from './ab-104332-plan.js';
 import { AB_104296_HOTSPOTS } from './ab-104296-plan.js';
+import { AB_105789_HOTSPOTS, AB_105789_LIGHT_DETAILS } from './ab-105789-plan.js';
 import { AB_105777_LAYOUT_ALIAS_SLUGS } from './ab-105777-layout.js';
 
 export const PLAN_IMAGE_BY_SLUG = {
+  "ab-105789": "/plans/670%20105789.svg",
   "ab-105777": "/plans/AB%20105777.svg",
   "ab-104332": "/plans/670%20104332.svg",
   "ab-104296": "/plans/670%20104296.svg",
@@ -121,6 +123,7 @@ export const PLAN_IMAGE_BY_SLUG = {
 // Most legacy drawings use the 842 x 595 CAD sheet. Keep native dimensions for
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
+  "ab-105789": { width: 842, height: 595 },
   "ab-105777": { width: 842, height: 595 },
   "ab-105778": { width: 842, height: 595 },
   "ab-104332": { width: 842, height: 595 },
@@ -155,6 +158,7 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
+  "ab-105789": AB_105789_LIGHT_DETAILS,
   "ab-105777": [
     {"componentKey": "dishwasher-base", "left": 87.030879, "top": 70.033613, "width": 11.223278, "height": 6.302521, "key": "dishwasher-basket", "persistWhenSelected": true},
     {"componentKey": "dishwasher-base", "left": 91.581948, "top": 79.02521, "width": 2.266033, "height": 2.92437, "key": "dishwasher-gs-mark", "persistWhenSelected": true},
@@ -526,6 +530,7 @@ export const AB_110401_FRG_ORDER_HOTSPOTS = [
 // linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const PLAN_HOTSPOTS_BY_SLUG = {
+  "ab-105789": AB_105789_HOTSPOTS,
   "ab-105777": [
     {"componentKey": "refrigerator", "left": 1.881235, "top": 34.998319, "width": 11.315914, "height": 51.448739, "preserveManualSize": true},
     {"componentKey": "wall-cabinet-1", "left": 14.251781, "top": 24.45042, "width": 12.228029, "height": 20.833613, "preserveManualSize": true},

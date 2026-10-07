@@ -373,7 +373,7 @@ function CatalogItem({
           )}
         </span>
       </div>
-      <div className={styles.itemMeta}>
+      <div className={`${styles.itemMeta} ${blendeTotal > 0 ? styles.itemMetaWithBlende : ""}`.trim()}>
         <span className={locked ? styles.lockedPill : styles.togglePill}>
           {locked
             ? translate("configurator.fixed", "Fixed")

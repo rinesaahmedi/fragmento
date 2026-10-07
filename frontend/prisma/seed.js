@@ -35,6 +35,7 @@ const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kit
 const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "105861"];
 const AB_105762_LAYOUT_ALIAS_CODES = ["105766", "105770", "105774"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105789",
   "ab-104332",
   "ab-104296",
   "burger-103898",
@@ -81,6 +82,7 @@ const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105862",
 ]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105789",
   "ab-105743",
   "ab-105748",
   "ab-105751", "ab-105754", "ab-105745",
@@ -2384,6 +2386,26 @@ const AB_105778_ITEMS = [
   ...defaultServices(),
 ];
 
+// 670 105789: eleven supplier rows, with cabinet fillers linked to the catalog;
+// the standalone UPK20 keeps its own supplier callout and selection.
+const AB_105789_ITEMS = [
+  defaultOvenHob({ articleNumber: "A-EH923640E + 9EC744100C", catalogArticleNumber: "A-EH923640E + 9EC744100C", catalogPriceSyncMode: "LOCKED_INCLUDED", widthMm: 600, sortOrder: 10, infoText: "Included UHK, A-EH923640E oven (supplier EH92364E-A) and 9EC744100C ceramic cooktop" }),
+  defaultWorktop({ code: "TOP-AB105789", articleNumber: "PLR60", catalogArticleNumber: "PLR60", catalogPriceSyncMode: "LOCKED_INCLUDED", sortOrder: 20 }),
+  defaultSinkBase({ code: "SINK-BASE-AB105789-SP60-R", articleNumber: "SP60", catalogArticleNumber: "SP60", catalogPriceSyncMode: "LOCKED_INCLUDED", widthMm: 600, heightMm: 878, depthMm: 600, sortOrder: 30, infoText: "Included SP60 sink base cabinet, hinge right (SP60 R)" }),
+  { itemType: ItemType.COMPONENT, code: "REF-AB105789-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), widthMm: 540, heightMm: 1810, depthMm: 576, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, articleNumber: "OL-KGCN388140E" },
+  sinkEndBlende("105789", { code: "BLENDE-AB105789-OVEN-END", componentKey: "base-end-blende", sortOrder: 50, catalogBlendeCode: "UPK20", infoText: "Standalone UPK20 between refrigerator and oven" }),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105789-US30-UPK20-1", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePriceWithBlende("US30", "UPK20"), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 60, articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20", blendePrice: blendePrice("UPK20"), infoText: "US30 lower cabinet with UPK20 filler on the oven leg" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105789-600-UPEF65", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePriceWithBlende("A-EGSPV597210 + TGV60", "UPEF65"), widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 70, articleNumber: "A-EGSPV597210 + TGV60", blendeCode: "UPEF65", blendeLabel: "UPEF65", blendePrice: blendePrice("UPEF65"), infoText: "Dishwasher incl. furniture front and UPEF65 corner filler" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105789-US30-UPK20-2", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePriceWithBlende("US30", "UPK20"), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 80, articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20", blendePrice: blendePrice("UPK20"), infoText: "US30 lower cabinet with UPK20 at the right end" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105789-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-1", sortOrder: 90, articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105789-FH664621E", name: "FH664621E Extractor Hood", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105789-H3002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H3002"), widthMm: 300, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 100, articleNumber: "H3002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105789-H6002-HPK2002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H6002", "HPK2002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002", blendePrice: blendePrice("HPK2002"), infoText: "H6002 upper cabinet with HPK2002 end filler" },
+  defaultSinkWorktop({ code: "SINK-WORKTOP-AB105789", articleNumber: "526335 + 517720", catalogArticleNumber: "526335 + 517720", catalogPriceSyncMode: "LOCKED_INCLUDED", sortOrder: 32, infoText: "Included 526335 sink, right orientation (526335 R), and 517720 faucet" }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // AB 105775-64: two-leg perspective kitchen. Supplier rows 1-3 are the
 // included oven, split worktop, and sink cabinet. Every secondary UPK/UPEF/HPK
 // article remains attached to its scheduled cabinet through a catalog Blende.
@@ -2799,6 +2821,11 @@ const DEFAULT_KITCHENS = [
     description: "Straight kitchen configuration based on frontend/public/plans/670 105778.svg",
     items: AB_105778_ITEMS,
     reconcileExisting: true,
+  },
+  {
+    slug: "ab-105789", kitchenCode: "105 789", name: "105789",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/670 105789.svg",
+    items: AB_105789_ITEMS, reconcileExisting: true,
   },
   // Separate kitchen records with the same article schedule and measured plan.
   ...["105781", "105784", "105787"].map((number) => ({

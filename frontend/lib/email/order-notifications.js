@@ -385,7 +385,10 @@ export async function loadKitchenPlanPreviewData() {
     const hotspotsLiteral = findBalancedObjectLiteral(source, "IMAGE_HOTSPOTS_BY_SLUG");
     const sinkEndBlendeBoundsLiteral = findBalancedObjectLiteral(source, "SINK_END_BLENDE_BOUNDS_BY_SLUG");
     const imageViews = imageViewsLiteral ? Function(`"use strict"; return (${imageViewsLiteral});`)() : {};
-    const hotspotsBySlug = hotspotsLiteral ? Function(`"use strict"; return (${hotspotsLiteral});`)() : {};
+    // Modular layouts reference this shared map inside the React object literal.
+    const hotspotsBySlug = hotspotsLiteral
+      ? Function("PLAN_HOTSPOTS_BY_SLUG", `"use strict"; return (${hotspotsLiteral});`)(PLAN_HOTSPOTS_BY_SLUG)
+      : {};
     const sinkEndBlendeBoundsBySlug = sinkEndBlendeBoundsLiteral
       ? Function(`"use strict"; return (${sinkEndBlendeBoundsLiteral});`)()
       : {};

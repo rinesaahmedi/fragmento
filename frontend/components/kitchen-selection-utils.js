@@ -383,6 +383,17 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105777-H6002-16": "16",
   "TOP-AB105776": "2",
   "TOP-AB105778": "2",
+  "TOP-AB105789": "2",
+  "SINK-BASE-AB105789-SP60-R": "3",
+  "REF-AB105789-KGCN388140E": "4",
+  "BLENDE-AB105789-OVEN-END": "5",
+  "CAB-BASE-AB105789-US30-UPK20-1": "6",
+  "DISH-AB105789-600-UPEF65": "7",
+  "CAB-BASE-AB105789-US30-UPK20-2": "8",
+  "CAB-HOOD-AB105789-600": "9",
+  "HOOD-AB105789-FH664621E": "9",
+  "CAB-WALL-AB105789-H3002": "10",
+  "CAB-WALL-AB105789-H6002-HPK2002": "11",
   "SINK-BASE-AB105778-SP50-R": "3",
   "CAB-BASE-AB105778-US40": "4",
   "DISH-AB105778-600": "5",
@@ -1293,6 +1304,9 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "ab-105789": [
+    ["component-wall-cabinet-1", "component-extractor-hood"],
+  ],
   "ab-101246": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-104332": [["component-wall-cabinet-2", "component-extractor-hood", "component-under-cabinet-light"], ["component-drawer-module", "component-end-blende"]],
   "ab-104296": [["component-wall-cabinet-3", "component-extractor-hood"]],

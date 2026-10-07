@@ -11,6 +11,7 @@ function normalizeAssetPaths(input) {
 }
 
 const SVG_BY_SLUG = {
+  "ab-105789": path.join(process.cwd(), "public", "plans", "670 105789.svg"),
   ...Object.fromEntries(AB_105777_LAYOUT_ALIAS_SLUGS.map((slug) => [
     slug, path.join(process.cwd(), "public", "plans", "AB 105777.svg"),
   ])),
