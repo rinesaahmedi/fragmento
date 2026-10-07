@@ -1693,6 +1693,12 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
 };
 
 const PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER = {
+  "9EC744100C": [
+    { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
+  ],
+  "EC744100C": [
+    { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
+  ],
   "A-EH923640E + 9EC744100C": [
     { label: "Backofen PDF", href: "/product-info/ovens/eh923640e/a-eh923640e-product-info.pdf" },
     { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
@@ -1700,8 +1706,8 @@ const PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER = {
 };
 
 function getConfiguredProductInfoDocuments(item) {
-  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
-  if (articleNumber === "EH92364E-A + 9EC744100C") {
+  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase().replace(/\s+/g, "");
+  if (["A-EH923640E+9EC744100C", "EH92364E-A+9EC744100C"].includes(articleNumber)) {
     return PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER["A-EH923640E + 9EC744100C"];
   }
   return PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER[articleNumber]
