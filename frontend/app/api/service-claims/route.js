@@ -1124,7 +1124,7 @@ function buildComplaintEmailText(payload) {
     `Vertragsnummer: ${payload.contractNumber}`,
     `Küche: ${payload.kitchenName || "-"}`,
     `Kunde: ${payload.genderLabel === "Keine Angabe" ? "" : `${payload.genderLabel} `}${payload.givenName} ${payload.surname}`,
-    `Adresse: ${payload.clientAddress}`,
+    `Adresse: ${formatClaimClientAddressForEmail(payload.clientAddress)}`,
     `Telefon: ${payload.phone || "—"}`,
     `E-Mail: ${payload.email || "—"}`,
     ...(claimItemRows.length
@@ -1295,8 +1295,8 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
 
 function formatClaimClientAddressForEmail(value) {
   return String(value || "")
-    .replace(/(^|[,\n]\s*)Floor:/gi, "$1Etage:")
-    .replace(/(^|[,\n]\s*)Unit:/gi, "$1Wohnungsnummer:");
+    .replace(/(^|[,\r\n]\s*)(?:Floor|Etage):\s*/gi, (_match, separator) => `${separator ? "\n" : ""}Etage: `)
+    .replace(/(^|[,\r\n]\s*)(?:Unit|Einheit|Wohnungsnummer):\s*/gi, (_match, separator) => `${separator ? "\n" : ""}Wohnungsnummer: `);
 }
 
 function formatMultiline(value) {
