@@ -2193,6 +2193,20 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
   const sinkRun = findRunForComponent(SPLIT_SIDE_SINK_KEYS);
   if (!ovenRun || !sinkRun || ovenRun === sinkRun) return [];
 
+  // Side A includes the freestanding refrigerator as well as the worktop run.
+  // Center its label over the complete elevation for this shared layout.
+  let sideARun = ovenRun;
+  if (slug === "ab-105777" || AB_105777_LAYOUT_ALIAS_SLUGS.includes(slug)) {
+    const refrigerator = definitions.find((definition) => definition.componentKey === "refrigerator");
+    if (refrigerator) {
+      const bounds = getHotspotSourceBounds(refrigerator);
+      if (bounds.right <= ovenRun.left + 0.5) {
+        const left = Math.min(bounds.left, ovenRun.left);
+        sideARun = { ...ovenRun, left, width: ovenRun.right - left };
+      }
+    }
+  }
+
   const getRunLabelTop = (run) => {
     const runElements = definitions
       .map(getHotspotSourceBounds)
@@ -2215,7 +2229,7 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
 
   return [
     toLabel(
-      ovenRun,
+      sideARun,
       translate("configurator.splitKitchenSideA", language === "de" ? "Seite A" : "Side A"),
     ),
     toLabel(
