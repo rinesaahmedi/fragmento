@@ -1867,7 +1867,9 @@ const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
 const SPLIT_SIDE_WORKTOP_GAP_PERCENT = 8;
 const SPLIT_SIDE_OVEN_KEYS = new Set(["oven-module", "oven-base"]);
 const SPLIT_SIDE_SINK_KEYS = new Set(["sink-base"]);
+const AB_105793_SIDE_LABEL_SLUGS = new Set(["ab-105793", "ab-105796", "ab-105799", "ab-105802"]);
 const SPLIT_SIDE_LABEL_SLUGS = new Set([
+  ...AB_105793_SIDE_LABEL_SLUGS,
   ...AB_105777_LAYOUT_ALIAS_SLUGS,
   "ab-105777",
   "ab-105833",
@@ -2160,7 +2162,12 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
   if (!SPLIT_SIDE_LABEL_SLUGS.has(slug)) return [];
 
   const worktopRuns = definitions
-    .filter(isHorizontalWorktopHotspot)
+    .filter((definition) => {
+      if (!AB_105793_SIDE_LABEL_SLUGS.has(slug)) return isHorizontalWorktopHotspot(definition);
+      const bounds = getHotspotSourceBounds(definition);
+      return ["worktop", "worktop-secondary"].includes(definition.componentKey)
+        && bounds.width >= 5 && bounds.height <= 2;
+    })
     .map(getHotspotSourceBounds)
     .filter((bounds) => bounds.width >= 8)
     .sort((a, b) => a.left - b.left);
@@ -2203,6 +2210,15 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
       if (bounds.right <= ovenRun.left + 0.5) {
         const left = Math.min(bounds.left, ovenRun.left);
         sideARun = { ...ovenRun, left, width: ovenRun.right - left };
+      }
+    }
+  }
+  if (AB_105793_SIDE_LABEL_SLUGS.has(slug)) {
+    const refrigerator = definitions.find((definition) => definition.componentKey === "refrigerator");
+    if (refrigerator) {
+      const bounds = getHotspotSourceBounds(refrigerator);
+      if (bounds.left >= ovenRun.right && bounds.right < sinkRun.left) {
+        sideARun = { ...ovenRun, right: bounds.right, width: bounds.right - ovenRun.left };
       }
     }
   }
