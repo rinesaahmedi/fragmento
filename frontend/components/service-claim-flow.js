@@ -2395,7 +2395,7 @@ function normalizeShortDateInput(value) {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
-const SERVICE_TOUR_VIDEO_SRC = "/video/fragmento-tutorial-ru-faststart.mp4";
+const SERVICE_TOUR_VIDEO_SRC = "/video/ASC_VIDEO_FIXED_07.10.2026_ER.mp4";
 
 function ServiceVideoGuide({ isOpen, copy, onClose, onFinish }) {
   const videoRef = useRef(null);

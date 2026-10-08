@@ -445,9 +445,14 @@ export async function loadKitchenPlanPreviewData() {
     // These layouts replace their older literal hotspots at runtime in the
     // configurator. Email must use the same hood fascia and both light regions,
     // and inherit the cabinet/hood link for each independently stored kitchen.
-    for (const slug of AB_105777_LAYOUT_SLUGS) {
-      hotspotsBySlug[slug] = PLAN_HOTSPOTS_BY_SLUG[slug];
-      linkedGroupsBySlug[slug] = linkedGroupsBySlug["ab-105777"];
+    for (const [slugs, sourceSlug] of [
+      [AB_105777_LAYOUT_SLUGS, "ab-105777"],
+      [AB_105779_LAYOUT_SLUGS, "ab-105779"],
+    ]) {
+      for (const slug of slugs) {
+        hotspotsBySlug[slug] = PLAN_HOTSPOTS_BY_SLUG[slug];
+        linkedGroupsBySlug[slug] = linkedGroupsBySlug[sourceSlug];
+      }
     }
 
     return { imageViews, hotspotsBySlug, linkedGroupsBySlug };
