@@ -5,11 +5,19 @@ import { AB_104332_HOTSPOTS } from './ab-104332-plan.js';
 import { AB_104296_HOTSPOTS } from './ab-104296-plan.js';
 import { AB_105789_HOTSPOTS, AB_105789_LIGHT_DETAILS } from './ab-105789-plan.js';
 import { AB_105790_HOTSPOTS, AB_105790_LIGHT_DETAILS } from './ab-105790-plan.js';
+import { AB_105791_HOTSPOTS, AB_105791_LIGHT_DETAILS } from './ab-105791-plan.js';
+import { AB_105794_HOTSPOTS, AB_105794_LIGHT_DETAILS } from './ab-105794-plan.js';
+import { AB_105797_HOTSPOTS, AB_105797_LIGHT_DETAILS } from './ab-105797-plan.js';
+import { AB_105800_HOTSPOTS, AB_105800_LIGHT_DETAILS } from './ab-105800-plan.js';
 import { AB_105777_LAYOUT_ALIAS_SLUGS } from './ab-105777-layout.js';
 import { AB_105779_HOTSPOTS } from './ab-105779-plan.js';
 import { AB_105779_LAYOUT_ALIAS_SLUGS } from './ab-105779-layout.js';
 
 export const PLAN_IMAGE_BY_SLUG = {
+  "ab-105791": "/plans/670%20105791.svg",
+  "ab-105794": "/plans/670%20105794.svg",
+  "ab-105797": "/plans/670%20105797.svg",
+  "ab-105800": "/plans/670%20105800.svg",
   "ab-105779": "/plans/AB%20105779.svg",
   "ab-105789": "/plans/670%20105789.svg",
   "ab-105790": "/plans/AB%20105790.svg",
@@ -128,6 +136,10 @@ export const PLAN_IMAGE_BY_SLUG = {
 // Most legacy drawings use the 842 x 595 CAD sheet. Keep native dimensions for
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
+  "ab-105791": { width: 842, height: 595 },
+  "ab-105794": { width: 842, height: 595 },
+  "ab-105797": { width: 842, height: 595 },
+  "ab-105800": { width: 842, height: 595 },
   "ab-105779": { width: 842, height: 595 },
   "ab-105789": { width: 842, height: 595 },
   "ab-105790": { width: 842, height: 595 },
@@ -165,6 +177,10 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
+  "ab-105791": AB_105791_LIGHT_DETAILS,
+  "ab-105794": AB_105794_LIGHT_DETAILS,
+  "ab-105797": AB_105797_LIGHT_DETAILS,
+  "ab-105800": AB_105800_LIGHT_DETAILS,
   "ab-105779": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 56.208, top: 69.570, width: 8.495, height: 8.783, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 59.671021, top: 80.759664, width: 1.683, height: 3.771428, persistWhenSelected: true },
@@ -545,6 +561,10 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
   "ab-105779": AB_105779_HOTSPOTS,
   "ab-105789": AB_105789_HOTSPOTS,
   "ab-105790": AB_105790_HOTSPOTS,
+  "ab-105791": AB_105791_HOTSPOTS,
+  "ab-105794": AB_105794_HOTSPOTS,
+  "ab-105797": AB_105797_HOTSPOTS,
+  "ab-105800": AB_105800_HOTSPOTS,
   "ab-105777": [
     {"componentKey": "refrigerator", "left": 1.881235, "top": 34.998319, "width": 11.315914, "height": 51.448739, "preserveManualSize": true},
     {"componentKey": "wall-cabinet-1", "left": 14.251781, "top": 24.45042, "width": 12.228029, "height": 20.833613, "preserveManualSize": true},
@@ -2221,4 +2241,3 @@ for (const slug of AB_105779_LAYOUT_ALIAS_SLUGS) {
   PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105779"];
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG[slug] = PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105779"];
 }
-

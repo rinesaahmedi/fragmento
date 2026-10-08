@@ -388,6 +388,7 @@ export default function ServiceClaimKitchenPicker({
       || hotspot.claimPartKey === "worktop-left"
       || hotspot.claimPartKey === "worktop-right"
       || hotspot.claimPartKey === "worktop-end-panel"
+      || hotspot.claimPartKey === "worktop-end-panel-left"
     ) && selectedIds.has(hotspot.componentId),
   );
   // Always restore the source appliance linework above a selected worktop.
@@ -521,6 +522,7 @@ export default function ServiceClaimKitchenPicker({
                       hotspot.claimPartKey === "worktop-left"
                       || hotspot.claimPartKey === "worktop-right"
                       || hotspot.claimPartKey === "worktop-end-panel"
+                      || hotspot.claimPartKey === "worktop-end-panel-left"
                     )
                     && hotspot.preserveManualSize
                   ) {
@@ -532,7 +534,8 @@ export default function ServiceClaimKitchenPicker({
                   const isSplitWorktop =
                     hotspot.claimPartKey === "worktop-left"
                     || hotspot.claimPartKey === "worktop-right"
-                    || hotspot.claimPartKey === "worktop-end-panel";
+                    || hotspot.claimPartKey === "worktop-end-panel"
+                    || hotspot.claimPartKey === "worktop-end-panel-left";
                   const outlineProps = {
                     fill: "none",
                     stroke: "#2f2a24",
@@ -620,6 +623,7 @@ export default function ServiceClaimKitchenPicker({
                         hotspot.claimPartKey === "worktop-left"
                         || hotspot.claimPartKey === "worktop-right"
                         || hotspot.claimPartKey === "worktop-end-panel"
+                        || hotspot.claimPartKey === "worktop-end-panel-left"
                           ? styles.planHotspotWorktop
                           : "",
                         hotspot.componentKey === "worktop" && Number(hotspot.height) < 2.5
@@ -655,6 +659,7 @@ export default function ServiceClaimKitchenPicker({
                             || hotspot.claimPartKey === "worktop-left"
                             || hotspot.claimPartKey === "worktop-right"
                             || hotspot.claimPartKey === "worktop-end-panel"
+                            || hotspot.claimPartKey === "worktop-end-panel-left"
                               ? 4
                               : 1,
                       }}

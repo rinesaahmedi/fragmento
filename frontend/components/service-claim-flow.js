@@ -133,6 +133,9 @@ function formatGermanClaimAreaName(area, fallbackName) {
   if (componentId === "component-claim-worktop-end-panel") {
     return "Unterschrank-Wange";
   }
+  if (componentId === "component-claim-worktop-end-panel-left") {
+    return "Unterschrank-Wange links";
+  }
 
   const exactLabel = CLAIM_AREA_LABELS_BY_CODE.de?.[code];
   if (exactLabel) {

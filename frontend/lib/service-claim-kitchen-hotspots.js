@@ -1,4 +1,8 @@
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
+import { AB_105791_BLENDE_CALIBRATION, AB_105791_COOKTOP_POINTS, AB_105791_OVEN_PART_POINTS, AB_105791_SINK_POINTS } from "./ab-105791-plan.js";
+import { AB_105794_BLENDE_CALIBRATION, AB_105794_COOKTOP_POINTS, AB_105794_OVEN_PART_POINTS, AB_105794_SINK_POINTS } from "./ab-105794-plan.js";
+import { AB_105797_BLENDE_CALIBRATION, AB_105797_COOKTOP_POINTS, AB_105797_OVEN_PART_POINTS, AB_105797_SINK_POINTS } from "./ab-105797-plan.js";
+import { AB_105800_BLENDE_CALIBRATION, AB_105800_COOKTOP_POINTS, AB_105800_OVEN_PART_POINTS, AB_105800_SINK_POINTS } from "./ab-105800-plan.js";
 import { AB_105790_BLENDE_CALIBRATION, AB_105790_COOKTOP_POINTS, AB_105790_OVEN_PART_POINTS, AB_105790_SINK_POINTS } from "./ab-105790-plan.js";
 import { AB_105789_BLENDE_CALIBRATION, AB_105789_COOKTOP_POINTS, AB_105789_OVEN_PART_POINTS, AB_105789_SINK_POINTS } from "./ab-105789-plan.js";
 import { AB_105777_LAYOUT_ALIAS_SLUGS } from "./ab-105777-layout.js";
@@ -39,6 +43,10 @@ const AB_105762_LAYOUT_ALIAS_SLUGS = [
 ];
 
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105791",
+  "ab-105794",
+  "ab-105797",
+  "ab-105800",
   ...AB_105779_LAYOUT_ALIAS_SLUGS,
   "ab-105779",
   "ab-105789",
@@ -134,6 +142,10 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 // by several narrow hotspots. These coordinates remain in the uncropped source
 // plan system and are projected into the ASC display crop below.
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
+  "ab-105791": AB_105791_SINK_POINTS,
+  "ab-105794": AB_105794_SINK_POINTS,
+  "ab-105797": AB_105797_SINK_POINTS,
+  "ab-105800": AB_105800_SINK_POINTS,
   "ab-105779": AB_105779_SINK_POINTS,
   "ab-105789": AB_105789_SINK_POINTS,
   "ab-105790": AB_105790_SINK_POINTS,
@@ -225,6 +237,10 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
 const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-104332", "ab-104296", "ab-105825", "ab-105831"]);
 DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105789");
 DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105790");
+DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105791");
+DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105794");
+DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105797");
+DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105800");
 
 // Thin visual silhouettes traced around the faucet body. Source hotspot boxes
 // remain intentionally generous for interaction, but painting those boxes
@@ -470,6 +486,10 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  "ab-105791": AB_105791_COOKTOP_POINTS,
+  "ab-105794": AB_105794_COOKTOP_POINTS,
+  "ab-105797": AB_105797_COOKTOP_POINTS,
+  "ab-105800": AB_105800_COOKTOP_POINTS,
   "ab-105789": AB_105789_COOKTOP_POINTS,
   "ab-105790": AB_105790_COOKTOP_POINTS,
   // Exact outside cooktop strokes from the AB 105775 vector plan. The
@@ -574,6 +594,10 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   "ab-105779": { "wall-cabinet-3": { wholeFacesOnly: true, wholeBlendeFaces: AB_105779_BLENDE_FACES } },
   "ab-105789": AB_105789_BLENDE_CALIBRATION,
   "ab-105790": AB_105790_BLENDE_CALIBRATION,
+  "ab-105791": AB_105791_BLENDE_CALIBRATION,
+  "ab-105794": AB_105794_BLENDE_CALIBRATION,
+  "ab-105797": AB_105797_BLENDE_CALIBRATION,
+  "ab-105800": AB_105800_BLENDE_CALIBRATION,
   "ab-105777": {
   "dishwasher-base": { side: "right", inner: 98.707838, outer: 99.035629 },
   "base-module-3": {
@@ -1239,6 +1263,10 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-105791": AB_105791_OVEN_PART_POINTS,
+  "ab-105794": AB_105794_OVEN_PART_POINTS,
+  "ab-105797": AB_105797_OVEN_PART_POINTS,
+  "ab-105800": AB_105800_OVEN_PART_POINTS,
   "ab-105779": AB_105779_OVEN_PART_POINTS,
   "ab-105789": AB_105789_OVEN_PART_POINTS,
   "ab-105790": AB_105790_OVEN_PART_POINTS,
@@ -1358,6 +1386,10 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
   "ab-105779": { indexPartKeys: AB_105779_WORKTOP_PART_KEYS },
   "ab-105789": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel", "worktop-left", "worktop-right", "worktop-right"] },
+  "ab-105791": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"] },
+  "ab-105794": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"] },
+  "ab-105797": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"] },
+  "ab-105800": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"] },
   "ab-105777": { indexPartKeys: ["worktop-left", "worktop-right", null] },
   "ab-104332": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-104296": { indexPartKeys: ["worktop-left", "worktop-right"] },
@@ -2340,6 +2372,9 @@ function splitWorktopEndPanelHotspots(hotspot, part, definition) {
 }
 
 export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], kitchenSlug = "") {
+  if (hotspots.some((hotspot) => hotspot.claimExcludeFromSelection)) {
+    hotspots = hotspots.filter((hotspot) => !hotspot.claimExcludeFromSelection);
+  }
   // Parts without a meaningful independent drawing are manual options below
   // the plan. They must not take over their source component's visible hotspot.
   const normalizedParts = (claimParts || [])
@@ -2424,7 +2459,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     if (!sourceParts.length) {
       return [hotspot];
     }
-    if (normalizedSlug === "ab-105790" && hotspot.claimFurniturePartKey) {
+    if ((normalizedSlug === "ab-105790" || sourceComponentKey === "worktop") && hotspot.claimFurniturePartKey) {
       const part = sourceParts.find((entry) => entry.partKey === hotspot.claimFurniturePartKey);
       return part ? [existingClaimPartHotspot(hotspot, part)] : [];
     }

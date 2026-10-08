@@ -14,6 +14,7 @@ const NON_APPLIANCE_CLAIM_PART_KEYS = new Set([
   "sink",
   "sink-cabinet",
   "worktop-end-panel",
+  "worktop-end-panel-left",
   "worktop-left",
   "worktop-right",
 ]);

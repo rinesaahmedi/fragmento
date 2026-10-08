@@ -641,6 +641,7 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
     || hotspot?.claimPartKey === "worktop-left"
     || hotspot?.claimPartKey === "worktop-right"
     || hotspot?.claimPartKey === "worktop-end-panel"
+    || hotspot?.claimPartKey === "worktop-end-panel-left"
   ));
   const unselectedApplianceHotspots = hasSelectedWorktop && isLShapedClaimKitchen(normalizedSlug)
     ? claimHotspots.filter((hotspot) => (
