@@ -660,7 +660,7 @@ const COPY = {
     clientPostalCodePlaceholder: "z.B. 10115",
     clientCity: "Ort",
     clientCityPlaceholder: "Berlin",
-    clientFloor: "Stockwerk",
+    clientFloor: "Etage",
     clientFloorPlaceholder: "z.B. 3",
     clientUnitNumber: "Wohnungsnummer",
     clientUnitNumberPlaceholder: "z.B. 3B",

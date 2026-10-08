@@ -1212,7 +1212,7 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
     ["Vorname", payload.givenName],
     ["Nachname", payload.surname],
     ["Anrede", payload.genderLabel],
-    ["Kundenadresse", payload.clientAddress],
+    ["Kundenadresse", formatClaimClientAddressForEmail(payload.clientAddress)],
     ["Telefon", payload.phone || "—"],
     ["E-Mail", payload.email || "—"],
     ...claimItemRows.map((row, index) => ["", { html: buildClaimItemHtml(row, { showArticleCode: showClaimItemArticleCode, itemNumber: index + 1 }), fullWidth: true }]),
@@ -1291,6 +1291,12 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
       </p>
     </div>
   `;
+}
+
+function formatClaimClientAddressForEmail(value) {
+  return String(value || "")
+    .replace(/(^|[,\n]\s*)Floor:/gi, "$1Etage:")
+    .replace(/(^|[,\n]\s*)Unit:/gi, "$1Wohnungsnummer:");
 }
 
 function formatMultiline(value) {
