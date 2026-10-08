@@ -1,4 +1,8 @@
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
+import { AB_105793_BLENDE_CALIBRATION, AB_105793_COOKTOP_POINTS, AB_105793_OVEN_PART_POINTS } from "./ab-105793-plan.js";
+import { AB_105796_BLENDE_CALIBRATION, AB_105796_COOKTOP_POINTS, AB_105796_OVEN_PART_POINTS } from "./ab-105796-plan.js";
+import { AB_105799_BLENDE_CALIBRATION, AB_105799_COOKTOP_POINTS, AB_105799_OVEN_PART_POINTS } from "./ab-105799-plan.js";
+import { AB_105802_BLENDE_CALIBRATION, AB_105802_COOKTOP_POINTS, AB_105802_OVEN_PART_POINTS } from "./ab-105802-plan.js";
 import { AB_105792_BLENDE_CALIBRATION, AB_105792_COOKTOP_POINTS, AB_105792_OVEN_PART_POINTS } from "./ab-105792-plan.js";
 import { AB_105795_BLENDE_CALIBRATION, AB_105795_COOKTOP_POINTS, AB_105795_OVEN_PART_POINTS } from "./ab-105795-plan.js";
 import { AB_105798_BLENDE_CALIBRATION, AB_105798_COOKTOP_POINTS, AB_105798_OVEN_PART_POINTS } from "./ab-105798-plan.js";
@@ -490,6 +494,10 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  "ab-105793": AB_105793_COOKTOP_POINTS,
+  "ab-105796": AB_105796_COOKTOP_POINTS,
+  "ab-105799": AB_105799_COOKTOP_POINTS,
+  "ab-105802": AB_105802_COOKTOP_POINTS,
   "ab-105792": AB_105792_COOKTOP_POINTS,
   "ab-105795": AB_105795_COOKTOP_POINTS,
   "ab-105798": AB_105798_COOKTOP_POINTS,
@@ -602,6 +610,10 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   "ab-105779": { "wall-cabinet-3": { wholeFacesOnly: true, wholeBlendeFaces: AB_105779_BLENDE_FACES } },
   "ab-105789": AB_105789_BLENDE_CALIBRATION,
   "ab-105790": AB_105790_BLENDE_CALIBRATION,
+  "ab-105793": AB_105793_BLENDE_CALIBRATION,
+  "ab-105796": AB_105796_BLENDE_CALIBRATION,
+  "ab-105799": AB_105799_BLENDE_CALIBRATION,
+  "ab-105802": AB_105802_BLENDE_CALIBRATION,
   "ab-105792": AB_105792_BLENDE_CALIBRATION,
   "ab-105795": AB_105795_BLENDE_CALIBRATION,
   "ab-105798": AB_105798_BLENDE_CALIBRATION,
@@ -1275,6 +1287,10 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-105793": AB_105793_OVEN_PART_POINTS,
+  "ab-105796": AB_105796_OVEN_PART_POINTS,
+  "ab-105799": AB_105799_OVEN_PART_POINTS,
+  "ab-105802": AB_105802_OVEN_PART_POINTS,
   "ab-105792": AB_105792_OVEN_PART_POINTS,
   "ab-105795": AB_105795_OVEN_PART_POINTS,
   "ab-105798": AB_105798_OVEN_PART_POINTS,
@@ -1697,9 +1713,9 @@ function elevationSinkHotspot(hotspots, part, sinkCabinetSourceKey = "sink-base"
 
   // This elevation has a measured worktop band: follow both drawn edges while
   // keeping the sink selection confined to the sink cabinet's width.
-  const measuredWorktop = (AB_105778_LAYOUT_SLUGS.has(kitchenSlug) || ["ab-105792", "ab-105795", "ab-105798", "ab-105801"].includes(kitchenSlug))
+  const measuredWorktop = (AB_105778_LAYOUT_SLUGS.has(kitchenSlug) || ["ab-105793", "ab-105796", "ab-105799", "ab-105802", "ab-105792", "ab-105795", "ab-105798", "ab-105801"].includes(kitchenSlug))
     ? hotspots.find((hotspot) => (
-      hotspot?.componentKey === "worktop"
+      hotspot?.componentKey === (["ab-105793", "ab-105796", "ab-105799", "ab-105802"].includes(kitchenSlug) ? "worktop-secondary" : "worktop")
       && !isFloorHeightWorktopEndPanel(hotspot)
     ))
     : null;

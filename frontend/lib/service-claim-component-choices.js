@@ -149,7 +149,7 @@ export function buildServiceClaimComponentChoiceGroups(selectableComponents = []
     });
   }
 
-  for (const panelPartKey of ["worktop-end-panel", "worktop-end-panel-left"]) {
+  for (const panelPartKey of ["worktop-end-panel", "worktop-end-panel-left", "worktop-end-panel-right"]) {
     const worktopEndPanel = componentByPartKey.get(panelPartKey);
     if (!worktopEndPanel) continue;
     const triggerPartKey = String(

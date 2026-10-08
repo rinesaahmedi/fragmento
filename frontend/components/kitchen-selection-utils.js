@@ -70,6 +70,18 @@ export function shouldHideComponentFromSelectionSummary(kitchenSlug, item) {
   if (normalizedSlug === "ab-105790") {
     return code === "TOP-AB105790-SECONDARY";
   }
+  if (normalizedSlug === "ab-105793") {
+    return code === "TOP-AB105793-SECONDARY";
+  }
+  if (normalizedSlug === "ab-105796") {
+    return code === "TOP-AB105796-SECONDARY";
+  }
+  if (normalizedSlug === "ab-105799") {
+    return code === "TOP-AB105799-SECONDARY";
+  }
+  if (normalizedSlug === "ab-105802") {
+    return code === "TOP-AB105802-SECONDARY";
+  }
 
   // 104296's oven cabinet and fillers are included structural parts,
   // retained for plan selection and claims without separate default rows.
@@ -248,6 +260,78 @@ function stripDimensionsFromName(name) {
 // kitchen-specific codes are minted when an otherwise identical item appears under a
 // different callout number.
 const AB_105806_PHOTO_NUMBER_BY_CODE = {
+  "TOP-AB105793": "2",
+  "TOP-AB105796": "2",
+  "TOP-AB105799": "2",
+  "TOP-AB105802": "2",
+  "SINK-BASE-AB105793-SP60-R": "3",
+  "SINK-BASE-AB105796-SP60-R": "3",
+  "SINK-BASE-AB105799-SP60-R": "3",
+  "SINK-BASE-AB105802-SP60-R": "3",
+  "SINK-WORKTOP-AB105793": "3",
+  "SINK-WORKTOP-AB105796": "3",
+  "SINK-WORKTOP-AB105799": "3",
+  "SINK-WORKTOP-AB105802": "3",
+  "CAB-BASE-AB105793-US30-UPK20": "4",
+  "CAB-BASE-AB105796-US30-UPK20": "4",
+  "CAB-BASE-AB105799-US30-UPK20": "4",
+  "CAB-BASE-AB105802-US30-UPK20": "4",
+  "CAB-BASE-AB105793-US40": "5",
+  "CAB-BASE-AB105796-US40": "5",
+  "CAB-BASE-AB105799-US40": "5",
+  "CAB-BASE-AB105802-US40": "5",
+  "CAB-BASE-AB105793-US60": "6",
+  "CAB-BASE-AB105796-US60": "6",
+  "CAB-BASE-AB105799-US60": "6",
+  "CAB-BASE-AB105802-US60": "6",
+  "REF-AB105793-KGCN388140E": "7",
+  "REF-AB105796-KGCN388140E": "7",
+  "REF-AB105799-KGCN388140E": "7",
+  "REF-AB105802-KGCN388140E": "7",
+  "DISH-AB105793-600": "8",
+  "DISH-AB105796-600": "8",
+  "DISH-AB105799-600": "8",
+  "DISH-AB105802-600": "8",
+  "CAB-BASE-AB105793-US50-UPK20": "9",
+  "CAB-BASE-AB105796-US50-UPK20": "9",
+  "CAB-BASE-AB105799-US50-UPK20": "9",
+  "CAB-BASE-AB105802-US50-UPK20": "9",
+  "CAB-WALL-AB105793-H3002-HPK2002": "10",
+  "CAB-WALL-AB105796-H3002-HPK2002": "10",
+  "CAB-WALL-AB105799-H3002-HPK2002": "10",
+  "CAB-WALL-AB105802-H3002-HPK2002": "10",
+  "CAB-WALL-AB105793-H4002": "11",
+  "CAB-WALL-AB105796-H4002": "11",
+  "CAB-WALL-AB105799-H4002": "11",
+  "CAB-WALL-AB105802-H4002": "11",
+  "CAB-HOOD-AB105793-600": "12",
+  "CAB-HOOD-AB105796-600": "12",
+  "CAB-HOOD-AB105799-600": "12",
+  "CAB-HOOD-AB105802-600": "12",
+  "HOOD-AB105793-FH664621E": "12",
+  "HOOD-AB105796-FH664621E": "12",
+  "HOOD-AB105799-FH664621E": "12",
+  "HOOD-AB105802-FH664621E": "12",
+  "CAB-WALL-AB105793-H6002-13": "13",
+  "CAB-WALL-AB105796-H6002-13": "13",
+  "CAB-WALL-AB105799-H6002-13": "13",
+  "CAB-WALL-AB105802-H6002-13": "13",
+  "CAB-WALL-AB105793-H6002-14": "14",
+  "CAB-WALL-AB105796-H6002-14": "14",
+  "CAB-WALL-AB105799-H6002-14": "14",
+  "CAB-WALL-AB105802-H6002-14": "14",
+  "CAB-WALL-AB105793-H6002-15": "15",
+  "CAB-WALL-AB105796-H6002-15": "15",
+  "CAB-WALL-AB105799-H6002-15": "15",
+  "CAB-WALL-AB105802-H6002-15": "15",
+  "CAB-WALL-AB105793-H5002-HPK2002": "16",
+  "CAB-WALL-AB105796-H5002-HPK2002": "16",
+  "CAB-WALL-AB105799-H5002-HPK2002": "16",
+  "CAB-WALL-AB105802-H5002-HPK2002": "16",
+  "TOP-AB105793-SECONDARY": "17",
+  "TOP-AB105796-SECONDARY": "17",
+  "TOP-AB105799-SECONDARY": "17",
+  "TOP-AB105802-SECONDARY": "17",
   "TOP-AB105792": "2",
   "TOP-AB105795": "2",
   "TOP-AB105798": "2",
@@ -1423,6 +1507,10 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "ab-105793": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105796": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105799": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105802": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105792": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105795": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105798": [["component-wall-cabinet-3", "component-extractor-hood"]],

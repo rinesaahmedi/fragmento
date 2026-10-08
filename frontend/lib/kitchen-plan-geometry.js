@@ -17,6 +17,10 @@ const CORNER_BLENDE_MIN_HEIGHT = 15;
 const CORNER_BLENDE_EDGE_TOLERANCE = 1.2;
 const CORNER_BLENDE_VERTICAL_TOLERANCE = 0.35;
 const BASE_PLINTH_EXTENSION_DISABLED_SLUGS = new Set([
+  "ab-105793", // Both front elevations already include the exact plinth.
+  "ab-105796", // Both front elevations already include the exact plinth.
+  "ab-105799", // Both front elevations already include the exact plinth.
+  "ab-105802", // Both front elevations already include the exact plinth.
   "ab-105792", // Front elevations already include their exact plinth.
   "ab-105795", // Front elevations already include their exact plinth.
   "ab-105798", // Front elevations already include their exact plinth.
