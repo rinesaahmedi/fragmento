@@ -30,6 +30,7 @@ import {
   getOrderKindForContractNumber,
 } from "./order-kind";
 import { prisma } from "./prisma";
+import { assertContractAllowsRepurchase } from "./contract-repurchase-restrictions";
 import { resolveProductInformation } from "./product-information";
 import {
   getAvailableCutleryVariantsForComponents,
@@ -806,6 +807,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw validationError("One or more selected items are invalid or inactive");
   }
 
+  assertContractAllowsRepurchase(validatedCustomer.contractNumber);
   const kitchenContract = await prisma.kitchenContract.findUnique({
     where: { contractNumber: validatedCustomer.contractNumber },
     include: { kitchen: true },

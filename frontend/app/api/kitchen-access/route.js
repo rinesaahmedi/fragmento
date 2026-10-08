@@ -7,6 +7,7 @@ import {
   safelyTrackPublicVisitEvent,
 } from "../../../lib/public-visit-tracking";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
+import { assertContractAllowsRepurchase } from "../../../lib/contract-repurchase-restrictions";
 
 export async function POST(request) {
   let submittedContractNumber = "";
@@ -35,6 +36,7 @@ export async function POST(request) {
       ...trackingContext,
     });
 
+    assertContractAllowsRepurchase(submittedContractNumber);
     const contract = await getKitchenContractForAccess(submittedContractNumber);
     const orderKind = getOrderKindForContractNumber(contract.contractNumber);
     const contractOrderState = await getContractOrderState(contract.id, prisma, orderKind);
@@ -69,7 +71,7 @@ export async function POST(request) {
     });
 
     return NextResponse.json(
-      { ok: false, error: error.message || "Contract access failed." },
+      { ok: false, error: error.message || "Contract access failed.", ...(error.code ? { code: error.code } : {}) },
       { status: error.status || 400 },
     );
   }

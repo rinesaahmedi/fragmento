@@ -11,6 +11,7 @@ import {
 import { persistFragmentoLanguage } from "../lib/fragmento-language";
 import { activatePublicLanguage } from "../lib/public-language-state";
 import CookieConsentBanner from "./cookie-consent-banner";
+import { isContractRepurchaseRestricted, REPURCHASE_UNAVAILABLE_CODE, REPURCHASE_UNAVAILABLE_MESSAGE } from "../lib/contract-repurchase-restrictions";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -66,6 +67,9 @@ function getLegalReturnEntryState() {
 
 const SCREEN_TEXT = {
   de: {
+    repurchaseNoticeTitle: "Wichtiger Hinweis!",
+    repurchaseNoticeMessage: "Diese Küche ist nicht für einen Nachkauf vorgesehen.",
+    repurchaseNoticeDismiss: "Verstanden",
     languageTitle: "Wähle deine Sprache",
     modeTitle: "Wie möchtest du die Anweisungen erhalten?",
     modeDescription: "Wähle zwischen:",
@@ -84,6 +88,9 @@ const SCREEN_TEXT = {
     contractPrivacySuffix: ".",
   },
   en: {
+    repurchaseNoticeTitle: "Important notice!",
+    repurchaseNoticeMessage: "This kitchen is not intended for additional purchases.",
+    repurchaseNoticeDismiss: "Understood",
     languageTitle: "Select your language",
     modeTitle: "How would you like instructions?",
     modeDescription: "Choose between:",
@@ -102,6 +109,9 @@ const SCREEN_TEXT = {
     contractPrivacySuffix: ".",
   },
   tr: {
+    repurchaseNoticeTitle: "Önemli bilgilendirme!",
+    repurchaseNoticeMessage: "Bu mutfak için sonradan ek ürün satın alınması öngörülmemiştir.",
+    repurchaseNoticeDismiss: "Anladım",
     languageTitle: "Dilini seç",
     modeTitle: "Talimatları nasıl almak istersiniz?",
     modeDescription: "Şunlardan birini seçin:",
@@ -120,6 +130,9 @@ const SCREEN_TEXT = {
     contractPrivacySuffix: " inceleyin.",
   },
   es: {
+    repurchaseNoticeTitle: "¡Aviso importante!",
+    repurchaseNoticeMessage: "No está previsto realizar compras adicionales para esta cocina.",
+    repurchaseNoticeDismiss: "Entendido",
     languageTitle: "Elige tu idioma",
     modeTitle: "¿Cómo quieres recibir las instrucciones?",
     modeDescription: "Elige entre:",
@@ -138,6 +151,9 @@ const SCREEN_TEXT = {
     contractPrivacySuffix: " para obtener más información.",
   },
   fr: {
+    repurchaseNoticeTitle: "Information importante !",
+    repurchaseNoticeMessage: "Aucun achat complémentaire n’est prévu pour cette cuisine.",
+    repurchaseNoticeDismiss: "Compris",
     languageTitle: "Choisis ta langue",
     modeTitle: "Comment souhaitez-vous recevoir les instructions ?",
     modeDescription: "Choisissez :",
@@ -156,6 +172,9 @@ const SCREEN_TEXT = {
     contractPrivacySuffix: " pour en savoir plus.",
   },
   ru: {
+    repurchaseNoticeTitle: "Важная информация!",
+    repurchaseNoticeMessage: "Для этой кухни не предусмотрена покупка дополнительных элементов.",
+    repurchaseNoticeDismiss: "Понятно",
     languageTitle: "Выберите язык",
     modeTitle: "Как вы хотите получить инструкции?",
     modeDescription: "Выберите вариант:",
@@ -375,6 +394,7 @@ export default function FragmentoEntryFlow() {
   const searchParams = useSearchParams();
   const pageOpenTrackedRef = useRef(false);
   const videoRef = useRef(null);
+  const repurchaseNoticeRef = useRef(null);
   const [initialEntryState] = useState(() => getLegalReturnEntryState());
   const [selectedLanguage, setSelectedLanguage] = useState(
     initialEntryState?.selectedLanguage || "de"
@@ -483,6 +503,12 @@ export default function FragmentoEntryFlow() {
       return;
     }
 
+    if (isContractRepurchaseRestricted(normalizedContractNumber)) {
+      setError("");
+      repurchaseNoticeRef.current?.showModal();
+      return;
+    }
+
     setIsValidatingContract(true);
     setError("");
 
@@ -497,6 +523,10 @@ export default function FragmentoEntryFlow() {
       });
       const payload = await response.json();
 
+      if (payload.code === REPURCHASE_UNAVAILABLE_CODE || payload.error === REPURCHASE_UNAVAILABLE_MESSAGE) {
+        repurchaseNoticeRef.current?.showModal();
+        return;
+      }
       if (!response.ok || !payload.ok) {
         throw new Error(payload.error || text.contractError);
       }
@@ -517,6 +547,20 @@ export default function FragmentoEntryFlow() {
 
   return (
     <>
+      <dialog
+        ref={repurchaseNoticeRef}
+        className="fragmento-repurchase-notice"
+        lang={selectedLanguage || "en"}
+        aria-labelledby="repurchase-notice-title"
+        aria-describedby="repurchase-notice-message"
+        style={{ width: "min(480px, calc(100vw - 40px))", boxSizing: "border-box", padding: "28px", border: "1px solid #eadfd3", borderRadius: "22px", background: "#fffdf9", color: "#302820", boxShadow: "0 24px 70px rgba(0,0,0,0.2)", textAlign: "center", fontFamily: pageStyle.fontFamily }}
+      >
+        <img src="/img/FIGURA.png" alt="Monteur Frank" style={{ width: "100px", height: "160px", objectFit: "contain" }} />
+        <h2 id="repurchase-notice-title" style={{ margin: "12px 0 18px", fontSize: "clamp(26px, 5vw, 34px)", fontWeight: 800, lineHeight: 1.2, textTransform: "uppercase", color: "#8b4d18" }}>{text.repurchaseNoticeTitle}</h2>
+        <p id="repurchase-notice-message" style={{ fontSize: "clamp(20px, 4vw, 22px)", fontWeight: 700, lineHeight: 1.5, margin: "0 0 24px", padding: "18px 20px", borderLeft: "4px solid #8b4d18", borderRadius: "10px", background: "#f4e9db", color: "#302820", textAlign: "left", overflowWrap: "break-word" }}>{text.repurchaseNoticeMessage}</p>
+        <button type="button" style={primaryButtonStyle} onClick={() => repurchaseNoticeRef.current?.close()}>{text.repurchaseNoticeDismiss}</button>
+      </dialog>
+      <style>{`.fragmento-repurchase-notice::backdrop { background: rgba(35, 29, 23, 0.45); }`}</style>
       <main style={pageStyle}>
         <style>{responsivePanelMedia}</style>
         <div style={centerWrapStyle}>
