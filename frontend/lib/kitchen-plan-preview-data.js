@@ -5,6 +5,10 @@ import { AB_104332_HOTSPOTS } from './ab-104332-plan.js';
 import { AB_104296_HOTSPOTS } from './ab-104296-plan.js';
 import { AB_105789_HOTSPOTS, AB_105789_LIGHT_DETAILS } from './ab-105789-plan.js';
 import { AB_105790_HOTSPOTS, AB_105790_LIGHT_DETAILS } from './ab-105790-plan.js';
+import { AB_105792_HOTSPOTS, AB_105792_LIGHT_DETAILS } from './ab-105792-plan.js';
+import { AB_105795_HOTSPOTS, AB_105795_LIGHT_DETAILS } from './ab-105795-plan.js';
+import { AB_105798_HOTSPOTS, AB_105798_LIGHT_DETAILS } from './ab-105798-plan.js';
+import { AB_105801_HOTSPOTS, AB_105801_LIGHT_DETAILS } from './ab-105801-plan.js';
 import { AB_105791_HOTSPOTS, AB_105791_LIGHT_DETAILS } from './ab-105791-plan.js';
 import { AB_105794_HOTSPOTS, AB_105794_LIGHT_DETAILS } from './ab-105794-plan.js';
 import { AB_105797_HOTSPOTS, AB_105797_LIGHT_DETAILS } from './ab-105797-plan.js';
@@ -14,6 +18,10 @@ import { AB_105779_HOTSPOTS } from './ab-105779-plan.js';
 import { AB_105779_LAYOUT_ALIAS_SLUGS } from './ab-105779-layout.js';
 
 export const PLAN_IMAGE_BY_SLUG = {
+  "ab-105792": "/plans/670%20105792.svg",
+  "ab-105795": "/plans/670%20105795.svg",
+  "ab-105798": "/plans/670%20105798.svg",
+  "ab-105801": "/plans/670%20105801.svg",
   "ab-105791": "/plans/670%20105791.svg",
   "ab-105794": "/plans/670%20105794.svg",
   "ab-105797": "/plans/670%20105797.svg",
@@ -136,6 +144,10 @@ export const PLAN_IMAGE_BY_SLUG = {
 // Most legacy drawings use the 842 x 595 CAD sheet. Keep native dimensions for
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
+  "ab-105792": { width: 842, height: 595 },
+  "ab-105795": { width: 842, height: 595 },
+  "ab-105798": { width: 842, height: 595 },
+  "ab-105801": { width: 842, height: 595 },
   "ab-105791": { width: 842, height: 595 },
   "ab-105794": { width: 842, height: 595 },
   "ab-105797": { width: 842, height: 595 },
@@ -177,6 +189,10 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
+  "ab-105792": AB_105792_LIGHT_DETAILS,
+  "ab-105795": AB_105795_LIGHT_DETAILS,
+  "ab-105798": AB_105798_LIGHT_DETAILS,
+  "ab-105801": AB_105801_LIGHT_DETAILS,
   "ab-105791": AB_105791_LIGHT_DETAILS,
   "ab-105794": AB_105794_LIGHT_DETAILS,
   "ab-105797": AB_105797_LIGHT_DETAILS,
@@ -561,6 +577,10 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
   "ab-105779": AB_105779_HOTSPOTS,
   "ab-105789": AB_105789_HOTSPOTS,
   "ab-105790": AB_105790_HOTSPOTS,
+  "ab-105792": AB_105792_HOTSPOTS,
+  "ab-105795": AB_105795_HOTSPOTS,
+  "ab-105798": AB_105798_HOTSPOTS,
+  "ab-105801": AB_105801_HOTSPOTS,
   "ab-105791": AB_105791_HOTSPOTS,
   "ab-105794": AB_105794_HOTSPOTS,
   "ab-105797": AB_105797_HOTSPOTS,
