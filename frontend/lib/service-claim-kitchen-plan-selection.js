@@ -446,6 +446,7 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
 // These plans place the floor-height WU16 panel at the left worktop run.
 // Other split L-kitchen plans place it at the right-hand end.
 const LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS = new Set([
+  "ab-105804",
   "ab-105805",
   "ab-105809",
   "ab-105813",

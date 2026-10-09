@@ -64,6 +64,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   ...AB_105846_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
 ]);
 const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105804",
   "ab-105777",
   "ab-105780",
   "ab-105783",
@@ -86,6 +87,7 @@ const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105862",
 ]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105804",
   ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
   "ab-105779",
   "ab-105789",
@@ -2567,7 +2569,31 @@ const AB_105779_ITEMS = [
 ];
 PRODUCT_INFO_BY_CODE["DISH-AB105779-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 
+// 670 105804: two independent perspective runs; supplier rows 1-12.
+const AB_105804_ITEMS = [
+  { ...AB_105777_ITEMS.find((item) => item.componentKey === "oven-module"), catalogPriceSyncMode: "LOCKED_INCLUDED", heightMm: 878, depthMm: 600 },
+  defaultWorktop({ code: "TOP-AB105804", catalogArticleNumber: "PLR60", displayArticleNumber: "PLR60", catalogPriceSyncMode: "LOCKED_INCLUDED", depthMm: 600, sortOrder: 20 }),
+  defaultSinkBase({ code: "SINK-BASE-AB105804-SP60-R", articleNumber: "SP60", catalogArticleNumber: "SP60", catalogPriceSyncMode: "LOCKED_INCLUDED", widthMm: 600, heightMm: 878, depthMm: 600, sortOrder: 30, infoText: "Included SP60 sink base cabinet, hinge right (SP60 R)" }),
+  defaultSinkWorktop({ code: "SINK-WORKTOP-AB105804", articleNumber: "526335 + 517720", catalogArticleNumber: "526335 + 517720", catalogPriceSyncMode: "LOCKED_INCLUDED", sortOrder: 32, infoText: "Included 526335 sink, right orientation (526335 R), and 517720 faucet" }),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105804-US50-UPK20", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", articleNumber: "US50", price: articlePriceWithBlende("US50", "UPK20"), blendeCode: "UPK20", blendeLabel: "UPK20", blendePrice: blendePrice("UPK20"), widthMm: 500, heightMm: 878, depthMm: 600, componentKey: "base-module-1", iconKey: "drawer_base_two", colorKey: "#f0a500", sortOrder: 40 },
+  { ...AB_105779_ITEMS.find((item) => item.componentKey === "dishwasher-base"), code: "DISH-AB105804-600", heightMm: 878, depthMm: 600, sortOrder: 50 },
+  sinkEndBlende("105804", { catalogBlendeCode: "UPK20", sortOrder: 60, heightMm: 878, depthMm: 16 }),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105804-US60-UPK20", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", articleNumber: "US60", price: articlePriceWithBlende("US60", "UPK20"), blendeCode: "UPK20", blendeLabel: "UPK20", blendePrice: blendePrice("UPK20"), widthMm: 600, heightMm: 878, depthMm: 600, componentKey: "base-module-2", iconKey: "drawer_base_two", colorKey: "#f0a500", sortOrder: 70 },
+  { ...AB_105789_ITEMS.find((item) => item.componentKey === "refrigerator"), code: "REF-AB105804-KGCN388140E", sortOrder: 80 },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105804-H5002-HPK2002", name: "Upper Cabinet", nameDe: "Oberschrank", articleNumber: "H5002", price: articlePriceWithBlende("H5002", "HPK2002"), blendeCode: "HPK2002", blendeLabel: "HPK2002", blendePrice: blendePrice("HPK2002"), widthMm: 500, heightMm: 723, depthMm: 340, componentKey: "wall-cabinet-1", iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", sortOrder: 90 },
+  { ...AB_105777_ITEMS.find((item) => item.componentKey === "wall-cabinet-2"), code: "CAB-HOOD-AB105804-600", heightMm: 723, depthMm: 340, sortOrder: 100 },
+  { ...AB_105777_ITEMS.find((item) => item.componentKey === "extractor-hood"), code: "HOOD-AB105804-FH664621E", heightMm: 173, depthMm: 303, sortOrder: 102 },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105804-H6002", name: "Upper Cabinet", nameDe: "Oberschrank", articleNumber: "H6002", price: articlePrice("H6002"), widthMm: 600, heightMm: 723, depthMm: 340, componentKey: "wall-cabinet-3", iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", sortOrder: 110 },
+  { ...AB_105779_ITEMS.find((item) => item.componentKey === "wall-cabinet-3"), code: "CAB-WALL-AB105804-H6002-HPK2002", componentKey: "wall-cabinet-4", sortOrder: 120 },
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+PRODUCT_INFO_BY_CODE["DISH-AB105804-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+PRODUCT_INFO_BY_CODE["REF-AB105804-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105804-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+
 const DEFAULT_KITCHENS = [
+  { slug: "ab-105804", kitchenCode: "105 804", name: "105804", description: "Two-run kitchen based on frontend/public/pdfs/670 105804.pdf", items: AB_105804_ITEMS, reconcileExisting: true },
   ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => ({
     slug: `ab-${code}`,
     kitchenCode: `${code.slice(0, 3)} ${code.slice(3)}`,

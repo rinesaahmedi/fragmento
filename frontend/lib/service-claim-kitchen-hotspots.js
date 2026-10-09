@@ -1,6 +1,7 @@
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
 import { AB_105790_BLENDE_CALIBRATION, AB_105790_COOKTOP_POINTS, AB_105790_OVEN_PART_POINTS, AB_105790_SINK_POINTS } from "./ab-105790-plan.js";
 import { AB_105789_BLENDE_CALIBRATION, AB_105789_COOKTOP_POINTS, AB_105789_OVEN_PART_POINTS, AB_105789_SINK_POINTS } from "./ab-105789-plan.js";
+import { AB_105804_BLENDE_CALIBRATION, AB_105804_COOKTOP_POINTS, AB_105804_OVEN_PART_POINTS, AB_105804_WORKTOP_PART_KEYS } from "./ab-105804-plan.js";
 import { AB_105777_LAYOUT_ALIAS_SLUGS } from "./ab-105777-layout.js";
 import { AB_105779_LAYOUT_ALIAS_SLUGS } from "./ab-105779-layout.js";
 import { AB_105779_BLENDE_FACES, AB_105779_WORKTOP_PART_KEYS, AB_105779_SINK_POINTS, AB_105779_COOKTOP_POINTS, AB_105779_OVEN_PART_POINTS } from "./ab-105779-plan.js";
@@ -470,6 +471,7 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  "ab-105804": AB_105804_COOKTOP_POINTS,
   "ab-105789": AB_105789_COOKTOP_POINTS,
   "ab-105790": AB_105790_COOKTOP_POINTS,
   // Exact outside cooktop strokes from the AB 105775 vector plan. The
@@ -571,6 +573,7 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  "ab-105804": AB_105804_BLENDE_CALIBRATION,
   "ab-105779": { "wall-cabinet-3": { wholeFacesOnly: true, wholeBlendeFaces: AB_105779_BLENDE_FACES } },
   "ab-105789": AB_105789_BLENDE_CALIBRATION,
   "ab-105790": AB_105790_BLENDE_CALIBRATION,
@@ -1239,6 +1242,7 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-105804": AB_105804_OVEN_PART_POINTS,
   "ab-105779": AB_105779_OVEN_PART_POINTS,
   "ab-105789": AB_105789_OVEN_PART_POINTS,
   "ab-105790": AB_105790_OVEN_PART_POINTS,
@@ -1356,6 +1360,7 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 );
 
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-105804": { indexPartKeys: AB_105804_WORKTOP_PART_KEYS },
   "ab-105779": { indexPartKeys: AB_105779_WORKTOP_PART_KEYS },
   "ab-105789": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel", "worktop-left", "worktop-right", "worktop-right"] },
   "ab-105777": { indexPartKeys: ["worktop-left", "worktop-right", null] },

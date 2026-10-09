@@ -36,6 +36,7 @@ import {
   AB_105831_FRG_ORDER_HOTSPOTS,
   AB_105837_FRG_ORDER_HOTSPOTS,
   PLAN_HOTSPOTS_BY_SLUG,
+  PLAN_IMAGE_BY_SLUG,
   PLAN_IMAGE_SOURCE_SIZE_BY_SLUG,
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data";
@@ -1596,6 +1597,8 @@ AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
 IMAGE_HOTSPOTS_BY_SLUG["ab-105762"] = PLAN_HOTSPOTS_BY_SLUG["ab-105762"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105777"] = PLAN_HOTSPOTS_BY_SLUG["ab-105777"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105779"] = PLAN_HOTSPOTS_BY_SLUG["ab-105779"];
+IMAGE_VIEW_BY_SLUG["ab-105804"] = PLAN_IMAGE_BY_SLUG["ab-105804"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105804"] = PLAN_HOTSPOTS_BY_SLUG["ab-105804"];
 for (const slug of AB_105779_LAYOUT_ALIAS_SLUGS) {
   IMAGE_VIEW_BY_SLUG[slug] = IMAGE_VIEW_BY_SLUG["ab-105779"];
   IMAGE_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG[slug];
@@ -2892,7 +2895,7 @@ export default function useKitchenSvgStage({
                       // The worktop is partitioned around the sink/cooktop cutouts.
                       // Paint its pieces continuously; their internal clipping edges
                       // must not add blue borders or inset shadows to the PDF.
-                      if (AB_105779_LAYOUT_SLUGS.includes(normalizedKitchenSlug) && hotspot.componentKey === "worktop" && hotspot.clipPath) {
+                      if ((AB_105779_LAYOUT_SLUGS.includes(normalizedKitchenSlug) || normalizedKitchenSlug === "ab-105804") && hotspot.componentKey === "worktop" && hotspot.clipPath) {
                         hotspotStyle.border = 0;
                         hotspotStyle.boxShadow = "none";
                         hotspotStyle.backgroundClip = "border-box";
