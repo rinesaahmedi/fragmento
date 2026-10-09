@@ -1,3 +1,4 @@
+import { buildServiceClaimDishwasherSvgOverlay } from "./service-claim-dishwasher-masks.js";
 import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
@@ -214,6 +215,7 @@ export function buildKitchenPreviewSvgMarkup({
   svgMarkup,
   kitchenSlug,
   highlightedComponentKeys = [],
+  selectedComponentIds = [],
   visibleComponentIds = null,
 }) {
   let baseMarkup = enhanceKitchenPreviewSvgMarkup(svgMarkup);
@@ -230,11 +232,12 @@ export function buildKitchenPreviewSvgMarkup({
     .map(buildHighlightMarkup)
     .join("");
 
-  if (!highlightMarkup) {
+  const dishwasherOverlay = buildServiceClaimDishwasherSvgOverlay({ kitchenSlug, selectedComponentIds });
+  if (!highlightMarkup && !dishwasherOverlay) {
     return baseMarkup;
   }
 
-  return baseMarkup.replace("</svg>", `${highlightMarkup}</svg>`);
+  return baseMarkup.replace("</svg>", `${highlightMarkup}${dishwasherOverlay}</svg>`);
 }
 
 export function resolveClaimPreviewComponentKeys({ selectedAreas = [], kitchenConfig = null }) {
@@ -316,6 +319,7 @@ export async function renderClaimKitchenPreviewSvg({
     svgMarkup: context.svgMarkup,
     kitchenSlug: resolvedKitchenSlug,
     highlightedComponentKeys,
+    selectedComponentIds: normalizedAreas.map((area) => area.componentId),
     visibleComponentIds,
   });
 
@@ -431,6 +435,7 @@ function withClaimPreviewDerivedSinkFaucet(hotspots, components) {
 }
 
 export function cropClaimPlanHotspot(hotspot, crop) {
+  hotspot = { ...hotspot, claimSourceBounds: getClaimPlanHotspotBounds(hotspot) };
   const points = Array.isArray(hotspot?.points) ? hotspot.points : [];
   if (points.length) {
     const croppedPoints = points.map(([x, y]) => [

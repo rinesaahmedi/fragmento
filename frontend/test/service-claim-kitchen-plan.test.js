@@ -1390,7 +1390,7 @@ test("optional dishwasher claim parts stay hidden until the dishwasher is ordere
   assert.ok(!result.selectableComponents.some((entry) => entry.code === "TGV60"));
 });
 
-test("dishwasher owns the plan hotspot while the furniture front stays manual", () => {
+test("dishwasher owns basket and GS while furniture front owns the complete face", () => {
   const sourceHotspot = {
     componentId: "component-base-module-3",
     componentKey: "base-module-3",
@@ -1404,11 +1404,11 @@ test("dishwasher owns the plan hotspot while the furniture front stays manual", 
     { partKey: "furniture-front", sourceComponentKey: "base-module-3" },
   ], "ab-105805");
 
-  assert.equal(result.length, 1);
-  assert.equal(result[0].componentId, "component-claim-dishwasher");
-  assert.equal(result[0].claimPartKey, "dishwasher");
-  assert.equal(result[0].left, sourceHotspot.left);
-  assert.equal(result[0].width, sourceHotspot.width);
+  assert.equal(result.length, 3);
+  assert.equal(result.filter(h => h.componentId === "component-claim-dishwasher").length, 2);
+  const front = result.find(h => h.claimPartKey === "furniture-front");
+  assert.equal(front.left, sourceHotspot.left);
+  assert.equal(front.width, sourceHotspot.width);
 });
 
 test("AB 105811 maps the drawn dishwasher panel to its ordered dishwasher", () => {
@@ -1425,9 +1425,9 @@ test("AB 105811 maps the drawn dishwasher panel to its ordered dishwasher", () =
     { partKey: "furniture-front", sourceComponentKey: "base-module-3" },
   ], "ab-105811");
 
-  assert.equal(result.length, 1);
-  assert.equal(result[0].componentId, "component-claim-dishwasher");
-  assert.equal(result[0].claimPartKey, "dishwasher");
+  assert.equal(result.length, 3);
+  assert.equal(result.filter(h => h.claimPartKey === "dishwasher").length, 2);
+  assert.equal(result.filter(h => h.claimPartKey === "furniture-front").length, 1);
 });
 
 test("45 cm dishwasher bundles remain unchanged without 60 cm claim parts", () => {
@@ -1498,9 +1498,9 @@ test("ASC links every 45 cm dishwasher family to its exact plan component", () =
     );
     assert.ok(sourceHotspot, `${slug} should retain its dishwasher face`);
     const claimHotspots = buildServiceClaimPartHotspots([sourceHotspot], claimParts, slug);
-    assert.equal(claimHotspots.length, 1);
-    assert.equal(claimHotspots[0].componentId, "component-claim-dishwasher");
-    assert.equal(claimHotspots[0].claimPartKey, "dishwasher");
+    assert.equal(claimHotspots.length, 3);
+    assert.equal(claimHotspots.filter(h => h.componentId === "component-claim-dishwasher").length, 2);
+    assert.equal(claimHotspots.filter(h => h.claimPartKey === "furniture-front").length, 1);
   }
 });
 

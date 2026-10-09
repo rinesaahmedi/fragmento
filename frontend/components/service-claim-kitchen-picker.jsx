@@ -37,6 +37,7 @@ import {
   isLShapedClaimKitchen,
 } from "../lib/service-claim-kitchen-hotspots";
 import { buildServiceClaimComponentChoiceGroups } from "../lib/service-claim-component-choices";
+import { buildServiceClaimDishwasherSvgOverlay } from "../lib/service-claim-dishwasher-masks.js";
 import styles from "./kitchen-configurator.module.css";
 
 const SERVICE_CLAIM_CLICK_BOUNDS_BY_SLUG = {
@@ -256,7 +257,7 @@ export default function ServiceClaimKitchenPicker({
     `${planDisplayCrop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${planDisplayCrop.height * PLAN_IMAGE_SOURCE_HEIGHT}`;
   const croppedImageHotspots = useMemo(() => {
     const cropped = sourceImageHotspots
-      .map((hotspot) => cropPlanHotspot(hotspot, planDisplayCrop))
+      .map((hotspot) => cropPlanHotspot({ ...hotspot, claimSourceBounds: { left: hotspot.left, top: hotspot.top, width: hotspot.width, height: hotspot.height } }, planDisplayCrop))
       .map((hotspot) => {
         return {
           ...hotspot,
@@ -327,6 +328,11 @@ export default function ServiceClaimKitchenPicker({
       normalizeColor,
     });
 
+    if (svg && selectableComponentIds.includes("component-claim-dishwasher")) {
+      svg.querySelector('[data-claim-dishwasher-overlay]')?.remove();
+      svg.insertAdjacentHTML('beforeend', buildServiceClaimDishwasherSvgOverlay({ kitchenSlug, selectedComponentIds: displaySelectedComponentIds }));
+    }
+
     if (!host || !svg) {
       return undefined;
     }
@@ -377,7 +383,12 @@ export default function ServiceClaimKitchenPicker({
       lockedComponentIds: fixedComponentIds,
       kitchenSlug,
     });
-  }, [displaySelectedComponentIds, fixedKey, fixedComponentIds, kitchenSlug, shouldUseImagePlan]);
+    const svg = svgHostRef.current?.querySelector('svg');
+    if (svg && selectableComponentIds.includes("component-claim-dishwasher")) {
+      svg.querySelector('[data-claim-dishwasher-overlay]')?.remove();
+      svg.insertAdjacentHTML('beforeend', buildServiceClaimDishwasherSvgOverlay({ kitchenSlug, selectedComponentIds: displaySelectedComponentIds }));
+    }
+  }, [selectableComponentIds, displaySelectedComponentIds, fixedKey, fixedComponentIds, kitchenSlug, shouldUseImagePlan]);
 
   const normalizedContractNumber = String(contractNumber || "").trim();
   const selectedIds = new Set(value || []);

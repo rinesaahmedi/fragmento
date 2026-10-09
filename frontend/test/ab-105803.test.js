@@ -16,7 +16,16 @@ const contains = (points,[x,y]) => {
   }
   return inside;
 };
-const hits=(key,x,y)=>AB_105803_HOTSPOTS.some(h=>h.componentKey===key&&contains(h.points,[x/842*100,y/595*100]));
+const maskContains=(hotspot,point)=>{
+  if(hotspot.points && !hotspot.clipPath) return contains(hotspot.points,point);
+  const polygon=hotspot.clipPath?.match(/^polygon\((.*)\)$/)?.[1];
+  const points=polygon ? polygon.split(',').map(p=>{
+    const [x,y]=p.trim().split(/\s+/).map(parseFloat);
+    return [hotspot.left+x/100*hotspot.width,hotspot.top+y/100*hotspot.height];
+  }) : [[hotspot.left,hotspot.top],[hotspot.left+hotspot.width,hotspot.top],[hotspot.left+hotspot.width,hotspot.top+hotspot.height],[hotspot.left,hotspot.top+hotspot.height]];
+  return contains(points,point);
+};
+const hits=(key,x,y)=>AB_105803_HOTSPOTS.some(h=>h.componentKey===key&&maskContains(h,[x/842*100,y/595*100]));
 
 test('105803 owns its vector plan and all eleven supplier callouts',async()=>{
   assert.match(await loadKitchenSvgMarkup('ab-105803'),/viewBox="0 0 842 595"/);
@@ -81,7 +90,7 @@ test('105803 ASC dropdown assigns both corner filler faces to UPEF65',()=>{
   const result=buildServiceClaimPartHotspots(split,[{partKey:'dishwasher',sourceComponentKey:'dishwasher-base'}],'ab-105803');
   const painted=(option,x,y)=>{
     const selected=resolveServiceClaimPlanDisplayComponentIds([dishwasher.componentId],groups,{'dishwasher-base':[option.componentId]});
-    return result.filter(h=>selected.includes(h.componentId || ('component-'+h.componentKey)) && contains(h.points,[x/842*100,y/595*100]));
+    return result.filter(h=>selected.includes(h.componentId || ('component-'+h.componentKey)) && maskContains(h,[x/842*100,y/595*100]));
   };
   for(const x of [387,394]) {
     assert.equal(painted(blende,x,420).length,1,'corner face belongs to filler');
@@ -91,4 +100,29 @@ test('105803 ASC dropdown assigns both corner filler faces to UPEF65',()=>{
   assert.equal(painted(dishwasher,330,420).length,1);
   assert.equal(painted(blende,382,420).length,0,'adjacent worktop panel remains separate');
   assert.equal(result.filter(h=>h.componentId===blende.componentId).length,2);
+});
+
+test('105803 ASC dishwasher paints basket and GS while furniture front paints the complete face',()=>{
+  const parts=['dishwasher','furniture-front'].map(partKey=>({partKey,sourceComponentKey:'dishwasher-base'}));
+  const prepared=prepareKitchenPlanGeometry(AB_105803_HOTSPOTS,'ab-105803');
+  // Exercise both source coordinates and the shifted/scaled display after cropping.
+  for(const crop of [{left:0,top:0,width:100,height:100},{left:10,top:5,width:75,height:90}]) {
+    const display=prepared.map(h=>({...h,left:(h.left-crop.left)/crop.width*100,top:(h.top-crop.top)/crop.height*100,width:h.width/crop.width*100,height:h.height/crop.height*100,clipPath:'polygon('+h.points.map(([x,y])=>((x-h.left)/h.width*100)+'% '+((y-h.top)/h.height*100)+'%').join(', ')+')'}));
+    const result=buildServiceClaimPartHotspots(display,parts,'ab-105803');
+    const selected=(partKey,x,y)=>result.filter(h=>h.claimPartKey===partKey&&maskContains(h,[(x/842*100-crop.left)/crop.width*100,(y/595*100-crop.top)/crop.height*100]));
+    assert.equal(result.filter(h=>h.claimPartKey==='dishwasher').length,2);
+    assert.equal(result.filter(h=>h.claimPartKey==='furniture-front').length,1);
+    for(const [x,y] of [[330,420],[335,470]]) {
+      assert.equal(selected('dishwasher',x,y).length,1);
+      assert.equal(selected('furniture-front',x,y).length,1);
+    }
+    for(const [x,y] of [[330,370],[300,490],[350,505],[300,395],[295,440],[370,444]]) {
+      assert.equal(selected('dishwasher',x,y).length,0);
+      assert.equal(selected('furniture-front',x,y).length,1);
+    }
+    for(const x of [387,394]) {
+      assert.equal(selected('dishwasher',x,420).length,0);
+      assert.equal(selected('furniture-front',x,420).length,0);
+    }
+  }
 });

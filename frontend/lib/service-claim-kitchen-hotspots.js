@@ -1,3 +1,4 @@
+import { getServiceClaimDishwasherMask } from "./service-claim-dishwasher-masks.js";
 import { AB_105803_BLENDE_CALIBRATION, AB_105803_COOKTOP_POINTS, AB_105803_OVEN_PART_POINTS, AB_105803_SINK_POINTS } from "./ab-105803-plan.js";
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
 import { AB_105793_BLENDE_CALIBRATION, AB_105793_COOKTOP_POINTS, AB_105793_OVEN_PART_POINTS } from "./ab-105793-plan.js";
@@ -2424,7 +2425,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
   // the plan. They must not take over their source component's visible hotspot.
   const normalizedParts = (claimParts || [])
     .map(normalizeClaimPart)
-    .filter((part) => part && !["filter", "furniture-front"].includes(part.partKey));
+    .filter((part) => part && part.partKey !== "filter");
   if (!normalizedParts.length) {
     return hotspots;
   }
@@ -2437,6 +2438,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
   });
 
   const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const dishwasherDefinition = getServiceClaimDishwasherMask(normalizedSlug);
   const linkedSinkCabinetFaceKeys = {
     "ab-109873": new Set(["base-module-1"]),
     "ab-110401": new Set(["base-module-2"]),
@@ -2493,13 +2495,19 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
 
   return (hotspots || []).flatMap((sourceHotspot, hotspotIndex) => {
     const hotspot = trimCabinetAtWorktopEndPanel(sourceHotspot, worktopEndPanels);
-    const sourceComponentKey = String(hotspot?.componentKey || "").trim();
+    const drawnComponentKey = String(hotspot?.componentKey || "").trim();
+    const sourceComponentKey = dishwasherDefinition?.hotspotSourceKey === drawnComponentKey
+      ? dishwasherDefinition.sourceComponentKey : drawnComponentKey;
     // Wide sink cabinets can be drawn as two adjacent fronts. Give every front
     // the same ASC claim identity while keeping sink and faucet independent.
     if (linkedSinkCabinetFaceKeys.has(sourceComponentKey) && linkedSinkCabinetPart) {
       return [existingClaimPartHotspot(hotspot, linkedSinkCabinetPart)];
     }
-    const sourceParts = partsBySourceKey.get(sourceComponentKey) || [];
+    const sourceParts = (partsBySourceKey.get(sourceComponentKey) || []).filter((part) => (
+      !dishwasherDefinition || dishwasherDefinition.hotspotSourceKey === dishwasherDefinition.sourceComponentKey
+      || drawnComponentKey !== dishwasherDefinition.sourceComponentKey
+      || !["dishwasher", "furniture-front"].includes(part.partKey)
+    ));
     if (sourceComponentKey === "worktop" && sourceHotspot.claimExcludeFromWorktop) return [];
     if (!sourceParts.length) {
       return [hotspot];
@@ -2537,6 +2545,35 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     // hotspot above or by a PDF-derived definition such as AB 105807.
     if (sourceComponentKey === "worktop" && worktopEndPanelPart) {
       return [hotspot];
+    }
+    if (sourceParts.some((part) => ["dishwasher", "furniture-front"].includes(part.partKey))) {
+      const definition = getServiceClaimDishwasherMask(normalizedSlug);
+      const sourceBounds = hotspot.claimSourceBounds || hotspotBounds(hotspot);
+      const basketBounds = definition ? hotspotBounds({ points: definition.basketPoints }) : null;
+      const ownsBasket = !basketBounds || (
+        (basketBounds.left + basketBounds.right) / 2 >= sourceBounds.left
+        && (basketBounds.left + basketBounds.right) / 2 <= sourceBounds.left + sourceBounds.width
+        && (basketBounds.top + basketBounds.bottom) / 2 >= sourceBounds.top
+        && (basketBounds.top + basketBounds.bottom) / 2 <= sourceBounds.top + sourceBounds.height
+      );
+      if (!ownsBasket) return [];
+      return sourceParts.flatMap((part) => {
+        if (part.partKey === "furniture-front") return [existingClaimPartHotspot(hotspot, part)];
+        if (part.partKey !== "dishwasher" || !ownsBasket) return [];
+        const polygons = definition
+          ? [definition.basketPoints, definition.gsPoints]
+          : [
+            [[.06,.38],[.94,.38],[.94,.44],[.90,.44],[.84,.66],[.82,.68],[.18,.68],[.16,.66],[.10,.44],[.06,.44]],
+            [[.42,.77],[.58,.77],[.58,.89],[.42,.89]],
+          ].map((points) => points.map(([x,y]) => [sourceBounds.left+x*sourceBounds.width,sourceBounds.top+y*sourceBounds.height]));
+        return polygons.filter((points) => points.length).map((points, index) => {
+          const displayPoints = points.map(([x,y]) => [
+            hotspot.left + (x-sourceBounds.left)/sourceBounds.width*hotspot.width,
+            hotspot.top + (y-sourceBounds.top)/sourceBounds.height*hotspot.height,
+          ]);
+          return { ...hotspotFromDisplayPoints(hotspot, part, displayPoints), claimDishwasherDetailKey: index === 0 ? "dishwasher-basket" : "dishwasher-gs-mark" };
+        });
+      });
     }
     const visibleSourceParts = sourceParts;
 

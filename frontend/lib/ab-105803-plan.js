@@ -35,7 +35,7 @@ export const AB_105803_HOTSPOTS = [
   face('base-module-1',[[140.52,358.48],[148.32,357.64],[148.32,534.16],[140.52,534.88]]),
   face('base-module-1',[[148.32,357.64],[194.76,352.96],[194.76,529.36],[148.32,534.16]]),
   face('sink-base',[[194.76,352.96],[287.88,343.36],[287.88,519.88],[194.76,529.36]]),
-  face('dishwasher-base',[[287.88,343.36],[380.88,333.88],[380.88,510.4],[287.88,519.88]]),
+  face('dishwasher-base',[[287.88,343.36],[380.88,333.88],[380.88,510.4],[287.88,519.88]],{claimDishwasherFront:true}),
   // UPEF65 belongs to the dishwasher package (supplier row 5).
   face('dishwasher-base',[[383.4,333.64],[391.2,332.8],[391.2,509.32],[383.4,510.04]]),
   face('dishwasher-base',[[391.2,332.8],[398.28,333.88],[398.28,510.28],[391.2,509.32]]),
@@ -81,6 +81,16 @@ const detail=(key,x1,y1,x2,y2)=>{
   const {left,right,top,bottom}=bounds([[x1,y1],[x2,y2]]);
   return {key,componentKey:'dishwasher-base',persistWhenSelected:true,left,top,width:right-left,height:bottom-top};
 };
+// Basket silhouette follows its sloped rim, mounting clips and rounded lower corners.
+export const AB_105803_DISHWASHER_BASKET_POINTS = pdf105803Points([
+  [292.5,403],[293.5,402],[295,403],[295,404.2],
+  [374.8,395.5],[374.8,394],[376,393.6],[377.4,394.2],
+  [377.4,405],[376.2,405.5],[374.8,404.8],
+  [373.5,405.5],[372.8,414],[371.2,425],[369.5,432.5],[368,435.2],
+  [366,437.2],[364.32,438.28],[305.16,444.28],
+  [303,444.3],[301.3,443.5],[300,442],[299.3,439.5],
+  [296.3,418],[295.3,410.5],[295,414],[293.5,414.5],[292.5,414],
+]);
 export const AB_105803_LIGHT_DETAILS = [
   detail('dishwasher-basket',291.1,391.6,377.8,446.2),
   detail('dishwasher-gs-mark',326,460.3,344.3,481.8),

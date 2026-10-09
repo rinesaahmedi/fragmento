@@ -442,8 +442,8 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
   // The filter is physically inside the hood cabinet and has no useful plan
   // hotspot. It is selected manually without replacing the cabinet target.
   "filter",
-  // The integrated dishwasher's furniture front is selected manually without
-  // replacing the appliance hotspot.
+  // The furniture front remains additive: ASC draws it independently from
+  // the appliance basket/GS symbols without replacing the source assembly.
   "furniture-front",
 ]);
 
