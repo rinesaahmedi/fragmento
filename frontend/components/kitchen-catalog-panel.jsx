@@ -25,6 +25,8 @@ import {
   getCutleryVariantLabel,
   isCutleryAccessoryItem,
   normalizeCutleryVariants,
+  MAX_CUTLERY_QUANTITY,
+  normalizeCutleryQuantity,
 } from "../lib/cutlery-accessories";
 import { applyArticleVariantSelectionForDisplay, findAuszugVariantOption } from "../lib/auszug-variants";
 import {
@@ -558,7 +560,7 @@ function CutleryInsertAccessoryCard({
   const infoPdfHref = getProductInfoHref(item);
 
   function clampQuantity(value) {
-    return Math.max(1, Math.min(99, Math.floor(Number(value) || 1)));
+    return normalizeCutleryQuantity(value);
   }
 
   const dropdownTriggerLabel = (() => {
@@ -675,7 +677,7 @@ function CutleryInsertAccessoryCard({
             const variant = getCutleryVariant(line.articleNumber, variants);
             const lineLabel = getCutleryVariantLabel(variant, translate, language);
             const lineTotal = (variant?.price || 0) * line.quantity;
-            const maxQuantity = Math.max(1, Math.floor(Number(variant?.maxQuantity || 99)));
+            const maxQuantity = MAX_CUTLERY_QUANTITY;
             const clampLineQuantity = (value) => Math.max(1, Math.min(maxQuantity, clampQuantity(value)));
 
             return (
