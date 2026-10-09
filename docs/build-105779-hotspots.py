@@ -100,7 +100,8 @@ for part, points in [
 ]:
     face('worktop',points)
     worktop_parts.append(part)
-face('worktop', [[682.2,384.88],[775.2,375.4],[775.2,551.8],[682.2,561.4]], separateLockedSidePanel=True)
+# The narrow front edge and broad side face are the same worktop end panel.
+face('worktop', [[680.04,384.64],[682.2,384.88],[775.2,375.4],[775.2,551.8],[682.2,561.4],[680.04,561.04]], separateLockedSidePanel=True)
 worktop_parts.append('worktop-end-panel')
 
 face('sink-faucet',SINK,claimFixturePartKey='sink')
@@ -122,7 +123,6 @@ face('base-module-2', [[549.96,365.68],[627.96,377.08],[627.96,553.48],[549.96,5
 face('worktop', [[547.8,365.44],[549.96,365.68],[549.96,542.2],[547.8,541.84]],separateLockedSidePanel=True,claimExcludeFromWorktop=True)
 worktop_parts.append(None)
 face('base-module-3', [[627.96,377.08],[680.04,384.64],[680.04,561.04],[627.96,553.48]])
-face('base-module-3', [[680.04,384.64],[682.2,384.88],[682.2,561.4],[680.04,561.04]])
 
 out = ROOT / 'frontend/lib/ab-105779-plan.js'
 exports = {

@@ -133,6 +133,9 @@ function formatGermanClaimAreaName(area, fallbackName) {
   if (componentId === "component-claim-worktop-end-panel") {
     return "Unterschrank-Wange";
   }
+  if (componentId === "component-claim-worktop-end-panel-left") {
+    return "Unterschrank-Wange links";
+  }
 
   const exactLabel = CLAIM_AREA_LABELS_BY_CODE.de?.[code];
   if (exactLabel) {
@@ -660,7 +663,7 @@ const COPY = {
     clientPostalCodePlaceholder: "z.B. 10115",
     clientCity: "Ort",
     clientCityPlaceholder: "Berlin",
-    clientFloor: "Stockwerk",
+    clientFloor: "Etage",
     clientFloorPlaceholder: "z.B. 3",
     clientUnitNumber: "Wohnungsnummer",
     clientUnitNumberPlaceholder: "z.B. 3B",
@@ -2392,7 +2395,7 @@ function normalizeShortDateInput(value) {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
-const SERVICE_TOUR_VIDEO_SRC = "/video/fragmento-tutorial-ru-faststart.mp4";
+const SERVICE_TOUR_VIDEO_SRC = "/video/ASC_VIDEO_FIXED_07.10.2026_ER.mp4";
 
 function ServiceVideoGuide({ isOpen, copy, onClose, onFinish }) {
   const videoRef = useRef(null);

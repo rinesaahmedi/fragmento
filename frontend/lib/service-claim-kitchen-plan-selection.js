@@ -406,6 +406,8 @@ export const SERVICE_CLAIM_PART_COMPONENT_IDS = {
   "worktop-left": "component-claim-worktop-left",
   "worktop-right": "component-claim-worktop-right",
   "worktop-end-panel": "component-claim-worktop-end-panel",
+  "worktop-end-panel-left": "component-claim-worktop-end-panel-left",
+  "worktop-end-panel-right": "component-claim-worktop-end-panel-right",
 };
 
 export function getServiceClaimPartComponentId(part = {}) {
@@ -435,6 +437,8 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
   // This panel is sold with the worktop but remains independently selectable
   // in claims. It must not replace the existing horizontal worktop selector.
   "worktop-end-panel",
+  "worktop-end-panel-left",
+  "worktop-end-panel-right",
   // The filter is physically inside the hood cabinet and has no useful plan
   // hotspot. It is selected manually without replacing the cabinet target.
   "filter",
@@ -447,6 +451,10 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
 // Other split L-kitchen plans place it at the right-hand end.
 const LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS = new Set([
   "ab-105804",
+  "ab-105793",
+  "ab-105796",
+  "ab-105799",
+  "ab-105802",
   "ab-105805",
   "ab-105809",
   "ab-105813",
@@ -1010,6 +1018,10 @@ export function buildServiceClaimSelectableComponents({
         claimPartKey: partKey,
         ...(partKey === "worktop-end-panel"
           ? { contextualChoiceTriggerPartKey: worktopEndPanelChoicePartKey }
+          : partKey === "worktop-end-panel-right"
+          ? { contextualChoiceTriggerPartKey: "worktop-right" }
+          : partKey === "worktop-end-panel-left"
+          ? { contextualChoiceTriggerPartKey: "worktop-left" }
           : {}),
       };
     })

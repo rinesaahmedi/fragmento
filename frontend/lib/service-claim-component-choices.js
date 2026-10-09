@@ -149,8 +149,9 @@ export function buildServiceClaimComponentChoiceGroups(selectableComponents = []
     });
   }
 
-  const worktopEndPanel = componentByPartKey.get("worktop-end-panel");
-  if (worktopEndPanel) {
+  for (const panelPartKey of ["worktop-end-panel", "worktop-end-panel-left", "worktop-end-panel-right"]) {
+    const worktopEndPanel = componentByPartKey.get(panelPartKey);
+    if (!worktopEndPanel) continue;
     const triggerPartKey = String(
       worktopEndPanel.contextualChoiceTriggerPartKey || "",
     ).trim();
@@ -163,7 +164,7 @@ export function buildServiceClaimComponentChoiceGroups(selectableComponents = []
 
     if (trigger) {
       groups.push({
-        sourceComponentKey: `claim-choice-${triggerPartKey}-worktop-end-panel`,
+        sourceComponentKey: `claim-choice-${triggerPartKey}-${panelPartKey}`,
         triggerComponentId: trigger.componentId,
         options: [trigger, worktopEndPanel],
       });

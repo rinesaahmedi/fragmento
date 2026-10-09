@@ -30,7 +30,7 @@ export const AB_105779_HOTSPOTS = [
   {"componentKey":"worktop","points":[[46.802081,55.844191],[47.444181,55.751261],[47.515439,55.993277]],"preserveManualSize":true},
   {"componentKey":"worktop","points":[[27.947743,58.67563],[45.748219,56.094118],[45.748219,57.445378],[27.947743,60.006723]],"preserveManualSize":true},
   {"componentKey":"worktop","points":[[45.748219,56.094118],[81.021378,63.334454],[92.066508,61.741176],[92.066508,63.092437],[81.021378,64.685714],[45.748219,57.445378]],"preserveManualSize":true},
-  {"componentKey":"worktop","points":[[81.021378,64.685714],[92.066508,63.092437],[92.066508,92.739496],[81.021378,94.352941]],"preserveManualSize":true,"separateLockedSidePanel":true},
+  {"componentKey":"worktop","points":[[80.764846,64.645378],[81.021378,64.685714],[92.066508,63.092437],[92.066508,92.739496],[81.021378,94.352941],[80.764846,94.292437]],"preserveManualSize":true,"separateLockedSidePanel":true},
   {"componentKey":"sink-faucet","points":[[47.444181,55.751261],[53.714964,54.843697],[55.140143,54.863866],[66.498812,57.203361],[66.498812,57.243697],[66.370546,57.485714],[60.099762,58.393277],[58.902613,58.373109],[47.515439,55.993277]],"preserveManualSize":true,"claimFixturePartKey":"sink"},
   {"componentKey":"sink-faucet","points":[[55.068884,46.292437],[55.738717,46.171429],[55.952494,49.640336],[55.311164,49.741176]],"preserveManualSize":true,"claimFixturePartKey":"faucet"},
   {"componentKey":"sink-faucet","points":[[55.752969,47.038655],[58.361045,47.038655],[58.31829,47.986555],[55.809976,47.986555]],"preserveManualSize":true,"claimFixturePartKey":"faucet"},
@@ -45,7 +45,6 @@ export const AB_105779_HOTSPOTS = [
   {"componentKey":"base-module-2","points":[[65.315914,61.458824],[74.579572,63.37479],[74.579572,93.021849],[65.315914,91.12605]],"preserveManualSize":true},
   {"componentKey":"worktop","points":[[65.059382,61.418487],[65.315914,61.458824],[65.315914,91.12605],[65.059382,91.065546]],"preserveManualSize":true,"separateLockedSidePanel":true,"claimExcludeFromWorktop":true},
   {"componentKey":"base-module-3","points":[[74.579572,63.37479],[80.764846,64.645378],[80.764846,94.292437],[74.579572,93.021849]],"preserveManualSize":true},
-  {"componentKey":"base-module-3","points":[[80.764846,64.645378],[81.021378,64.685714],[81.021378,94.352941],[80.764846,94.292437]],"preserveManualSize":true},
 ];
 
 export const AB_105779_WORKTOP_PART_KEYS = ["worktop-left","worktop-left","worktop-left","worktop-right","worktop-right","worktop-right","worktop-right","worktop-right","worktop-right","worktop-right","worktop-right","worktop-right","worktop-left","worktop-right","worktop-end-panel",null,null];

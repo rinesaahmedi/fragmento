@@ -22,3 +22,8 @@ outputs/pre-burger-20260826-1213/*.xlsx
 
 # Local database catalog audit reports
 /output/catalog-link-audit/
+
+# Local verification artifacts for kitchen 105791
+/tmp/kitchen-105791/
+/tmp/kitchen_105791_work.py
+/tmp/kitchen_105791_verify.cjs

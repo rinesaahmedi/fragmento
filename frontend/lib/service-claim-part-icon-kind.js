@@ -27,7 +27,7 @@ export function iconKind(option = {}, choiceGroup = null) {
   if (partKey === "cooktop") return "cooktop";
   if (partKey === "oven" || partKey === "oven-set") return "oven";
   if (partKey === "filter") return "filter";
-  if (partKey === "worktop-end-panel") return "side-panel";
+  if (partKey === "worktop-end-panel" || partKey === "worktop-end-panel-left") return "side-panel";
   if (
     partKey === "worktop-left"
     || partKey === "worktop-right"

@@ -1124,7 +1124,7 @@ function buildComplaintEmailText(payload) {
     `Vertragsnummer: ${payload.contractNumber}`,
     `Küche: ${payload.kitchenName || "-"}`,
     `Kunde: ${payload.genderLabel === "Keine Angabe" ? "" : `${payload.genderLabel} `}${payload.givenName} ${payload.surname}`,
-    `Adresse: ${payload.clientAddress}`,
+    `Adresse: ${formatClaimClientAddressForEmail(payload.clientAddress)}`,
     `Telefon: ${payload.phone || "—"}`,
     `E-Mail: ${payload.email || "—"}`,
     ...(claimItemRows.length
@@ -1212,7 +1212,7 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
     ["Vorname", payload.givenName],
     ["Nachname", payload.surname],
     ["Anrede", payload.genderLabel],
-    ["Kundenadresse", payload.clientAddress],
+    ["Kundenadresse", formatClaimClientAddressForEmail(payload.clientAddress)],
     ["Telefon", payload.phone || "—"],
     ["E-Mail", payload.email || "—"],
     ...claimItemRows.map((row, index) => ["", { html: buildClaimItemHtml(row, { showArticleCode: showClaimItemArticleCode, itemNumber: index + 1 }), fullWidth: true }]),
@@ -1291,6 +1291,12 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
       </p>
     </div>
   `;
+}
+
+function formatClaimClientAddressForEmail(value) {
+  return String(value || "")
+    .replace(/(^|[,\r\n]\s*)(?:Floor|Etage):\s*/gi, (_match, separator) => `${separator ? "\n" : ""}Etage: `)
+    .replace(/(^|[,\r\n]\s*)(?:Unit|Einheit|Wohnungsnummer):\s*/gi, (_match, separator) => `${separator ? "\n" : ""}Wohnungsnummer: `);
 }
 
 function formatMultiline(value) {

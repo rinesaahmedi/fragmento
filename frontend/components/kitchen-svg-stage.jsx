@@ -64,6 +64,18 @@ const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
 export const IMAGE_VIEW_BY_SLUG = {
+  "ab-105793": "/plans/AB%20105793.svg",
+  "ab-105796": "/plans/AB%20105796.svg",
+  "ab-105799": "/plans/AB%20105799.svg",
+  "ab-105802": "/plans/AB%20105802.svg",
+  "ab-105792": "/plans/670%20105792.svg",
+  "ab-105795": "/plans/670%20105795.svg",
+  "ab-105798": "/plans/670%20105798.svg",
+  "ab-105801": "/plans/670%20105801.svg",
+  "ab-105791": "/plans/670%20105791.svg",
+  "ab-105794": "/plans/670%20105794.svg",
+  "ab-105797": "/plans/670%20105797.svg",
+  "ab-105800": "/plans/670%20105800.svg",
   "ab-105779": "/plans/AB%20105779.svg",
   "ab-105789": "/plans/670%20105789.svg",
   "ab-105790": "/plans/AB%20105790.svg",
@@ -205,6 +217,27 @@ AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
 // linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const IMAGE_HOTSPOTS_BY_SLUG = {
+  // The right block's end panel remains white in orders; ASC keeps its own selector.
+  "ab-105793": PLAN_HOTSPOTS_BY_SLUG["ab-105793"].filter(
+    (hotspot) => hotspot.claimFurniturePartKey !== "worktop-end-panel-right",
+  ),
+  "ab-105796": PLAN_HOTSPOTS_BY_SLUG["ab-105796"].filter(
+    (hotspot) => hotspot.claimFurniturePartKey !== "worktop-end-panel-right",
+  ),
+  "ab-105799": PLAN_HOTSPOTS_BY_SLUG["ab-105799"].filter(
+    (hotspot) => hotspot.claimFurniturePartKey !== "worktop-end-panel-right",
+  ),
+  "ab-105802": PLAN_HOTSPOTS_BY_SLUG["ab-105802"].filter(
+    (hotspot) => hotspot.claimFurniturePartKey !== "worktop-end-panel-right",
+  ),
+  "ab-105792": PLAN_HOTSPOTS_BY_SLUG["ab-105792"],
+  "ab-105795": PLAN_HOTSPOTS_BY_SLUG["ab-105795"],
+  "ab-105798": PLAN_HOTSPOTS_BY_SLUG["ab-105798"],
+  "ab-105801": PLAN_HOTSPOTS_BY_SLUG["ab-105801"],
+  "ab-105791": PLAN_HOTSPOTS_BY_SLUG["ab-105791"],
+  "ab-105794": PLAN_HOTSPOTS_BY_SLUG["ab-105794"],
+  "ab-105797": PLAN_HOTSPOTS_BY_SLUG["ab-105797"],
+  "ab-105800": PLAN_HOTSPOTS_BY_SLUG["ab-105800"],
   "ab-105789": PLAN_HOTSPOTS_BY_SLUG["ab-105789"],
   "ab-105790": PLAN_HOTSPOTS_BY_SLUG["ab-105790"],
   "burger-103898": [
@@ -1837,7 +1870,9 @@ const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
 const SPLIT_SIDE_WORKTOP_GAP_PERCENT = 8;
 const SPLIT_SIDE_OVEN_KEYS = new Set(["oven-module", "oven-base"]);
 const SPLIT_SIDE_SINK_KEYS = new Set(["sink-base"]);
+const AB_105793_SIDE_LABEL_SLUGS = new Set(["ab-105793", "ab-105796", "ab-105799", "ab-105802"]);
 const SPLIT_SIDE_LABEL_SLUGS = new Set([
+  ...AB_105793_SIDE_LABEL_SLUGS,
   ...AB_105777_LAYOUT_ALIAS_SLUGS,
   "ab-105777",
   "ab-105833",
@@ -2130,7 +2165,12 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
   if (!SPLIT_SIDE_LABEL_SLUGS.has(slug)) return [];
 
   const worktopRuns = definitions
-    .filter(isHorizontalWorktopHotspot)
+    .filter((definition) => {
+      if (!AB_105793_SIDE_LABEL_SLUGS.has(slug)) return isHorizontalWorktopHotspot(definition);
+      const bounds = getHotspotSourceBounds(definition);
+      return ["worktop", "worktop-secondary"].includes(definition.componentKey)
+        && bounds.width >= 5 && bounds.height <= 2;
+    })
     .map(getHotspotSourceBounds)
     .filter((bounds) => bounds.width >= 8)
     .sort((a, b) => a.left - b.left);
@@ -2163,6 +2203,29 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
   const sinkRun = findRunForComponent(SPLIT_SIDE_SINK_KEYS);
   if (!ovenRun || !sinkRun || ovenRun === sinkRun) return [];
 
+  // Side A includes the freestanding refrigerator as well as the worktop run.
+  // Center its label over the complete elevation for this shared layout.
+  let sideARun = ovenRun;
+  if (slug === "ab-105777" || AB_105777_LAYOUT_ALIAS_SLUGS.includes(slug)) {
+    const refrigerator = definitions.find((definition) => definition.componentKey === "refrigerator");
+    if (refrigerator) {
+      const bounds = getHotspotSourceBounds(refrigerator);
+      if (bounds.right <= ovenRun.left + 0.5) {
+        const left = Math.min(bounds.left, ovenRun.left);
+        sideARun = { ...ovenRun, left, width: ovenRun.right - left };
+      }
+    }
+  }
+  if (AB_105793_SIDE_LABEL_SLUGS.has(slug)) {
+    const refrigerator = definitions.find((definition) => definition.componentKey === "refrigerator");
+    if (refrigerator) {
+      const bounds = getHotspotSourceBounds(refrigerator);
+      if (bounds.left >= ovenRun.right && bounds.right < sinkRun.left) {
+        sideARun = { ...ovenRun, right: bounds.right, width: bounds.right - ovenRun.left };
+      }
+    }
+  }
+
   const getRunLabelTop = (run) => {
     const runElements = definitions
       .map(getHotspotSourceBounds)
@@ -2185,7 +2248,7 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
 
   return [
     toLabel(
-      ovenRun,
+      sideARun,
       translate("configurator.splitKitchenSideA", language === "de" ? "Seite A" : "Side A"),
     ),
     toLabel(

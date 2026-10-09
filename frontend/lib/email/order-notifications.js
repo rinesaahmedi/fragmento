@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 import path from "path";
 import { PDFDocument, rgb } from "pdf-lib";
 import sharp from "sharp";
+import { AB_105777_LAYOUT_SLUGS } from "../ab-105777-layout.js";
 import { AB_105779_LAYOUT_SLUGS } from "../ab-105779-layout.js";
 import { observeOrderEmailSend, buildOrderEmailDelivery } from "./order-email-observer.js";
 import { scheduleOrderEmailAttempt } from "./order-email-after.js";
@@ -440,6 +441,19 @@ export async function loadKitchenPlanPreviewData() {
     Object.entries(PLAN_HOTSPOTS_BY_SLUG).forEach(([slug, hotspots]) => {
       hotspotsBySlug[slug] ||= hotspots;
     });
+
+    // These layouts replace their older literal hotspots at runtime in the
+    // configurator. Email must use the same hood fascia and both light regions,
+    // and inherit the cabinet/hood link for each independently stored kitchen.
+    for (const [slugs, sourceSlug] of [
+      [AB_105777_LAYOUT_SLUGS, "ab-105777"],
+      [AB_105779_LAYOUT_SLUGS, "ab-105779"],
+    ]) {
+      for (const slug of slugs) {
+        hotspotsBySlug[slug] = PLAN_HOTSPOTS_BY_SLUG[slug];
+        linkedGroupsBySlug[slug] = linkedGroupsBySlug[sourceSlug];
+      }
+    }
 
     return { imageViews, hotspotsBySlug, linkedGroupsBySlug };
   })();
