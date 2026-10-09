@@ -2,6 +2,7 @@ import { AB_105777_LAYOUT_SLUGS } from "./ab-105777-layout.js";
 import { AB_105779_LAYOUT_SLUGS } from "./ab-105779-layout.js";
 
 const KITCHEN_ARTICLE_NUMBER_ALIAS_SLUGS = new Set([
+  "ab-105804",
   ...AB_105779_LAYOUT_SLUGS,
   "ab-105789",
   "ab-105790",

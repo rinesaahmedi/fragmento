@@ -26,6 +26,16 @@ export const BURGER_103898_CUTLERY_VARIANTS = [
 
 export const DEFAULT_CUTLERY_ARTICLE_NUMBER = "ZB60SG";
 
+// Quantities are stored in a database Int; cabinet counts do not limit purchases.
+export const MAX_CUTLERY_QUANTITY = 2147483647;
+
+export function normalizeCutleryQuantity(value) {
+  const quantity = Number(value);
+  return Number.isFinite(quantity)
+    ? Math.max(1, Math.min(MAX_CUTLERY_QUANTITY, Math.floor(quantity)))
+    : 1;
+}
+
 const CUTLERY_DRAWER_ICON_KEYS = new Set([
   "base_cabinet_30",
   "drawer_base",
@@ -204,7 +214,7 @@ export function getAvailableCutleryVariantsForComponents(components = [], varian
     .filter((variant) => widthCounts.has(String(variant.widthCm)))
     .map((variant) => ({
       ...variant,
-      maxQuantity: widthCounts.get(String(variant.widthCm)) || 1,
+      maxQuantity: MAX_CUTLERY_QUANTITY,
     }));
 
   return available.length ? available : [];
@@ -252,8 +262,8 @@ export function normalizeCutleryLines(lines = [], variants = CUTLERY_VARIANTS) {
     const variant = getCutleryVariant(articleNumber, normalizedVariants);
     if (!variant) continue;
 
-    const maxQuantity = Math.max(1, Math.floor(Number(variant.maxQuantity || 99)));
-    const quantity = Math.max(1, Math.min(maxQuantity, Math.floor(Number(line?.quantity || 1))));
+    const maxQuantity = MAX_CUTLERY_QUANTITY;
+    const quantity = normalizeCutleryQuantity(line?.quantity ?? 1);
     const existing = merged.get(articleNumber);
     if (existing) {
       existing.quantity = Math.min(maxQuantity, existing.quantity + quantity);

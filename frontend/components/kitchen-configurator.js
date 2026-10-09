@@ -49,6 +49,7 @@ import {
   isCutleryAccessoryItem,
   normalizeCutleryVariants,
   normalizeCutleryLines,
+  normalizeCutleryQuantity,
 } from "../lib/cutlery-accessories";
 import { applyArticleVariantSelectionForDisplay, findAuszugVariantOption } from "../lib/auszug-variants";
 import { PublicI18nProvider, PublicLanguageSwitcher, usePublicI18n } from "./public-i18n";
@@ -1745,7 +1746,7 @@ function KitchenConfiguratorContent({
     if (orderLockedAccessoryCodes.has(cutleryBaseItem?.code)) return;
 
     const normalizedArticleNumber = String(articleNumber || "").trim().toUpperCase();
-    const nextQuantity = Math.max(1, Math.min(99, Math.floor(Number(quantity) || 1)));
+    const nextQuantity = normalizeCutleryQuantity(quantity);
     setCutleryLines((current) =>
       normalizeCutleryLines(
         current.map((line) =>

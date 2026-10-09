@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 import {
   isCutleryAccessoryCode,
   parseCutleryLineFromOrderItem,
+  MAX_CUTLERY_QUANTITY,
+  normalizeCutleryQuantity,
 } from "../lib/cutlery-accessories.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -28,6 +30,27 @@ return buildOrderItemSelectionKey;`,
 }
 
 const buildOrderItemSelectionKey = loadBuildOrderItemSelectionKey();
+
+const submissionSource = ordersSource.match(/function normalizeSubmissionItems\(items = \[\]\) \{[\s\S]*?\n\}/);
+assert.ok(submissionSource, "order submission normalization should be available");
+const normalizeSubmissionItems = new Function(
+  "isCutleryAccessoryCode",
+  "MAX_CUTLERY_QUANTITY",
+  "normalizeCutleryQuantity",
+  `${submissionSource[0]}\nreturn normalizeSubmissionItems;`,
+)(isCutleryAccessoryCode, MAX_CUTLERY_QUANTITY, normalizeCutleryQuantity);
+
+test("order submission preserves and merges cutlery quantities above 99", () => {
+  const items = normalizeSubmissionItems([
+    { code: "ACC-CUTLERY", articleNumber: "ZB50SG", quantity: 150 },
+    { code: "ACC-CUTLERY", articleNumber: "ZB50SG", quantity: 25 },
+    { code: "ACC-CUTLERY", articleNumber: "ZB60SG", quantity: 200 },
+    { code: "ACC-LIGHTING", quantity: 150 },
+  ]);
+  assert.equal(items[0].quantity, 175);
+  assert.equal(items[1].quantity, 200);
+  assert.equal(items[2].quantity, 99);
+});
 
 test("confirmed cutlery baseline keys infer article number from the snapshot name", () => {
   const confirmedItem = {

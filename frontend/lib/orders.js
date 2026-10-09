@@ -38,6 +38,8 @@ import {
   getCutleryVariant,
   BURGER_103898_CUTLERY_VARIANTS,
   isCutleryAccessoryCode,
+  MAX_CUTLERY_QUANTITY,
+  normalizeCutleryQuantity,
   parseCutleryLineFromOrderItem,
   resolveCutleryCatalogArticles,
 } from "./cutlery-accessories";
@@ -177,13 +179,16 @@ function normalizeSubmissionItems(items = []) {
     if (!code && !name) continue;
 
     const articleNumber = item?.articleNumber ? String(item.articleNumber).trim().toUpperCase() : null;
-    const quantity = Math.max(1, Math.min(99, Math.floor(Number(item?.quantity || 1))));
+    const maxQuantity = isCutleryAccessoryCode(code) ? MAX_CUTLERY_QUANTITY : 99;
+    const quantity = isCutleryAccessoryCode(code)
+      ? normalizeCutleryQuantity(item?.quantity ?? 1)
+      : Math.max(1, Math.min(maxQuantity, Math.floor(Number(item?.quantity || 1))));
     const price = item?.price != null && Number.isFinite(Number(item.price)) ? Number(item.price) : null;
     const key = articleNumber ? `${code || ""}|${articleNumber}` : (code || name);
 
     if (merged.has(key)) {
       const existing = merged.get(key);
-      existing.quantity = Math.min(99, existing.quantity + quantity);
+      existing.quantity = Math.min(maxQuantity, existing.quantity + quantity);
       continue;
     }
 

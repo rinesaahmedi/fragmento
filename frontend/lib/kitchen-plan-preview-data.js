@@ -5,6 +5,7 @@ import { AB_105803_HOTSPOTS, AB_105803_LIGHT_DETAILS } from "./ab-105803-plan.js
 import { AB_104332_HOTSPOTS } from './ab-104332-plan.js';
 import { AB_104296_HOTSPOTS } from './ab-104296-plan.js';
 import { AB_105789_HOTSPOTS, AB_105789_LIGHT_DETAILS } from './ab-105789-plan.js';
+import { AB_105804_HOTSPOTS, AB_105804_LIGHT_DETAILS } from './ab-105804-plan.js';
 import { AB_105790_HOTSPOTS, AB_105790_LIGHT_DETAILS } from './ab-105790-plan.js';
 import { AB_105793_HOTSPOTS, AB_105793_LIGHT_DETAILS } from './ab-105793-plan.js';
 import { AB_105796_HOTSPOTS, AB_105796_LIGHT_DETAILS } from './ab-105796-plan.js';
@@ -23,6 +24,7 @@ import { AB_105779_HOTSPOTS } from './ab-105779-plan.js';
 import { AB_105779_LAYOUT_ALIAS_SLUGS } from './ab-105779-layout.js';
 
 export const PLAN_IMAGE_BY_SLUG = {
+  "ab-105804": "/plans/670%20105804.svg",
   "ab-105793": "/plans/AB%20105793.svg",
   "ab-105796": "/plans/AB%20105796.svg",
   "ab-105799": "/plans/AB%20105799.svg",
@@ -154,6 +156,7 @@ export const PLAN_IMAGE_BY_SLUG = {
 // Most legacy drawings use the 842 x 595 CAD sheet. Keep native dimensions for
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
+  "ab-105804": { width: 842, height: 595 },
   "ab-105793": { width: 842, height: 595 },
   "ab-105796": { width: 842, height: 595 },
   "ab-105799": { width: 842, height: 595 },
@@ -204,6 +207,7 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
+  "ab-105804": AB_105804_LIGHT_DETAILS,
   "ab-105793": AB_105793_LIGHT_DETAILS,
   "ab-105796": AB_105796_LIGHT_DETAILS,
   "ab-105799": AB_105799_LIGHT_DETAILS,
@@ -594,6 +598,7 @@ export const AB_110401_FRG_ORDER_HOTSPOTS = [
 // linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const PLAN_HOTSPOTS_BY_SLUG = {
+  "ab-105804": AB_105804_HOTSPOTS,
   "ab-105779": AB_105779_HOTSPOTS,
   "ab-105789": AB_105789_HOTSPOTS,
   "ab-105790": AB_105790_HOTSPOTS,
