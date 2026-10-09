@@ -1286,6 +1286,10 @@ export function serializeKitchenForLegacy(kitchen) {
       catalogArticle,
       catalogBlende,
     });
+    const dimensionlessCatalogBlende = (standaloneCatalogBlende && catalogBlende?.code === "UPK20")
+      || (!catalogArticle
+        && (item.iconKey === "blende" || String(item.componentKey || "").endsWith("-blende"))
+        && String(item.articleNumber || "").trim().toUpperCase() === "UPK20");
     const claimProducts = claimParts.filter(
       (part) => String(part?.sourceKitchenItemCode || "") === String(item.code || ""),
     );
@@ -1357,9 +1361,9 @@ export function serializeKitchenForLegacy(kitchen) {
         || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
         || "",
       price: catalogPrice,
-      widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
-      heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
-      depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
+      widthMm: dimensionlessCatalogBlende ? null : catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
+      heightMm: dimensionlessCatalogBlende ? null : catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
+      depthMm: dimensionlessCatalogBlende ? null : catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: productInformation.productImagePath,
       productImagePaths: productInformation.productImagePaths || [],

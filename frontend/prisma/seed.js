@@ -36,6 +36,7 @@ const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "1
 const AB_105762_LAYOUT_ALIAS_CODES = ["105766", "105770", "105774"];
 const AB_105779_LAYOUT_ALIAS_CODES = ["105782", "105785", "105788"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105803",
   ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
   "ab-105779",
   "ab-105789",
@@ -94,6 +95,7 @@ const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105862",
 ]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105803",
   "ab-105793",
   "ab-105796",
   "ab-105799",
@@ -435,7 +437,6 @@ function sinkEndBlende(kitchenCode, overrides = {}) {
     name: "Filler Panel up to 20 cm",
     nameDe: "Passblende bis 20 cm",
     price: blendePrice("UPK20", 1),
-    widthMm: 200,
     iconKey: "blende",
     colorKey: "#f0a500",
     componentKey: "sink-end-blende",
@@ -2693,6 +2694,25 @@ const AB_105800_ITEMS = [
   ...defaultServices(),
 ];
 
+// 670 105803: supplier rows 1-11; secondary articles stay catalog-linked.
+const AB_105803_ITEMS = [
+  defaultOvenHob({ articleNumber: "A-EH923640E + 9EC744100C", catalogArticleNumber: "A-EH923640E + 9EC744100C", catalogPriceSyncMode: "LOCKED_INCLUDED", widthMm: 600, sortOrder: 10, infoText: "Included UHK, A-EH923640E oven (supplier EH92364E-A) and 9EC744100C ceramic cooktop" }),
+  defaultWorktop({ code: "TOP-AB105803", articleNumber: "PLR60", catalogArticleNumber: "PLR60", catalogPriceSyncMode: "LOCKED_INCLUDED", sortOrder: 20 }),
+  defaultSinkBase({ code: "SINK-BASE-AB105803-SP60-L", articleNumber: "SP60", catalogArticleNumber: "SP60", catalogPriceSyncMode: "LOCKED_INCLUDED", widthMm: 600, heightMm: 878, depthMm: 600, sortOrder: 30, infoText: "Included SP60 sink base cabinet, hinge left (SP60 L)" }),
+  defaultSinkWorktop({ code: "SINK-WORKTOP-AB105803", articleNumber: "526335 + 517720", catalogArticleNumber: "526335 + 517720", catalogPriceSyncMode: "LOCKED_INCLUDED", sortOrder: 32, infoText: "Included 526335 sink, left orientation (526335 L), and 517720 faucet" }),
+  { ...AB_105802_ITEMS.find(item => item.code === "CAB-BASE-AB105802-US30-UPK20"), sortOrder: 40 },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105803-600-UPEF65", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePriceWithBlende("A-EGSPV597210 + TGV60", "UPEF65"), widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, articleNumber: "A-EGSPV597210 + TGV60", catalogArticleNumber: "A-EGSPV597210 + TGV60", blendeCode: "UPEF65", blendeLabel: "UPEF65", blendePrice: blendePrice("UPEF65") },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105803-US30-UPK20", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePriceWithBlende("US30", "UPK20"), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 60, articleNumber: "US30", catalogArticleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20", blendePrice: blendePrice("UPK20") },
+  { itemType: ItemType.COMPONENT, code: "BLENDE-AB105803-UPK20", name: "Lower cabinet end filler", nameDe: "Passblende Unterschrank", price: blendePrice("UPK20"), iconKey: "blende", colorKey: "#f0a500", componentKey: "end-blende", sortOrder: 70, articleNumber: "UPK20", catalogBlendeCode: "UPK20" },
+  { ...AB_105800_ITEMS.find(item => item.componentKey === "refrigerator"), sortOrder: 80 },
+  { ...AB_105800_ITEMS.find(item => item.componentKey === "wall-cabinet-1"), sortOrder: 90 },
+  { ...AB_105800_ITEMS.find(item => item.componentKey === "wall-cabinet-3"), code: "CAB-WALL-AB105803-H3002", componentKey: "wall-cabinet-2", sortOrder: 100 },
+  { ...AB_105800_ITEMS.find(item => item.componentKey === "wall-cabinet-2"), code: "CAB-HOOD-AB105803-600", componentKey: "wall-cabinet-3", sortOrder: 110 },
+  { ...AB_105800_ITEMS.find(item => item.componentKey === "extractor-hood"), code: "HOOD-AB105803-FH664621E", catalogArticleNumber: "FH664621E + FWK124 + HD6002", sortOrder: 112 },
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // AB 105775-64: two-leg perspective kitchen. Supplier rows 1-3 are the
 // included oven, split worktop, and sink cabinet. Every secondary UPK/UPEF/HPK
 // article remains attached to its scheduled cabinet through a catalog Blende.
@@ -2827,6 +2847,7 @@ const AB_105779_ITEMS = [
 PRODUCT_INFO_BY_CODE["DISH-AB105779-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 
 const DEFAULT_KITCHENS = [
+  { slug: "ab-105803", kitchenCode: "105 803", name: "105803", description: "L-shaped kitchen based on frontend/public/plans/670 105803.svg", items: AB_105803_ITEMS, reconcileExisting: true },
   ...AB_105779_LAYOUT_ALIAS_CODES.map((code) => ({
     slug: `ab-${code}`,
     kitchenCode: `${code.slice(0, 3)} ${code.slice(3)}`,
@@ -4748,6 +4769,10 @@ async function main() {
         : null;
       const catalogBlendeQuantity = catalogBlende ? Math.max(1, getBlendeQuantity(item)) : null;
       const resolvedCatalogBlendeQuantity = isStandaloneCatalogBlende ? 1 : catalogBlendeQuantity;
+      const dimensionlessCatalogBlende = (isStandaloneCatalogBlende && catalogBlende?.code === "UPK20")
+        || (!catalogArticle
+          && (item.iconKey === "blende" || String(item.componentKey || "").endsWith("-blende"))
+          && String(item.articleNumber || "").trim().toUpperCase() === "UPK20");
       const data = {
         ...productInfo,
         productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,
@@ -4767,9 +4792,9 @@ async function main() {
             || (isStandaloneCatalogBlende ? catalogBlende?.nameDe : itemNameDe)
             || null,
         price: isStandaloneCatalogBlende && catalogBlende ? catalogBlende.price : item.price,
-        widthMm: resolvedWidthMm,
-        heightMm: resolvedHeightMm,
-        depthMm: resolvedDepthMm,
+        widthMm: dimensionlessCatalogBlende ? null : resolvedWidthMm,
+        heightMm: dimensionlessCatalogBlende ? null : resolvedHeightMm,
+        depthMm: dimensionlessCatalogBlende ? null : resolvedDepthMm,
         infoText: item.infoText || null,
         iconKey: item.iconKey || null,
         colorKey: item.colorKey || null,
@@ -5183,7 +5208,7 @@ async function main() {
         nameDe: "Unterschrank-Wange",
         sortOrder: 80,
       }];
-      if (["ab-105791", "ab-105794", "ab-105797", "ab-105800"].includes(normalizedKitchenSlug)) {
+      if (["ab-105791", "ab-105794", "ab-105797", "ab-105800", "ab-105803"].includes(normalizedKitchenSlug)) {
         panelParts.push({
           partKey: "worktop-end-panel-left", articleCode: "WU16",
           name: "Left cabinet side panel", nameDe: "Unterschrank-Wange links", sortOrder: 81,

@@ -1,3 +1,4 @@
+import { AB_105803_HOTSPOTS, AB_105803_LIGHT_DETAILS } from "./ab-105803-plan.js";
 // Vector plans (rendered from the source PDFs via docs/render-plan-svg.py) so the drawing
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
@@ -34,6 +35,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105794": "/plans/670%20105794.svg",
   "ab-105797": "/plans/670%20105797.svg",
   "ab-105800": "/plans/670%20105800.svg",
+  "ab-105803": "/plans/670%20105803.svg",
   "ab-105779": "/plans/AB%20105779.svg",
   "ab-105789": "/plans/670%20105789.svg",
   "ab-105790": "/plans/AB%20105790.svg",
@@ -164,6 +166,7 @@ export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
   "ab-105794": { width: 842, height: 595 },
   "ab-105797": { width: 842, height: 595 },
   "ab-105800": { width: 842, height: 595 },
+  "ab-105803": { width: 842, height: 595 },
   "ab-105779": { width: 842, height: 595 },
   "ab-105789": { width: 842, height: 595 },
   "ab-105790": { width: 842, height: 595 },
@@ -213,6 +216,7 @@ export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
   "ab-105794": AB_105794_LIGHT_DETAILS,
   "ab-105797": AB_105797_LIGHT_DETAILS,
   "ab-105800": AB_105800_LIGHT_DETAILS,
+  "ab-105803": AB_105803_LIGHT_DETAILS,
   "ab-105779": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 56.208, top: 69.570, width: 8.495, height: 8.783, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 59.671021, top: 80.759664, width: 1.683, height: 3.771428, persistWhenSelected: true },
@@ -605,6 +609,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
   "ab-105794": AB_105794_HOTSPOTS,
   "ab-105797": AB_105797_HOTSPOTS,
   "ab-105800": AB_105800_HOTSPOTS,
+  "ab-105803": AB_105803_HOTSPOTS,
   "ab-105777": [
     {"componentKey": "refrigerator", "left": 1.881235, "top": 34.998319, "width": 11.315914, "height": 51.448739, "preserveManualSize": true},
     {"componentKey": "wall-cabinet-1", "left": 14.251781, "top": 24.45042, "width": 12.228029, "height": 20.833613, "preserveManualSize": true},

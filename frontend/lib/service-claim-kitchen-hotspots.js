@@ -1,3 +1,4 @@
+import { AB_105803_BLENDE_CALIBRATION, AB_105803_COOKTOP_POINTS, AB_105803_OVEN_PART_POINTS, AB_105803_SINK_POINTS } from "./ab-105803-plan.js";
 import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
 import { AB_105793_BLENDE_CALIBRATION, AB_105793_COOKTOP_POINTS, AB_105793_OVEN_PART_POINTS } from "./ab-105793-plan.js";
 import { AB_105796_BLENDE_CALIBRATION, AB_105796_COOKTOP_POINTS, AB_105796_OVEN_PART_POINTS } from "./ab-105796-plan.js";
@@ -51,6 +52,7 @@ const AB_105762_LAYOUT_ALIAS_SLUGS = [
 ];
 
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105803",
   "ab-105791",
   "ab-105794",
   "ab-105797",
@@ -150,6 +152,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 // by several narrow hotspots. These coordinates remain in the uncropped source
 // plan system and are projected into the ASC display crop below.
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
+  "ab-105803": AB_105803_SINK_POINTS,
   "ab-105791": AB_105791_SINK_POINTS,
   "ab-105794": AB_105794_SINK_POINTS,
   "ab-105797": AB_105797_SINK_POINTS,
@@ -249,6 +252,7 @@ DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105791");
 DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105794");
 DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105797");
 DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105800");
+DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.add("ab-105803");
 
 // Thin visual silhouettes traced around the faucet body. Source hotspot boxes
 // remain intentionally generous for interaction, but painting those boxes
@@ -494,6 +498,7 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  "ab-105803": AB_105803_COOKTOP_POINTS,
   "ab-105793": AB_105793_COOKTOP_POINTS,
   "ab-105796": AB_105796_COOKTOP_POINTS,
   "ab-105799": AB_105799_COOKTOP_POINTS,
@@ -607,6 +612,7 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  "ab-105803": AB_105803_BLENDE_CALIBRATION,
   "ab-105779": { "wall-cabinet-3": { wholeFacesOnly: true, wholeBlendeFaces: AB_105779_BLENDE_FACES } },
   "ab-105789": AB_105789_BLENDE_CALIBRATION,
   "ab-105790": AB_105790_BLENDE_CALIBRATION,
@@ -1287,6 +1293,7 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-105803": AB_105803_OVEN_PART_POINTS,
   "ab-105793": AB_105793_OVEN_PART_POINTS,
   "ab-105796": AB_105796_OVEN_PART_POINTS,
   "ab-105799": AB_105799_OVEN_PART_POINTS,
@@ -1416,6 +1423,7 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 );
 
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-105803": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"] },
   "ab-105779": { indexPartKeys: AB_105779_WORKTOP_PART_KEYS },
   "ab-105789": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel", "worktop-left", "worktop-right", "worktop-right"] },
   "ab-105791": { indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"] },
