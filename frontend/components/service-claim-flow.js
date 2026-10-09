@@ -6115,6 +6115,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                   <p className="service-form__section-title">{copy.problemDescription}</p>
                   <ServiceClaimKitchenPicker
                     kitchenPlan={contractLookup.kitchenPlan}
+                    language={language}
                     value={problemComponentIds}
                     visualValue={problemPlanDisplayComponentIds}
                     onChange={setProblemComponentIds}

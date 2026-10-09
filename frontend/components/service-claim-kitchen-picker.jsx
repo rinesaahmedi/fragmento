@@ -17,6 +17,7 @@ import {
   PLAN_IMAGE_SOURCE_WIDTH,
   cropPlanHotspot,
   getPlanDisplayCrop,
+  getSplitKitchenSideLabels,
   withBasePlinthExtension,
   withCornerBlendeExtensions,
   withDerivedSinkFaucet,
@@ -38,6 +39,8 @@ import {
 } from "../lib/service-claim-kitchen-hotspots";
 import { buildServiceClaimComponentChoiceGroups } from "../lib/service-claim-component-choices";
 import styles from "./kitchen-configurator.module.css";
+import KitchenPlanSideLabels from "./kitchen-plan-side-labels";
+import { getTwoPartMobilePlanLayout } from "../lib/two-part-mobile-plan-layout";
 
 const SERVICE_CLAIM_CLICK_BOUNDS_BY_SLUG = {
   "kitchen-model-b": [
@@ -134,6 +137,7 @@ export default function ServiceClaimKitchenPicker({
   onComponentToggle,
   labels,
   contractNumber,
+  language = "en",
 }) {
   const svgHostRef = useRef(null);
   const rawImageClipPathId = useId();
@@ -254,6 +258,16 @@ export default function ServiceClaimKitchenPicker({
   );
   const croppedPlanAspectRatio =
     `${planDisplayCrop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${planDisplayCrop.height * PLAN_IMAGE_SOURCE_HEIGHT}`;
+  const sideLabels = useMemo(
+    () => getSplitKitchenSideLabels(
+      (PLAN_HOTSPOTS_BY_SLUG[kitchenSlug] || []).map(withHotspotSourceBounds),
+      planDisplayCrop,
+      kitchenSlug,
+      (_key, fallback) => fallback,
+      language,
+    ),
+    [planDisplayCrop, kitchenSlug, language],
+  );
   const croppedImageHotspots = useMemo(() => {
     const cropped = sourceImageHotspots
       .map((hotspot) => cropPlanHotspot(hotspot, planDisplayCrop))
@@ -682,6 +696,7 @@ export default function ServiceClaimKitchenPicker({
                   );
                 })}
               </div>
+              <KitchenPlanSideLabels labels={sideLabels} twoPart={Boolean(getTwoPartMobilePlanLayout(kitchenSlug))} />
             </div>
           </div>
         </div>
