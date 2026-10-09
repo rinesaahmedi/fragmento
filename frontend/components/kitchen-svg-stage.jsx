@@ -8,6 +8,7 @@ export { withBasePlinthExtension } from "../lib/kitchen-plan-plinth.js";
 import dynamic from "next/dynamic";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
+import KitchenPlanSideLabels from "./kitchen-plan-side-labels";
 import {
   componentIdForItem,
   componentIdForKey,
@@ -1870,6 +1871,13 @@ const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
   },
 };
 const SPLIT_SIDE_WORKTOP_GAP_PERCENT = 8;
+// Horizontal frame edges traced from these SVGs' original CAD coordinates.
+const SPLIT_SIDE_A_FRAME_EDGES_BY_SLUG = {
+  "ab-105833": [47, 3432],
+  "ab-105836": [60, 3483],
+  "ab-105839": [47, 3342],
+  "ab-105842": [47, 3342],
+};
 const SPLIT_SIDE_OVEN_KEYS = new Set(["oven-module", "oven-base"]);
 const SPLIT_SIDE_SINK_KEYS = new Set(["sink-base"]);
 const AB_105793_SIDE_LABEL_SLUGS = new Set(["ab-105793", "ab-105796", "ab-105799", "ab-105802"]);
@@ -2163,8 +2171,24 @@ function cropPlanBox(box, crop) {
   };
 }
 
-function getSplitKitchenSideLabels(definitions, crop, slug, translate, language) {
+export function getSplitKitchenSideLabels(definitions, crop, slug, translate, language, isCompactMobilePlan = false) {
   if (!SPLIT_SIDE_LABEL_SLUGS.has(slug)) return [];
+
+  if (["ab-105847", "ab-105850", "ab-105853", "ab-105856", "ab-105859", "ab-105862"].includes(slug)) {
+    // Use the actual SVG header bands, between the frame and cabinet tops.
+    const layout = isCompactMobilePlan ? getTwoPartMobilePlanLayout(slug) : null;
+    return [[119.27, 327.67, "A"], [407.66, 555.27, "B"]].map(([left, right, side]) => {
+      const header = {
+        label: translate(`configurator.splitKitchenSide${side}`, language === "de" ? `Seite ${side}` : `Side ${side}`),
+        left: left / 800 * 100,
+        top: 207.82 / 600 * 100,
+        width: (right - left) / 800 * 100,
+        height: 23.44 / 600 * 100,
+        isFrameHeader: true,
+      };
+      return cropPlanBox(shiftTwoPartPlanGeometry(header, layout), crop);
+    });
+  }
 
   const worktopRuns = definitions
     .filter((definition) => {
@@ -2206,16 +2230,14 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
   if (!ovenRun || !sinkRun || ovenRun === sinkRun) return [];
 
   // Side A includes the freestanding refrigerator as well as the worktop run.
-  // Center its label over the complete elevation for this shared layout.
+  // Center its label over the complete elevation for every split layout.
   let sideARun = ovenRun;
-  if (slug === "ab-105777" || AB_105777_LAYOUT_ALIAS_SLUGS.includes(slug)) {
-    const refrigerator = definitions.find((definition) => definition.componentKey === "refrigerator");
-    if (refrigerator) {
-      const bounds = getHotspotSourceBounds(refrigerator);
-      if (bounds.right <= ovenRun.left + 0.5) {
-        const left = Math.min(bounds.left, ovenRun.left);
-        sideARun = { ...ovenRun, left, width: ovenRun.right - left };
-      }
+  const refrigerator = definitions.find((definition) => definition.componentKey === "refrigerator");
+  if (refrigerator) {
+    const bounds = getHotspotSourceBounds(refrigerator);
+    if (bounds.right <= ovenRun.left + 0.5) {
+      const left = Math.min(bounds.left, ovenRun.left);
+      sideARun = { ...ovenRun, left, width: ovenRun.right - left };
     }
   }
   if (AB_105793_SIDE_LABEL_SLUGS.has(slug)) {
@@ -2226,6 +2248,12 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
         sideARun = { ...ovenRun, right: bounds.right, width: bounds.right - ovenRun.left };
       }
     }
+  }
+
+  const sideAFrameEdges = SPLIT_SIDE_A_FRAME_EDGES_BY_SLUG[slug];
+  if (sideAFrameEdges) {
+    const [frameLeft, frameRight] = sideAFrameEdges.map((x) => x * 0.12 / 842 * 100);
+    sideARun = { ...sideARun, left: frameLeft, right: frameRight, width: frameRight - frameLeft };
   }
 
   const getRunLabelTop = (run) => {
@@ -2548,8 +2576,8 @@ export default function useKitchenSvgStage({
     ));
   }, [activePlanDisplayCrop, normalizedKitchenSlug]);
   const splitKitchenSideLabels = useMemo(
-    () => getSplitKitchenSideLabels(activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language),
-    [activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language],
+    () => getSplitKitchenSideLabels(activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language, isCompactMobilePlan),
+    [activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language, isCompactMobilePlan],
   );
   const planImageSourceSize =
     PLAN_IMAGE_SOURCE_SIZE_BY_SLUG[normalizedKitchenSlug] || {
@@ -3104,23 +3132,7 @@ export default function useKitchenSvgStage({
                       </Fragment>
                     );
                   })}
-                  {splitKitchenSideLabels.length ? (
-                    <div className={styles.planSideLabelLayer} aria-hidden="true">
-                      {splitKitchenSideLabels.map((sideLabel) => (
-                        <div
-                          key={sideLabel.label}
-                          className={`${styles.planSideLabel} ${mobilePlanLayout ? styles.planSideLabelTwoPart : ""}`}
-                          style={{
-                            left: `${sideLabel.left}%`,
-                            top: `${sideLabel.top}%`,
-                            width: `${sideLabel.width}%`,
-                          }}
-                        >
-                          <strong>{sideLabel.label}</strong>
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
+                  <KitchenPlanSideLabels labels={splitKitchenSideLabels} twoPart={Boolean(mobilePlanLayout)} />
                   {isCalibrating ? (
                     <div className={styles.planCalibrationGrid} aria-hidden="true">
                       {CALIBRATION_TICKS.map((tick) => (
